@@ -1,0 +1,1 @@
+module_add_library(gui_speedsaver gui_speedsaver.c)
