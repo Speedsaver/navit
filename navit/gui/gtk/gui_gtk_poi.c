@@ -35,7 +35,7 @@
 #include "attr.h"
 #include "util.h"
 
-#include "navigation.h"         /* for KILOMETERS_TO_MILES */
+#include "navigation.h"         /* for FEET_PER_METER and other conversion factors. */
 
 static struct gtk_poi_search{
 	GtkWidget *entry_distance;
@@ -127,14 +127,15 @@ model_poi (struct gtk_poi_search *search)
 	if (imperial == FALSE) {
 		/* Input is in kilometers */
 		search_distance_meters=1000*atoi((char *) gtk_entry_get_text(GTK_ENTRY(search->entry_distance)));
+                gtk_label_set_text(GTK_LABEL(search->label_distance),_("Select a search radius from screen center in km"));
 	} else {
 		/* Input is in miles. */
 		search_distance_meters=atoi((char *) gtk_entry_get_text(GTK_ENTRY(search->entry_distance)))/METERS_TO_MILES;
+                gtk_label_set_text(GTK_LABEL(search->label_distance),_("Select a search radius from screen center in miles"));
 	}
 
 	cursor_position.x=navit_get_width(search->nav)/2;
 	cursor_position.y=navit_get_height(search->nav)/2;
-	gtk_label_set_text(GTK_LABEL(search->label_distance),_("Select a search radius from screen center"));
 
 	transform_reverse(navit_get_trans(search->nav), &cursor_position, &center);
 	pc.pro = transform_get_projection(navit_get_trans(search->nav));
@@ -322,8 +323,21 @@ void gtk_gui_poi(struct navit *nav)
 	table = gtk_table_new(4, 4, FALSE);
 
 	label_category = gtk_label_new(_("Select a category"));
-	search->label_distance = gtk_label_new(_("Select a distance to look for (km)"));
 	label_poi=gtk_label_new(_("Select a POI"));
+
+	/* Respect the Imperial attribute as we enlighten the user. */
+	struct attr attr;
+	int imperial = FALSE;  /* default to using metric measures. */
+	if (navit_get_attr(gtk_poi_search.nav, attr_imperial, &attr, NULL))
+	    imperial=attr.u.num;
+
+	if (imperial == FALSE) {
+		/* Input is in kilometers */
+                search->label_distance = gtk_label_new(_("Select a search radius from screen center in km"));
+	} else {
+		/* Input is in miles. */
+                search->label_distance = gtk_label_new(_("Select a search radius from screen center in miles"));
+	}
 
 	search->entry_distance=gtk_entry_new_with_max_length(2);
 	gtk_entry_set_text(GTK_ENTRY(search->entry_distance),"10");
@@ -349,7 +363,7 @@ void gtk_gui_poi(struct navit *nav)
 	renderer=gtk_cell_renderer_text_new();
 	gtk_tree_view_insert_column_with_attributes (GTK_TREE_VIEW (search->treeview_poi),-1, _("Direction"), renderer, "text",0,NULL);
 	renderer=gtk_cell_renderer_text_new();
-	gtk_tree_view_insert_column_with_attributes (GTK_TREE_VIEW (search->treeview_poi),-1, _("Distance(m)"), renderer, "text", 1, NULL);
+	gtk_tree_view_insert_column_with_attributes (GTK_TREE_VIEW (search->treeview_poi),-1, _("Distance"), renderer, "text", 1, NULL);
 	renderer=gtk_cell_renderer_text_new();
 	gtk_tree_view_insert_column_with_attributes (GTK_TREE_VIEW (search->treeview_poi),-1, _("Name"), renderer, "text", 2, NULL);
 	search->store_poi_sorted=gtk_tree_model_sort_new_with_model(GTK_TREE_MODEL(search->store_poi));
