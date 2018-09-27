@@ -236,7 +236,7 @@ graphics_ssd1306_idle(void *data)
 					dbg(lvl_debug,
 					    "route speed : %0.0f\n",
 					    routespeed);
-					if (speed > routespeed
+					if (speed > routespeed + 1
 					    && current_tick % 2) {
 						display.setTextColor(BLACK, WHITE);	// 'inverted' text
 						display.printf(snum);
