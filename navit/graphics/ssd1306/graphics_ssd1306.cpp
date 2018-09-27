@@ -81,8 +81,6 @@ static gboolean
 graphics_ssd1306_idle(void *data)
 {
 	dbg(lvl_debug, "idle\n");
-	// g_timeout_add(10, graphics_ssd1306_idle, data);
-	// return TRUE;
 
 	struct graphics_priv *ssd1306 = (struct graphics_priv *) data;
 
