@@ -222,32 +222,37 @@ graphics_ssd1306_idle(void *data)
 							    maxspeed;
 					}
 				}
-
-				sprintf(snum, "%3.0f", speed);
-				display.setTextSize(3);
-				display.setCursor(1, 6);
-				if (routespeed == -1) {
-					display.printf(snum);
-					display.setTextColor(BLACK, WHITE);
-					display.setCursor(60, 6);
-					display.printf("???");
-					display.setTextColor(WHITE, BLACK);
+				if ( current_tick % 10 ) {
+				    display.setTextSize(3);
+				    display.setCursor(1, 6);
+				    display.printf(ssd1306->imperial ? "m/h" : "k/h");
 				} else {
-					dbg(lvl_debug,
-					    "route speed : %0.0f\n",
-					    routespeed);
-					if (speed > routespeed + 1
-					    && current_tick % 2) {
-						display.setTextColor(BLACK, WHITE);	// 'inverted' text
+					sprintf(snum, "%3.0f", speed);
+					display.setTextSize(3);
+					display.setCursor(1, 6);
+					if (routespeed == -1) {
 						display.printf(snum);
-						display.setTextColor(WHITE, BLACK);	// 'inverted' text
+						display.setTextColor(BLACK, WHITE);
+						display.setCursor(60, 6);
+						display.printf("???");
+						display.setTextColor(WHITE, BLACK);
 					} else {
+						dbg(lvl_debug,
+						    "route speed : %0.0f\n",
+						    routespeed);
+						if (speed > routespeed + 1
+						    && current_tick % 2) {
+							display.setTextColor(BLACK, WHITE);	// 'inverted' text
+							display.printf(snum);
+							display.setTextColor(WHITE, BLACK);	// 'inverted' text
+						} else {
+							display.printf(snum);
+						}
+						display.drawRect(62, 2, 62, display.height() - 4, WHITE);
+						display.setCursor(66, 6);
+						sprintf(snum, "%3.0f", routespeed);
 						display.printf(snum);
 					}
-	                                display.drawRect(62, 2, 62, display.height() - 4, WHITE);
-					display.setCursor(66, 6);
-					sprintf(snum, "%3.0f", routespeed);
-					display.printf(snum);
 				}
 			}
 			if (ssd1306->debug) {
