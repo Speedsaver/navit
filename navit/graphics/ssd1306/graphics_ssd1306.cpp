@@ -223,10 +223,6 @@ graphics_ssd1306_idle(void *data)
 					}
 				}
 				if ( current_tick % 10 ) {
-				    display.setTextSize(3);
-				    display.setCursor(1, 6);
-				    display.printf(ssd1306->imperial ? "m/h" : "k/h");
-				} else {
 					sprintf(snum, "%3.0f", speed);
 					display.setTextSize(3);
 					display.setCursor(1, 6);
@@ -253,6 +249,10 @@ graphics_ssd1306_idle(void *data)
 						sprintf(snum, "%3.0f", routespeed);
 						display.printf(snum);
 					}
+				} else {
+				    display.setTextSize(3);
+				    display.setCursor(1, 6);
+				    display.printf(ssd1306->imperial ? "m/h" : "k/h");
 				}
 			}
 			if (ssd1306->debug) {
