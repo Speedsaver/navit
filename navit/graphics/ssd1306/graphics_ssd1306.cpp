@@ -391,6 +391,6 @@ graphics_ssd1306_new(struct navit *nav, struct graphics_methods *meth,
 void
 plugin_init(void)
 {
-	tone_cmd = g_strdup_printf("aplay \"%s/tone7.wav\" 2>/dev/null >/dev/null", getenv("NAVIT_SHAREDIR"));
+	tone_cmd = g_strdup_printf("aplay \"%s/tone7.wav\" 2>/dev/null >/dev/null&", getenv("NAVIT_SHAREDIR"));
 	plugin_register_category_graphics("ssd1306", graphics_ssd1306_new);
 }
