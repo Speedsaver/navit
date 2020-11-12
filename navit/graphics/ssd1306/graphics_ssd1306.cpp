@@ -376,15 +376,6 @@ graphics_ssd1306_new(struct navit *nav, struct graphics_methods *meth,
 
 	display.begin();
 	display.clearDisplay();
-
-	display.setTextSize(1);
-	display.setTextColor(WHITE);
-	display.setCursor(0, 0);
-	display.print("Navit\n");
-	// display.setTextColor(BLACK, WHITE); // 'inverted' text
-	// display.printf (version);
-	display.setTextSize(2);
-	display.setTextColor(WHITE);
 	display.display();
 
 	this_->nav = nav;
@@ -392,7 +383,7 @@ graphics_ssd1306_new(struct navit *nav, struct graphics_methods *meth,
 	this_->fps = 0;
 	this_->tick = get_uptime();
 
-	g_timeout_add(10, graphics_ssd1306_idle, this_);
+	graphics_ssd1306_idle(this_);
 
 	dbg(lvl_debug, "initialized\n");
 	return this_;
