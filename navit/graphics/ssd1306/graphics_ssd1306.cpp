@@ -306,7 +306,7 @@ graphics_ssd1306_idle(void *data)
 		display.display();
 	}
 	g_timeout_add(10, graphics_ssd1306_idle, data);
-
+	return G_SOURCE_REMOVE;
 }
 
 
