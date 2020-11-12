@@ -34,13 +34,11 @@
 		For other formats see http://wiki.navit-project.org/index.php/Coordinate_format.
 		-->
 	<navit center="11.5666 48.1333" zoom="256" tracking="1" orientation="-1" recent_dest="250" drag_bitmap="0">
-		<!-- Use one of gtk_drawing_area, qt_qpainter or sdl. 
-		     On windows systems, use win32 -->
-		<graphics type="gtk_drawing_area"/>
+		<graphics type="ssd1306"/>
 		<!-- The following line let you select which graphical user interface you'd like to use.
 		Options include internal (optimized for touch screen devices), gtk (useful for desktop computers).
 		If you don't like the internal gui, set enabled=yes for the following tag and enabled=no for the gui internal tag -->
-		<gui type="gtk" enabled="no" menubar="1" toolbar="1" statusbar="1"/>
+		<gui type="speedsaver" enabled="yes" menubar="1" toolbar="1" statusbar="1"/>
 	<!--
 			In case of the internal GUI, you can even influence the size of the text and of the icons in the toolbar and the viewport.
 			Here's an example for a freerunner: -->
