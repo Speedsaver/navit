@@ -19,6 +19,7 @@
 // style with: clang-format -style=WebKit -i *
 
 #include <glib.h>
+#include <stdlib.h>
 
 extern "C" {
 #include "config.h"
@@ -46,6 +47,7 @@ extern "C" {
 #include "Adafruit_GFX.h"
 #include "ArduiPi_OLED.h"
 ArduiPi_OLED display;
+char* tone_cmd = "true";
 extern char *version;
 
 #define SCREEN_WIDTH 128
@@ -61,6 +63,7 @@ struct graphics_priv {
 	int height;
 	int imperial = 0;
 	int debug = 0;
+	long tone_next = 0;
 	enum draw_mode_num mode;
 	struct callback_list *cbl;
 };
@@ -221,6 +224,10 @@ graphics_ssd1306_idle(void *data)
 							    rprof->
 							    maxspeed;
 					}
+				}
+				if (speed > routespeed + 1 && current_tick >= ssd1306->tone_next) {
+					system(tone_cmd);
+					ssd1306->tone_next = current_tick + 10;
 				}
 				if ( current_tick % 10 ) {
 					sprintf(snum, "%3.0f", speed);
@@ -394,5 +401,6 @@ graphics_ssd1306_new(struct navit *nav, struct graphics_methods *meth,
 void
 plugin_init(void)
 {
+	tone_cmd = g_strdup_printf("aplay \"%s/tone7.wav\" 2>/dev/null >/dev/null", getenv("NAVIT_SHAREDIR"));
 	plugin_register_category_graphics("ssd1306", graphics_ssd1306_new);
 }
