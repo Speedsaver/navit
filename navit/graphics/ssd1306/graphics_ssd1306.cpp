@@ -259,7 +259,7 @@ graphics_ssd1306_idle(void *data)
 				} else {
 				    display.setTextSize(3);
 				    display.setCursor(1, 6);
-				    display.printf(ssd1306->imperial ? "m/h" : "k/h");
+				    display.printf(ssd1306->imperial ? "MPH" : "KM/H");
 				}
 			}
 			if (ssd1306->debug) {
