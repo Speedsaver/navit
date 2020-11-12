@@ -368,9 +368,6 @@ graphics_ssd1306_new(struct navit *nav, struct graphics_methods *meth,
 		}
 	}
 
-	dbg(lvl_error, "Using imperial measurements : %i\n",
-	    this_->imperial);
-
 	if (!display.init(OLED_I2C_RESET, 2))
 		exit(-1);
 
