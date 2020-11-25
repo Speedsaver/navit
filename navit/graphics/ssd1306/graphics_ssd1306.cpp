@@ -231,7 +231,7 @@ graphics_ssd1306_idle(void *data)
 				}
 				if (speed > routespeed + 1 && current_tick >= ssd1306->tone_next) {
 					system(tone_cmd);
-					ssd1306->tone_next = current_tick + 10;
+					ssd1306->tone_next = current_tick + 2;
 				}
 				if ( current_tick % 10 ) {
 					sprintf(snum, "%3.0f", speed);
