@@ -193,6 +193,10 @@ graphics_ssd1306_idle(void *data)
 			struct attr maxspeed_attr;
 			int osm_data = 0;
 			tracking = navit_get_tracking(ssd1306->nav);
+			if (getenv("GOTTA_GO_FAST")) {
+				routespeed = 50;
+				speed = 88;
+			}
 
 			if (tracking) {
 				struct item *item;
