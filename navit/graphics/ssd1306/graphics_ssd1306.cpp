@@ -148,7 +148,7 @@ graphics_ssd1306_idle(void *data)
 				}
 				break;
 			default:
-				strength = 1;
+				strength = -1;
 			}
 		}
 		if (ssd1306->debug) {
@@ -189,6 +189,7 @@ graphics_ssd1306_idle(void *data)
 
 			struct tracking *tracking = NULL;
 			double routespeed = -1;
+			int speeding = 0;
 			int *flags;
 			struct attr maxspeed_attr;
 			int osm_data = 0;
@@ -199,8 +200,6 @@ graphics_ssd1306_idle(void *data)
 			}
 
 			if (tracking) {
-				struct item *item;
-
 				flags =
 				    tracking_get_current_flags(tracking);
 				if (flags && (*flags & AF_SPEED_LIMIT)
@@ -211,25 +210,8 @@ graphics_ssd1306_idle(void *data)
 					routespeed = maxspeed_attr.u.num / ( ssd1306->imperial ? 1.609344 : 1 );
 					osm_data = 1;
 				}
-				item = tracking_get_current_item(tracking);
-				if (routespeed == -1 and item) {
-
-					struct vehicleprofile *prof =
-					    navit_get_vehicleprofile
-					    (ssd1306->nav);
-					struct roadprofile *rprof = NULL;
-					if (prof)
-						rprof =
-						    vehicleprofile_get_roadprofile
-						    (prof, item->type);
-					if (rprof) {
-						if (rprof->maxspeed != 0)
-							routespeed =
-							    rprof->
-							    maxspeed;
-					}
-				}
-				if (speed > routespeed + 1 && current_tick >= ssd1306->tone_next) {
+				speeding = routespeed != -1 && (speed > routespeed + 1);
+				if (speeding && current_tick >= ssd1306->tone_next) {
 					system(tone_cmd);
 					ssd1306->tone_next = current_tick + 2;
 				}
@@ -253,7 +235,7 @@ graphics_ssd1306_idle(void *data)
 						display.printf(snum);
 						display.setCursor(1, 6);
 						sprintf(snum, "%3.0f", speed);
-						if (speed > routespeed + 1
+						if (speeding
 						    && current_tick % 2) {
 							display.setTextColor(BLACK, WHITE);	// 'inverted' text
 							display.printf(snum);
