@@ -46,8 +46,15 @@ extern "C" {
 #include "ArduiPi_OLED_lib.h"
 #include "Adafruit_GFX.h"
 #include "ArduiPi_OLED.h"
+#include "graphics_init_animation.h"
+
+const size_t init_animation_frames = 3;
+const size_t init_animation_images = 3;
+const size_t init_animation_count = init_animation_frames * init_animation_images;
+
 ArduiPi_OLED display;
-char* tone_cmd = "true";
+simple_bm *init_animation[init_animation_count];
+const char* tone_cmd = "true";
 extern char *version;
 
 #define SCREEN_WIDTH 128
@@ -68,6 +75,21 @@ struct graphics_priv {
 	struct callback_list *cbl;
 };
 
+void
+show_start_animation(struct graphics_priv *ssd1306, long current_tick)
+{
+	static int xpos[3] = { 0, 6*8, 11*8 };
+	long step = current_tick % init_animation_frames;
+#ifdef SIMPLE_BM_DEBUG
+	simple_bm *bm = init_animation[0];
+	display.drawBitmap(xpos[0],0,bm->get_bm(),bm->get_width(),bm->get_height(),WHITE);
+#else
+	for(size_t i = 0 ; i < init_animation_images ; i++ ) {
+		simple_bm *bm = init_animation[step*init_animation_frames+i];
+		display.drawBitmap(xpos[i],0,bm->get_bm(),bm->get_width(),bm->get_height(),WHITE);
+	}
+#endif
+}
 
 long
 get_uptime()
@@ -267,36 +289,7 @@ graphics_ssd1306_idle(void *data)
 				ssd1306->tick = current_tick;
 			}
 		} else {
-			if (current_tick % 2) {
-				display.printf("Waiting for GPS...");
-			} else {
-				display.printf("Waiting for GPS.");
-			}
-
-			if (strength > 0)
-				display.fillRect(36, display.height() - 9,
-						 6, 8, WHITE);
-			else
-				display.drawRect(36, display.height() - 9,
-						 6, 8, WHITE);
-			if (strength > 1)
-				display.fillRect(44, display.height() - 13,
-						 6, 12, WHITE);
-			else
-				display.fillRect(44, display.height() - 13,
-						 6, 12, WHITE);
-			if (strength > 2)
-				display.drawRect(52, display.height() - 17,
-						 6, 16, WHITE);
-			else
-				display.fillRect(52, display.height() - 17,
-						 6, 16, WHITE);
-			if (strength > 3)
-				display.fillRect(60, display.height() - 21,
-						 6, 20, WHITE);
-			else
-				display.drawRect(60, display.height() - 21,
-						 6, 20, WHITE);
+			show_start_animation(ssd1306, current_tick);
 		}
 		display.display();
 	}
@@ -355,6 +348,7 @@ graphics_ssd1306_new(struct navit *nav, struct graphics_methods *meth,
 			this_->imperial = imperial_attr.u.num;
 		}
 	}
+	generate_init_animations(init_animation,init_animation_count);
 
 	if (!display.init(OLED_I2C_RESET, 2))
 		exit(-1);
