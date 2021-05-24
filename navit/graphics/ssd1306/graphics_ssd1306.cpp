@@ -103,6 +103,89 @@ get_uptime()
 	return s_info.uptime;
 }
 
+static int
+get_signal_strength(const struct attr &attr)
+{
+	int strength = -1;
+	struct attr position_fix_attr;
+	if (vehicle_get_attr(attr.u.vehicle, attr_position_fix_type, &position_fix_attr, NULL)) {
+		switch (position_fix_attr.u.num) {
+		case 1:
+		case 2:
+			strength = 2;
+			if (vehicle_get_attr(attr.u.vehicle, attr_position_sats_used, &position_fix_attr, NULL)) {
+				if (position_fix_attr.u.num >= 3)
+					strength = position_fix_attr.u.num - 1;
+				if (strength > 5)
+					strength = 5;
+				if (strength > 3) {
+					if (vehicle_get_attr(attr.u.vehicle, attr_position_hdop, &position_fix_attr, NULL)) {
+						if (*position_fix_attr.u.numd > 2.0 && strength > 4)
+							strength = 4;
+						if (*position_fix_attr.u.numd > 4.0 && strength > 3)
+							strength = 3;
+					}
+				}
+			}
+			break;
+		default:
+			strength = -1;
+		}
+	}
+	return strength;
+}
+
+static double
+get_native_speed(struct graphics_priv *ssd1306, double speed)
+{
+	if (ssd1306->imperial) {
+		speed /= 1.609344;
+	}
+	return speed;
+}
+
+static double
+get_vehicle_speed(struct graphics_priv *ssd1306, const struct attr &attr)
+{
+	double speed = -1;
+	struct attr position_attr;
+	if (vehicle_get_attr(attr.u.vehicle, attr_position_coord_geo, &position_attr, NULL)) {
+		enum projection pro = position_attr.u.pcoord->pro;
+		struct coord c1;
+		transform_from_geo(pro, position_attr.u.coord_geo, &c1);
+		char snum[32];
+		dbg(lvl_debug, "%f %f\n", position_attr.u.coord_geo->lat, position_attr.u.coord_geo->lng);
+		sprintf(snum, "%f %f\n", position_attr.u.coord_geo->lat, position_attr.u.coord_geo->lng);
+		if (ssd1306->debug) {
+			display.printf(snum);
+		}
+		struct attr speed_attr;
+		vehicle_get_attr(attr.u.vehicle, attr_position_speed, &speed_attr, NULL);
+		speed = get_native_speed(ssd1306, *speed_attr.u.numd);
+		dbg(lvl_debug, "speed : %0.0f (%f)\n", speed, speed);
+	} else {
+		dbg(lvl_error, "vehicle_get_attr failed\n");
+	}
+	return speed;
+}
+
+static double
+get_route_speed(struct graphics_priv *ssd1306)
+{
+	double routespeed = -1;
+	struct tracking *tracking = navit_get_tracking(ssd1306->nav);
+	if (tracking) {
+		struct attr maxspeed_attr;
+		int *flags = tracking_get_current_flags(tracking);
+		if (flags
+		    && (*flags & AF_SPEED_LIMIT)
+		    && tracking_get_attr(tracking, attr_maxspeed, &maxspeed_attr, NULL)) {
+			routespeed = get_native_speed(ssd1306, maxspeed_attr.u.num);
+		}
+	}
+	return routespeed;
+}
+
 static gboolean
 graphics_ssd1306_idle(void *data)
 {
@@ -117,121 +200,69 @@ graphics_ssd1306_idle(void *data)
 
 	char snum[32];
 
-	struct attr attr, attr2, vattr;
-	struct attr position_attr, position_fix_attr;
+	struct attr attr, attr2;
 	struct attr_iter *iter;
-	enum projection pro;
-	struct coord c1;
 	long current_tick = get_uptime();
 
-	struct attr speed_attr;
 	double speed = -1;
 	int strength = -1;
 
 	iter = navit_attr_iter_new();
 	if (navit_get_attr(ssd1306->nav, attr_vehicle, &attr, iter) &&
 	   !navit_get_attr(ssd1306->nav, attr_vehicle, &attr2, iter)) {
-		vehicle_get_attr(attr.u.vehicle, attr_name, &vattr, NULL);
 		navit_attr_iter_destroy(iter);
 
-		if (vehicle_get_attr(attr.u.vehicle, attr_position_fix_type, &position_fix_attr, NULL)) {
-			switch (position_fix_attr.u.num) {
-			case 1:
-			case 2:
-				strength = 2;
-				if (vehicle_get_attr(attr.u.vehicle, attr_position_sats_used, &position_fix_attr, NULL)) {
-					if (position_fix_attr.u.num >= 3)
-						strength = position_fix_attr.u.num - 1;
-					if (strength > 5)
-						strength = 5;
-					if (strength > 3) {
-						if (vehicle_get_attr(attr.u.vehicle, attr_position_hdop, &position_fix_attr, NULL)) {
-							if (*position_fix_attr.u.numd > 2.0 && strength > 4)
-								strength = 4;
-							if (*position_fix_attr.u.numd > 4.0 && strength > 3)
-								strength = 3;
-						}
-					}
-				}
-				break;
-			default:
-				strength = -1;
-			}
-		}
+		strength = get_signal_strength(attr);
 		if (ssd1306->debug) {
 			display.drawLine(0, display.height() - 1, strength * 5, display.height() - 1, WHITE);
 		}
 		if (strength > -1) {
-			if (vehicle_get_attr(attr.u.vehicle, attr_position_coord_geo, &position_attr, NULL)) {
-				pro = position_attr.u.pcoord->pro;
-				transform_from_geo(pro, position_attr.u.coord_geo, &c1);
-				dbg(lvl_debug, "%f %f\n", position_attr.u.coord_geo->lat, position_attr.u.coord_geo->lng);
-				sprintf(snum, "%f %f\n", position_attr.u.coord_geo->lat, position_attr.u.coord_geo->lng);
-				if (ssd1306->debug) {
-					display.printf(snum);
-				}
-				vehicle_get_attr(attr.u.vehicle, attr_position_speed, &speed_attr, NULL);
-				speed = *speed_attr.u.numd / ( ssd1306->imperial ? 1.609344 : 1 );
-				dbg(lvl_debug, "speed : %0.0f (%f)\n", speed, speed);
-			} else {
-				dbg(lvl_error, "vehicle_get_attr failed\n");
-			}
+			speed = get_vehicle_speed(ssd1306, attr);
 
-			double routespeed = -1;
+			double routespeed = get_route_speed(ssd1306);
 			int speeding = 0;
-			int *flags;
-			struct attr maxspeed_attr;
-			struct tracking *tracking = navit_get_tracking(ssd1306->nav);
 
 			if (getenv("GOTTA_GO_FAST")) {
 				routespeed = 50;
 				speed = 88;
 			}
 
-			if (tracking) {
-				flags = tracking_get_current_flags(tracking);
-				if (flags
-				    && (*flags & AF_SPEED_LIMIT)
-				    && tracking_get_attr(tracking, attr_maxspeed, &maxspeed_attr, NULL)) {
-					routespeed = maxspeed_attr.u.num / ( ssd1306->imperial ? 1.609344 : 1 );
-				}
-				speeding = routespeed != -1 && (speed > routespeed + 1);
-				if (speeding && current_tick >= ssd1306->tone_next) {
-					system(tone_cmd);
-					ssd1306->tone_next = current_tick + 2;
-				}
-				if ( current_tick % 10 ) {
-					sprintf(snum, "%3.0f", speed);
-					display.setTextSize(3);
-					display.setCursor(1, 6);
-					if (routespeed == -1) {
-						display.printf(snum);
-						display.setTextColor(BLACK, WHITE);
-						display.setCursor(60, 6);
-						display.printf("???");
-						display.setTextColor(WHITE, BLACK);
-					} else {
-						dbg(lvl_debug, "route speed : %0.0f\n", routespeed);
-						display.drawRect(62, 2, 62, display.height() - 4, WHITE);
-						display.setCursor(66, 6);
-						sprintf(snum, "%3.0f", routespeed);
-						display.printf(snum);
-						display.setCursor(1, 6);
-						sprintf(snum, "%3.0f", speed);
-						if (speeding
-						    && current_tick % 2) {
-							display.setTextColor(BLACK, WHITE);	// 'inverted' text
-							display.printf(snum);
-						} else {
-							display.setTextColor(WHITE, BLACK);
-							display.printf(snum);
-						}
-					}
+			speeding = routespeed != -1 && (speed > routespeed + 1);
+			if (speeding && current_tick >= ssd1306->tone_next) {
+				system(tone_cmd);
+				ssd1306->tone_next = current_tick + 2;
+			}
+			if ( current_tick % 10 ) {
+				sprintf(snum, "%3.0f", speed);
+				display.setTextSize(3);
+				display.setCursor(1, 6);
+				if (routespeed == -1) {
+					display.printf(snum);
+					display.setTextColor(BLACK, WHITE);
+					display.setCursor(60, 6);
+					display.printf("???");
+					display.setTextColor(WHITE, BLACK);
 				} else {
-					display.setTextSize(3);
+					dbg(lvl_debug, "route speed : %0.0f\n", routespeed);
+					display.drawRect(62, 2, 62, display.height() - 4, WHITE);
+					display.setCursor(66, 6);
+					sprintf(snum, "%3.0f", routespeed);
+					display.printf(snum);
 					display.setCursor(1, 6);
-					display.printf(ssd1306->imperial ? "MPH" : "KM/H");
+					sprintf(snum, "%3.0f", speed);
+					if (speeding
+					    && current_tick % 2) {
+						display.setTextColor(BLACK, WHITE);	// 'inverted' text
+						display.printf(snum);
+					} else {
+						display.setTextColor(WHITE, BLACK);
+						display.printf(snum);
+					}
 				}
+			} else {
+				display.setTextSize(3);
+				display.setCursor(1, 6);
+				display.printf(ssd1306->imperial ? "MPH" : "KM/H");
 			}
 			if (ssd1306->debug) {
 				display.drawLine(display.width() - 1 - ssd1306->fps, display.height() - 1, display.width() - 1, display.height() - 1, WHITE);
