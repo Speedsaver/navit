@@ -189,50 +189,43 @@ get_route_speed(struct graphics_priv *ssd1306)
 static gboolean
 graphics_ssd1306_idle(void *data)
 {
-	dbg(lvl_info, "idle\n");
-
 	struct graphics_priv *ssd1306 = (struct graphics_priv *) data;
+	long current_tick = get_uptime();
+	bool ggf = getenv("GOTTA_GO_FAST") != NULL;
+
+	dbg(lvl_info, "idle at %ld, ggf=%d\n", current_tick, ggf);
 
 	display.clearDisplay();
 	display.setTextSize(1);
 	display.setTextColor(WHITE);
 	display.setCursor(0, 0);
 
-	char snum[32];
-
 	struct attr attr, attr2;
-	struct attr_iter *iter;
-	long current_tick = get_uptime();
-
-	double speed = -1;
-	int strength = -1;
-
-	iter = navit_attr_iter_new();
+	struct attr_iter *iter = navit_attr_iter_new();
 	if (navit_get_attr(ssd1306->nav, attr_vehicle, &attr, iter) &&
 	   !navit_get_attr(ssd1306->nav, attr_vehicle, &attr2, iter)) {
 		navit_attr_iter_destroy(iter);
 
-		strength = get_signal_strength(attr);
+		int strength = get_signal_strength(attr);
 		if (ssd1306->debug) {
 			display.drawLine(0, display.height() - 1, strength * 5, display.height() - 1, WHITE);
 		}
-		if (strength > -1) {
-			speed = get_vehicle_speed(ssd1306, attr);
-
+		if (ggf || strength > -1) {
+			double speed = get_vehicle_speed(ssd1306, attr);
 			double routespeed = get_route_speed(ssd1306);
-			int speeding = 0;
 
-			if (getenv("GOTTA_GO_FAST")) {
+			if (ggf) {
 				routespeed = 50;
 				speed = 88;
 			}
 
-			speeding = routespeed != -1 && (speed > routespeed + 1);
+			int speeding = routespeed != -1 && (speed > routespeed + 1);
 			if (speeding && current_tick >= ssd1306->tone_next) {
 				system(tone_cmd);
 				ssd1306->tone_next = current_tick + 2;
 			}
 			if ( current_tick % 10 ) {
+				char snum[32];
 				sprintf(snum, "%3.0f", speed);
 				display.setTextSize(3);
 				display.setCursor(1, 6);
@@ -250,8 +243,7 @@ graphics_ssd1306_idle(void *data)
 					display.printf(snum);
 					display.setCursor(1, 6);
 					sprintf(snum, "%3.0f", speed);
-					if (speeding
-					    && current_tick % 2) {
+					if (speeding && current_tick % 2) {
 						display.setTextColor(BLACK, WHITE);	// 'inverted' text
 						display.printf(snum);
 					} else {
@@ -265,7 +257,9 @@ graphics_ssd1306_idle(void *data)
 				display.printf(ssd1306->imperial ? "MPH" : "KM/H");
 			}
 			if (ssd1306->debug) {
-				display.drawLine(display.width() - 1 - ssd1306->fps, display.height() - 1, display.width() - 1, display.height() - 1, WHITE);
+				display.drawLine(display.width() - 1 - ssd1306->fps, display.height() - 1,
+						 display.width() - 1,                display.height() - 1,
+						 WHITE);
 			}
 
 			if (current_tick == ssd1306->tick) {
