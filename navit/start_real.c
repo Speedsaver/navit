@@ -225,7 +225,7 @@ int main_real(int argc, char * const* argv)
 				dbg(lvl_error, "Could not close the specified startup file: %s\n", startup_file);
 			}
 		} else {
-			dbg(lvl_error, "Could not open the specified startup file: %s", startup_file);
+			dbg(lvl_error, "Could not open the specified startup file: %s\n", startup_file);
                 }
 	}
 	if (command) {

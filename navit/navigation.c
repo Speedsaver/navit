@@ -828,7 +828,7 @@ navigation_set_announce(struct navigation *this_, enum item_type type, int *leve
 {
 	int i;
 	if (type < route_item_first || type > route_item_last) {
-		dbg(lvl_debug,"street type %d out of range [%d,%d]", type, route_item_first, route_item_last);
+		dbg(lvl_debug,"street type %d out of range [%d,%d]\n", type, route_item_first, route_item_last);
 		return 0;
 	}
 	for (i = 0 ; i < 3 ; i++)
@@ -2489,7 +2489,9 @@ void navigation_analyze_roundabout(struct navigation *this_, struct navigation_c
 			if (central_angle)
 				roundabout_length = len * 360 / central_angle;
 			else {
-				dbg(lvl_error,"central_angle in roundabout_length computation lead to divide by zero (delta1 = %d, delta2 = %d, cmd->delta  = %d, dtsir = %d, len = %d)",delta1,delta2,cmd->delta,dtsir,len);
+				dbg(lvl_error,"central_angle in roundabout_length computation lead to divide by zero "
+					"(delta1 = %d, delta2 = %d, cmd->delta  = %d, dtsir = %d, len = %d)\n",
+					delta1,delta2,cmd->delta,dtsir,len);
 				roundabout_length = len;
 			}
 			dbg(lvl_debug,"roundabout_length = %dm (for central_angle = %d degrees)\n", roundabout_length, central_angle);

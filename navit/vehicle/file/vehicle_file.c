@@ -955,7 +955,7 @@ vehicle_file_new_file(struct vehicle_methods
 
 	source = attr_search(attrs, NULL, attr_source);
 	if(source == NULL){
-		 dbg(lvl_error,"Missing source attribute");
+		 dbg(lvl_error,"Missing source attribute\n");
 		 return NULL;
     }
 	ret = g_new0(struct vehicle_priv, 1);   // allocate and initialize to 0

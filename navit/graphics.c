@@ -2618,7 +2618,7 @@ static void graphics_load_mapset(struct graphics *gra, struct displaylist *displ
 {
 	int order=transform_get_order(trans);
 
-	dbg(lvl_debug,"enter");
+	dbg(lvl_debug,"enter\n");
 	if (displaylist->busy) {
 		if (async == 1)
 			return;

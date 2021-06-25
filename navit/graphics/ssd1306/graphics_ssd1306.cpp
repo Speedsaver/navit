@@ -181,7 +181,11 @@ get_route_speed(struct graphics_priv *ssd1306)
 		    && (*flags & AF_SPEED_LIMIT)
 		    && tracking_get_attr(tracking, attr_maxspeed, &maxspeed_attr, NULL)) {
 			routespeed = get_native_speed(ssd1306, maxspeed_attr.u.num);
+		} else {
+			dbg(lvl_warning, "Flag=(%p,%x)\n",flags,flags?*flags:0);
 		}
+	} else {
+		dbg(lvl_warning, "Not tracking\n");
 	}
 	return routespeed;
 }
@@ -225,6 +229,7 @@ graphics_ssd1306_idle(void *data)
 				ssd1306->tone_next = current_tick + 2;
 			}
 			if ( current_tick % 10 ) {
+				dbg(lvl_debug,"General speed display\n");
 				char snum[32];
 				sprintf(snum, "%3.0f", speed);
 				display.setTextSize(3);
@@ -252,6 +257,7 @@ graphics_ssd1306_idle(void *data)
 					}
 				}
 			} else {
+				dbg(lvl_debug,"General Units display\n");
 				display.setTextSize(3);
 				display.setCursor(1, 6);
 				display.printf(ssd1306->imperial ? "MPH" : "KM/H");
@@ -270,6 +276,7 @@ graphics_ssd1306_idle(void *data)
 				ssd1306->tick = current_tick;
 			}
 		} else {
+			dbg(lvl_debug,"General animation display\n");
 			show_start_animation(ssd1306, current_tick);
 		}
 		display.display();
@@ -345,10 +352,6 @@ graphics_ssd1306_new(struct navit *nav, struct graphics_methods *meth,
 
 	graphics_ssd1306_idle(this_);
 
-	char *bug = getenv("SSD1306_DEBUG_LEVEL");
-	if ( bug )
-		debug_level_set(dbg_module,(dbg_level)(*bug-'0'));
-
 	dbg(lvl_info, "initialized\n");
 	return this_;
 }
@@ -358,4 +361,7 @@ plugin_init(void)
 {
 	tone_cmd = g_strdup_printf("aplay \"%s/tone7.wav\" 2>/dev/null >/dev/null&", getenv("NAVIT_SHAREDIR"));
 	plugin_register_category_graphics("ssd1306", graphics_ssd1306_new);
+	char *bug = getenv("SSD1306_DEBUG_LEVEL");
+	if ( bug )
+		debug_level_set(dbg_module,(dbg_level)(*bug-'0'));
 }

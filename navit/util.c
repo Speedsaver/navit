@@ -523,7 +523,7 @@ spawn_process(char **argv)
 			r->pid=pid;
 			spawn_process_children=g_list_prepend(spawn_process_children,r);
 		} else {
-			dbg(lvl_error,"fork() returned error.");
+			dbg(lvl_error,"fork() returned error.\n");
 			g_free(r);
 			r=NULL;
 		}

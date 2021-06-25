@@ -51,7 +51,7 @@ struct tracking_line
 
 
 /**
- * @brief Conatins a list of previous speeds
+ * @brief Contains a list of previous speeds
  *
  * This structure is used to hold a list of previously reported
  * speeds. This data is used by the CDF.

@@ -1484,7 +1484,7 @@ navit_set_gui(struct navit *this_, struct gui *gui)
 		if (! main_loop_gui) {
 			main_loop_gui=this_->gui;
 		} else {
-			dbg(lvl_error,"gui with main loop already active, ignoring this instance");
+			dbg(lvl_error,"gui with main loop already active, ignoring this instance\n");
 			return 0;
 		}
 	}

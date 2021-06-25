@@ -2107,7 +2107,7 @@ binmap_search_new(struct map_priv *map, struct item *item, struct attr *search, 
 			map_rect_destroy_binfile(map_rec);
 			break;
 		case attr_house_number:
-			dbg(lvl_debug,"case house_number");
+			dbg(lvl_debug,"case house_number\n");
 			if (! item->map)
 				break;
 			if (!map_priv_is(item->map, map))

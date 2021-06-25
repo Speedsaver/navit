@@ -89,7 +89,7 @@ save_map_csv(struct map_priv *m)
 		struct quadtree_item *qitem;
 
 		if( ! (fp=fopen(filename,"w+"))) {
-			dbg(lvl_error, "Error opening csv file to write new entries");
+			dbg(lvl_error, "Error opening csv file to write new entries\n");
 			return;
 		}
 		/*query the world*/
