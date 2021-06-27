@@ -52,6 +52,7 @@ const size_t init_animation_frames = 3;
 const size_t init_animation_images = 3;
 const size_t init_animation_count = init_animation_frames * init_animation_images;
 const int refresh_rate_ms = 100;
+const int version_timeout = 2000 / refresh_rate_ms;
 
 ArduiPi_OLED display;
 simple_bm *init_animation[init_animation_count];
@@ -285,6 +286,34 @@ graphics_ssd1306_idle(void *data)
 	return G_SOURCE_REMOVE;
 }
 
+static gboolean
+show_version_info(void *data)
+{
+	struct graphics_priv *ssd1306 = (struct graphics_priv *) data;
+	static int version_ticks = 0;
+	static char version_id[100];
+	if ( version_ticks < version_timeout ) {
+		if ( version_ticks == 0 ) {
+			FILE *fp = fopen("/etc/version_stamp","r");
+			if ( fp ) {
+				fgets(version_id,sizeof(version_id), fp);
+				fclose(fp);
+			}
+		}
+		display.clearDisplay();
+		display.setTextSize(1);
+		display.setTextColor(WHITE);
+		display.setCursor(0,0);
+		display.print(version_id);
+		display.display();
+		version_ticks++;
+		g_timeout_add(refresh_rate_ms, show_version_info, data);
+		return G_SOURCE_REMOVE;
+	}
+	// When we're done, start using the regular display timeout handler.
+	g_timeout_add(refresh_rate_ms, graphics_ssd1306_idle, data);
+	return G_SOURCE_REMOVE;
+}
 
 static struct graphics_methods graphics_methods = {
 	NULL,			//graphics_destroy,
@@ -350,7 +379,7 @@ graphics_ssd1306_new(struct navit *nav, struct graphics_methods *meth,
 	this_->fps = 0;
 	this_->tick = get_uptime();
 
-	graphics_ssd1306_idle(this_);
+	show_version_info(this_);
 
 	dbg(lvl_info, "initialized\n");
 	return this_;
