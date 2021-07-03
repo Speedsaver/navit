@@ -40,9 +40,10 @@ public:
 	~simple_bm() {
 		delete [] m_bm;
 	};
-	// TODO: rule of 3, rule of 5 - non-trival memory management in use.
+	// TODO: rule of 3, rule of 5 - non-trivial memory management in use.
 };
 
 void generate_init_animations(simple_bm *bms[], size_t num_bms);
+void generate_qr_bm(simple_bm *&qr);
 
 #endif

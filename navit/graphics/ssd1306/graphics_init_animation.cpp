@@ -19,6 +19,7 @@ simple_bm::simple_bm(const char *pixmap[], size_t lines) :
 	if ( is >> width >> height >> colours >> chars_per_pixel ) {
 		if ( height + colours + 1 != (int)lines ) {
 			std::cerr << "Bad XPM - inconsistent height, colours and lines\n";
+			std::cerr << "Bad XPM - H=" << height << ", C=" << colours << ", L=" << lines << "\n";
 			return;
 		}
 		// Only interested in simple monochrome images
@@ -46,6 +47,7 @@ simple_bm::simple_bm(const char *pixmap[], size_t lines) :
 			}
 		} else {
 			std::cerr << "Bad XPM - unexpected number of colours\n";
+			std::cerr << "Bad XPM - C=" << colours << ", CPP=" << chars_per_pixel << "\n";
 			return;
 		}
 	} else {
@@ -83,7 +85,7 @@ void simple_bm::load_bm(const char *pixmap[], int first_row, char set_char) {
 #ifdef SIMPLE_BM_DEBUG
 /* XPM */
 static const char * sample_xpm[] = {
-	// Sampler to check for byte/bit/row order weirdess.
+	// Sampler to check for byte/bit/row order weirdness.
 	"32 32 2 1",
 	".	c #FFFFFF",
 	"#	c #000000",
@@ -398,6 +400,46 @@ static const char * signal_bar3_xpm[] = {
 	"                                "
 };
 
+/* XPM */
+/* Regular code is 25x25 but padded to 32x32 for convenience */
+static const char * qr_speedsaver_xpm[] = {
+	"32 32 2 1",
+	" 	c #FFFFFF",
+	".	c #000000",
+	"                         " "       ",	// 4 blank before
+	"                         " "       ",
+	"                         " "       ",
+	"                         " "       ",
+	"....... ..    . . ......." "       ",	// 7 blank pixels appended to each row
+	".     .      ..   .     ." "       ",
+	". ... . .  ....   . ... ." "       ",
+	". ... . .. . ...  . ... ." "       ",
+	". ... . ....  ... . ... ." "       ",
+	".     .  .  ..    .     ." "       ",
+	"....... . . . . . ......." "       ",
+	"         . .    .        " "       ",
+	"....  . .     . ..  ... ." "       ",
+	".. ...  ..    . .. .   . " "       ",
+	" ..  ...     .  .  .     " "       ",
+	".      ..  ...   ..  ..  " "       ",
+	".     . .. ..... .... ..." "       ",
+	" ...      ..  ... ...   ." "       ",
+	" ... ... .   .. ..  . .. " "       ",
+	".   ..  ...   .. . ..   ." "       ",
+	"   .. ... ....  ........." "       ",
+	"        .........   . . ." "       ",
+	".......  .   .  . . . ..." "       ",
+	".     .  . .. ...   .  .." "       ",
+	". ... .  .      ......  ." "       ",
+	". ... . . .. .  . . ....." "       ",
+	". ... . . .. .   .. . .. " "       ",
+	".     . .. ... . .. . .  " "       ",
+	"....... .. ....    ......" "       ",
+	"                         " "       ",	// 3 blank lines after
+	"                         " "       ",
+	"                         " "       "
+};
+
 #define NLINES(x)	(sizeof(x)/sizeof(*x))
 #define BMX(x)		x, NLINES(x)
 void generate_init_animations(simple_bm *bms[], size_t num_bms) {
@@ -417,4 +459,8 @@ void generate_init_animations(simple_bm *bms[], size_t num_bms) {
 	bms[i++] = new simple_bm(BMX(signal_bar3_xpm));
 	bms[i++] = new simple_bm(BMX(satellite_xpm));
 #endif
+}
+
+void generate_qr_bm(simple_bm *&qr) {
+	qr = new simple_bm(BMX(qr_speedsaver_xpm));
 }

@@ -20,6 +20,7 @@
 
 #include <glib.h>
 #include <stdlib.h>
+#include <math.h>
 
 extern "C" {
 #include "config.h"
@@ -52,10 +53,12 @@ const size_t init_animation_frames = 3;
 const size_t init_animation_images = 3;
 const size_t init_animation_count = init_animation_frames * init_animation_images;
 const int refresh_rate_ms = 100;
-const int version_timeout = 2000 / refresh_rate_ms;
+const int version_timeout = 5000;
+const double moving_speed_threshold = 8;  // In KPH
 
 ArduiPi_OLED display;
 simple_bm *init_animation[init_animation_count];
+simple_bm *qr_logo;
 const char* tone_cmd = "true";
 extern char *version;
 
@@ -65,23 +68,24 @@ extern char *version;
 
 struct graphics_priv {
 	struct navit *nav;
-	int frames;
-	long tick;
-	int fps;
 	int width;
 	int height;
 	int imperial = 0;
-	int debug = 0;
 	long tone_next = 0;
 	enum draw_mode_num mode;
 	struct callback_list *cbl;
 };
 
-void
-show_start_animation(struct graphics_priv *ssd1306, long current_tick)
+struct latlong_pos {
+	double lat;
+	double lng;
+};
+
+static void
+show_start_animation()
 {
 	static int xpos[3] = { 0, 6*8, 11*8 };
-	long step = current_tick % init_animation_frames;
+	static size_t step = 0;
 #ifdef SIMPLE_BM_DEBUG
 	simple_bm *bm = init_animation[0];
 	display.drawBitmap(xpos[0],0,bm->get_bm(),bm->get_width(),bm->get_height(),WHITE);
@@ -90,10 +94,11 @@ show_start_animation(struct graphics_priv *ssd1306, long current_tick)
 		simple_bm *bm = init_animation[step*init_animation_frames+i];
 		display.drawBitmap(xpos[i],0,bm->get_bm(),bm->get_width(),bm->get_height(),WHITE);
 	}
+	step = (step + 1) % init_animation_images;
 #endif
 }
 
-long
+static long
 get_uptime()
 {
 	struct sysinfo s_info;
@@ -146,20 +151,14 @@ get_native_speed(struct graphics_priv *ssd1306, double speed)
 }
 
 static double
-get_vehicle_speed(struct graphics_priv *ssd1306, const struct attr &attr)
+get_vehicle_speed(struct graphics_priv *ssd1306, const struct attr &attr, latlong_pos &current_pos)
 {
 	double speed = -1;
 	struct attr position_attr;
 	if (vehicle_get_attr(attr.u.vehicle, attr_position_coord_geo, &position_attr, NULL)) {
-		enum projection pro = position_attr.u.pcoord->pro;
-		struct coord c1;
-		transform_from_geo(pro, position_attr.u.coord_geo, &c1);
-		char snum[32];
-		dbg(lvl_debug, "%f %f\n", position_attr.u.coord_geo->lat, position_attr.u.coord_geo->lng);
-		sprintf(snum, "%f %f\n", position_attr.u.coord_geo->lat, position_attr.u.coord_geo->lng);
-		if (ssd1306->debug) {
-			display.printf(snum);
-		}
+		dbg(lvl_info, "%f %f\n", position_attr.u.coord_geo->lat, position_attr.u.coord_geo->lng);
+		current_pos.lat = position_attr.u.coord_geo->lat;
+		current_pos.lng = position_attr.u.coord_geo->lng;
 		struct attr speed_attr;
 		vehicle_get_attr(attr.u.vehicle, attr_position_speed, &speed_attr, NULL);
 		speed = get_native_speed(ssd1306, *speed_attr.u.numd);
@@ -191,6 +190,65 @@ get_route_speed(struct graphics_priv *ssd1306)
 	return routespeed;
 }
 
+static void
+show_moving_display(struct graphics_priv *ssd1306, double speed, double routespeed, long current_tick)
+{
+	int speeding = routespeed != -1 && (speed > routespeed + 1);
+	if (speeding && current_tick >= ssd1306->tone_next) {
+		system(tone_cmd);
+		ssd1306->tone_next = current_tick + 2;
+	}
+	if ( current_tick % 10 ) {
+		dbg(lvl_debug,"General speed display\n");
+		char snum[32];
+		sprintf(snum, "%3.0f", speed);
+		display.setTextSize(3);
+		display.setCursor(1, 6);
+		if (routespeed == -1) {
+			display.printf(snum);
+			display.setTextColor(BLACK, WHITE);
+			display.setCursor(60, 6);
+			display.printf("???");
+			display.setTextColor(WHITE, BLACK);
+		} else {
+			dbg(lvl_debug, "route speed : %0.0f\n", routespeed);
+			display.drawRect(62, 2, 62, display.height() - 4, WHITE);
+			display.setCursor(66, 6);
+			sprintf(snum, "%3.0f", routespeed);
+			display.printf(snum);
+			display.setCursor(1, 6);
+			sprintf(snum, "%3.0f", speed);
+			if (speeding && current_tick % 2) {
+				display.setTextColor(BLACK, WHITE);	// 'inverted' text
+				display.printf(snum);
+			} else {
+				display.setTextColor(WHITE, BLACK);
+				display.printf(snum);
+			}
+		}
+	} else {
+		dbg(lvl_debug,"General Units display\n");
+		display.setTextSize(3);
+		display.setCursor(1, 6);
+		display.printf(ssd1306->imperial ? "MPH" : "KM/H");
+	}
+}
+
+static void
+show_stationary_display(struct graphics_priv *ssd1306, const latlong_pos &current_pos, long current_tick)
+{
+	char lat_buff[20];
+	char lng_buff[20];
+	snprintf(lat_buff, sizeof(lat_buff), "%c%9.5f",current_pos.lat >= 0 ? 'N' : 'S', fabs(current_pos.lat));
+	snprintf(lng_buff, sizeof(lng_buff), "%c%9.5f",current_pos.lng >= 0 ? 'E' : 'W', fabs(current_pos.lng));
+	display.setTextSize(2);
+	display.setTextColor(WHITE);
+	display.setCursor(0, 0);
+	display.print(lat_buff);
+	display.setCursor(0, 16);
+	display.print(lng_buff);
+}
+
 static gboolean
 graphics_ssd1306_idle(void *data)
 {
@@ -212,11 +270,9 @@ graphics_ssd1306_idle(void *data)
 		navit_attr_iter_destroy(iter);
 
 		int strength = get_signal_strength(attr);
-		if (ssd1306->debug) {
-			display.drawLine(0, display.height() - 1, strength * 5, display.height() - 1, WHITE);
-		}
 		if (ggf || strength > -1) {
-			double speed = get_vehicle_speed(ssd1306, attr);
+			latlong_pos current_pos;
+			double speed = get_vehicle_speed(ssd1306, attr, current_pos);
 			double routespeed = get_route_speed(ssd1306);
 
 			if (ggf) {
@@ -224,63 +280,17 @@ graphics_ssd1306_idle(void *data)
 				speed = 88;
 			}
 
-			int speeding = routespeed != -1 && (speed > routespeed + 1);
-			if (speeding && current_tick >= ssd1306->tone_next) {
-				system(tone_cmd);
-				ssd1306->tone_next = current_tick + 2;
-			}
-			if ( current_tick % 10 ) {
-				dbg(lvl_debug,"General speed display\n");
-				char snum[32];
-				sprintf(snum, "%3.0f", speed);
-				display.setTextSize(3);
-				display.setCursor(1, 6);
-				if (routespeed == -1) {
-					display.printf(snum);
-					display.setTextColor(BLACK, WHITE);
-					display.setCursor(60, 6);
-					display.printf("???");
-					display.setTextColor(WHITE, BLACK);
-				} else {
-					dbg(lvl_debug, "route speed : %0.0f\n", routespeed);
-					display.drawRect(62, 2, 62, display.height() - 4, WHITE);
-					display.setCursor(66, 6);
-					sprintf(snum, "%3.0f", routespeed);
-					display.printf(snum);
-					display.setCursor(1, 6);
-					sprintf(snum, "%3.0f", speed);
-					if (speeding && current_tick % 2) {
-						display.setTextColor(BLACK, WHITE);	// 'inverted' text
-						display.printf(snum);
-					} else {
-						display.setTextColor(WHITE, BLACK);
-						display.printf(snum);
-					}
-				}
+			if(speed > get_native_speed(ssd1306, moving_speed_threshold)) {
+				show_moving_display(ssd1306, speed, routespeed, current_tick);
 			} else {
-				dbg(lvl_debug,"General Units display\n");
-				display.setTextSize(3);
-				display.setCursor(1, 6);
-				display.printf(ssd1306->imperial ? "MPH" : "KM/H");
-			}
-			if (ssd1306->debug) {
-				display.drawLine(display.width() - 1 - ssd1306->fps, display.height() - 1,
-						 display.width() - 1,                display.height() - 1,
-						 WHITE);
-			}
-
-			if (current_tick == ssd1306->tick) {
-				ssd1306->frames++;
-			} else {
-				ssd1306->fps = ssd1306->frames;
-				ssd1306->frames = 0;
-				ssd1306->tick = current_tick;
+				show_stationary_display(ssd1306, current_pos, current_tick);
 			}
 		} else {
 			dbg(lvl_debug,"General animation display\n");
-			show_start_animation(ssd1306, current_tick);
+			show_start_animation();
 		}
 		display.display();
+		display.display();	//!! FIXME
 	}
 	g_timeout_add(refresh_rate_ms, graphics_ssd1306_idle, data);
 	return G_SOURCE_REMOVE;
@@ -289,31 +299,49 @@ graphics_ssd1306_idle(void *data)
 static gboolean
 show_version_info(void *data)
 {
-	struct graphics_priv *ssd1306 = (struct graphics_priv *) data;
-	static int version_ticks = 0;
-	static char version_id[100];
-	if ( version_ticks < version_timeout ) {
-		if ( version_ticks == 0 ) {
-			FILE *fp = fopen("/etc/version_stamp","r");
-			if ( fp ) {
-				fgets(version_id,sizeof(version_id), fp);
-				fclose(fp);
-			}
-		}
-		display.clearDisplay();
-		display.setTextSize(1);
-		display.setTextColor(WHITE);
-		display.setCursor(0,0);
-		display.print(version_id);
-		display.display();
-		version_ticks++;
-		g_timeout_add(refresh_rate_ms, show_version_info, data);
-		return G_SOURCE_REMOVE;
+	char version_id[200] = "Unknown";
+	FILE *fp = fopen("/etc/version_stamp","r");
+	if ( fp ) {
+		fgets(version_id, sizeof(version_id), fp);
+		fclose(fp);
 	}
+
+	display.clearDisplay();
+	display.setTextSize(2);
+	display.setTextColor(WHITE);
+	display.setCursor(0,0);
+	display.print(version_id);
+	display.display();
+	display.display();	//!! FIXME
+
 	// When we're done, start using the regular display timeout handler.
-	g_timeout_add(refresh_rate_ms, graphics_ssd1306_idle, data);
+	g_timeout_add(version_timeout, graphics_ssd1306_idle, data);
 	return G_SOURCE_REMOVE;
 }
+
+#if 0
+// The pixels are too point-like (surrounded by darkness) and the contrast
+// it too high for QR recognisers on phones to make sense of.
+// We might stand a better chance if
+// - The OLED pixels solidly butted together (like any normal display)
+// - We had the 1.3" display with 64 pixel rows, then the QR code could be displayed in a 50x50 block
+// - The proprietary https://en.wikipedia.org/wiki/QR_code#IQR_code is made open so we could use all the pixels :)
+static gboolean
+show_qrcode(void *data)
+{
+	display.clearDisplay();
+	display.setTextSize(1);
+	display.setTextColor(WHITE);
+	display.setCursor(0,0);
+	display.drawBitmap(48,0,qr_logo->get_bm(),qr_logo->get_width(),qr_logo->get_height(),WHITE);
+	dbg(lvl_info, "QR: %d %d\n", qr_logo->get_width(), qr_logo->get_height());
+	display.display();
+	display.display();	//!! FIXME
+	g_timeout_add(version_timeout, graphics_ssd1306_idle, data);
+	return G_SOURCE_REMOVE;
+}
+#endif // 0
+
 
 static struct graphics_methods graphics_methods = {
 	NULL,			//graphics_destroy,
@@ -321,19 +349,19 @@ static struct graphics_methods graphics_methods = {
 	NULL,			//draw_lines,
 	NULL,			//draw_polygon,
 	NULL,			//draw_rectangle,
-	NULL,
+	NULL,			//draw_circle
 	NULL,			//draw_text,
 	NULL,			//draw_image,
-	NULL,
+	NULL,			//draw_image_warp
 	NULL,			//draw_drag,
-	NULL,
+	NULL,			//font_new
 	NULL,			//gc_new,
 	NULL,			//background_gc,
 	NULL,			//overlay_new,
 	NULL,			//image_new,
 	NULL,			//get_data,
 	NULL,			//image_free,
-	NULL,
+	NULL,			//get_text_bbox
 	NULL,			//overlay_disable,
 	NULL,			//overlay_resize,
 	NULL,			/* set_attr, */
@@ -366,6 +394,7 @@ graphics_ssd1306_new(struct navit *nav, struct graphics_methods *meth,
 		}
 	}
 	generate_init_animations(init_animation,init_animation_count);
+	generate_qr_bm(qr_logo);
 
 	if (!display.init(OLED_I2C_RESET, 2))
 		exit(-1);
@@ -375,9 +404,6 @@ graphics_ssd1306_new(struct navit *nav, struct graphics_methods *meth,
 	display.display();
 
 	this_->nav = nav;
-	this_->frames = 0;
-	this_->fps = 0;
-	this_->tick = get_uptime();
 
 	show_version_info(this_);
 
