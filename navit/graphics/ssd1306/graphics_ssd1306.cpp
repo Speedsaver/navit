@@ -307,7 +307,7 @@ show_version_info(void *data)
 	}
 
 	display.clearDisplay();
-	display.setTextSize(2);
+	display.setTextSize(1);
 	display.setTextColor(WHITE);
 	display.setCursor(0,0);
 	display.print(version_id);
