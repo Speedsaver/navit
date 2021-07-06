@@ -27,7 +27,7 @@
 #include <XGetopt.h>
 #endif
 #include "config_.h"
-#include "version.h"
+//#include "version.h"
 #include "item.h"
 #include "coord.h"
 #include "main.h"
@@ -51,7 +51,7 @@
 #include <winbase.h>
 #endif
 
-char *version=PACKAGE_VERSION"+git:"GIT_VERSION""NAVIT_VARIANT;
+char *version="dev-version"; // PACKAGE_VERSION"+git:"GIT_VERSION""NAVIT_VARIANT;
 int main_argc;
 char * const* main_argv;
 
