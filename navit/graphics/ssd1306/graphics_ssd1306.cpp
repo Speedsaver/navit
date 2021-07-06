@@ -55,12 +55,12 @@ const size_t init_animation_count = init_animation_frames * init_animation_image
 const int refresh_rate_ms = 100;
 const int version_timeout = 5000;
 const double moving_speed_threshold = 8;  // In KPH
+const int display_blank_timeout = 10 * 60; // measured in seconds, aka 10 minutes
 
 ArduiPi_OLED display;
 simple_bm *init_animation[init_animation_count];
 simple_bm *qr_logo;
 const char* tone_cmd = "true";
-extern char *version;
 
 #define SCREEN_WIDTH 128
 #define SCREEN_HEIGHT 32
@@ -74,6 +74,10 @@ struct graphics_priv {
 	long tone_next = 0;
 	enum draw_mode_num mode;
 	struct callback_list *cbl;
+	long last_draw_time = 0;
+	// screensaver state
+	int ss_xpos = 0;
+	int ss_ypos = 0;
 };
 
 struct latlong_pos {
@@ -193,6 +197,7 @@ get_route_speed(struct graphics_priv *ssd1306)
 static void
 show_moving_display(struct graphics_priv *ssd1306, double speed, double routespeed, long current_tick)
 {
+	ssd1306->last_draw_time = current_tick;
 	int speeding = routespeed != -1 && (speed > routespeed + 1);
 	if (speeding && current_tick >= ssd1306->tone_next) {
 		system(tone_cmd);
@@ -237,16 +242,35 @@ show_moving_display(struct graphics_priv *ssd1306, double speed, double routespe
 static void
 show_stationary_display(struct graphics_priv *ssd1306, const latlong_pos &current_pos, long current_tick)
 {
-	char lat_buff[20];
-	char lng_buff[20];
-	snprintf(lat_buff, sizeof(lat_buff), "%c%9.5f",current_pos.lat >= 0 ? 'N' : 'S', fabs(current_pos.lat));
-	snprintf(lng_buff, sizeof(lng_buff), "%c%9.5f",current_pos.lng >= 0 ? 'E' : 'W', fabs(current_pos.lng));
-	display.setTextSize(2);
-	display.setTextColor(WHITE);
-	display.setCursor(0, 0);
-	display.print(lat_buff);
-	display.setCursor(0, 16);
-	display.print(lng_buff);
+	dbg(lvl_info,"Tick %ld, pos=%f,%f\n", current_tick, current_pos.lat, current_pos.lng);
+	bool isBlanked = ssd1306->last_draw_time + display_blank_timeout < current_tick;
+	if ( isBlanked ) {
+		const char *msg = "SpeedSaver";
+		int width = -((int)strlen(msg) * 6);
+		int height= display.height() - 8;
+		if( ssd1306->ss_xpos <= width ) {
+			ssd1306->ss_xpos = display.width();
+			ssd1306->ss_ypos = rand()%height;
+			dbg(lvl_info,"New start pos=%d,%d\n", ssd1306->ss_xpos, ssd1306->ss_ypos);
+		} else {
+			ssd1306->ss_xpos--;
+		}
+		display.setTextSize(1);
+		display.setTextColor(WHITE);
+		display.setCursor(ssd1306->ss_xpos, ssd1306->ss_ypos);
+		display.print(msg);
+	} else {
+		char lat_buff[20];
+		char lng_buff[20];
+		snprintf(lat_buff, sizeof(lat_buff), "%c%9.5f",current_pos.lat >= 0 ? 'N' : 'S', fabs(current_pos.lat));
+		snprintf(lng_buff, sizeof(lng_buff), "%c%9.5f",current_pos.lng >= 0 ? 'E' : 'W', fabs(current_pos.lng));
+		display.setTextSize(2);
+		display.setTextColor(WHITE);
+		display.setCursor(0, 0);
+		display.print(lat_buff);
+		display.setCursor(0, 16);
+		display.print(lng_buff);
+	}
 }
 
 static gboolean
@@ -271,7 +295,7 @@ graphics_ssd1306_idle(void *data)
 
 		int strength = get_signal_strength(attr);
 		if (ggf || strength > -1) {
-			latlong_pos current_pos;
+			latlong_pos current_pos = { 0, 0 };
 			double speed = get_vehicle_speed(ssd1306, attr, current_pos);
 			double routespeed = get_route_speed(ssd1306);
 
@@ -404,6 +428,7 @@ graphics_ssd1306_new(struct navit *nav, struct graphics_methods *meth,
 	display.display();
 
 	this_->nav = nav;
+	this_->last_draw_time = get_uptime();
 
 	show_version_info(this_);
 
