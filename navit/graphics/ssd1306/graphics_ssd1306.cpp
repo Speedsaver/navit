@@ -245,7 +245,7 @@ show_stationary_display(struct graphics_priv *ssd1306, const latlong_pos &curren
 	dbg(lvl_info,"Tick %ld, pos=%f,%f\n", current_tick, current_pos.lat, current_pos.lng);
 	bool isBlanked = ssd1306->last_draw_time + display_blank_timeout < current_tick;
 	if ( isBlanked ) {
-		const char *msg = "SpeedSaver";
+		const char *msg = "Speedsaver";
 		int width = -((int)strlen(msg) * 6);
 		int height= display.height() - 8;
 		if( ssd1306->ss_xpos <= width ) {
