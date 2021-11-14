@@ -158,7 +158,11 @@ vehicle_gpsd_callback(struct gps_data_t *data, const char *buf, size_t len,
         data->set &= ~SATELLITE_SET;
     }
     if (data->set & STATUS_SET) {
+#if GPSD_API_MAJOR_VERSION <= 9
         priv->status = data->status;
+#else
+        priv->status = data->fix.status;
+#endif
         data->set &= ~STATUS_SET;
     }
     if (data->set & MODE_SET) {
