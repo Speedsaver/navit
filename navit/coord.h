@@ -49,21 +49,6 @@ struct coord_rect {
 };
 
 
-#ifdef AVOID_FLOAT
-/**
- * On platforms where we are trying to avoid floats, sometimes we can't.
- * It is better on these platforms to use single precision floating points
- * over double percision ones since performance is much better.
- */
-typedef float navit_float;
-#define navit_sin(x) sinf(x)
-#define navit_cos(x) cosf(x)
-#define navit_tan(x) tanf(x)
-#define navit_atan(x) atanf(x)
-#define navit_acos(x) acosf(x)
-#define navit_asin(x) asinf(x)
-#define navit_sqrt(x) sqrtf(x)
-#else
 typedef  double navit_float;
 #define navit_sin(x) sin(x)
 #define navit_cos(x) cos(x)
@@ -72,7 +57,6 @@ typedef  double navit_float;
 #define navit_acos(x) acos(x)
 #define navit_asin(x) asin(x)
 #define navit_sqrt(x) sqrt(x)
-#endif
 
 
 //! A double mercator coordinate

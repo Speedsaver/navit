@@ -2288,11 +2288,7 @@ route_process_turn_restriction(struct route_graph *this, struct item *item)
 static void
 route_process_street_graph(struct route_graph *this, struct item *item, struct vehicleprofile *profile)
 {
-#ifdef AVOID_FLOAT
-	int len=0;
-#else
 	double len=0;
-#endif
 	int segmented = 0;
 	struct roadprofile *roadp;
 	struct route_graph_point *s_pnt,*e_pnt; /* Start and end point */

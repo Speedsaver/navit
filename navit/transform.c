@@ -1029,11 +1029,7 @@ transform_distance_garmin(struct coord *c1, struct coord *c2)
  
 	navit_float a=(sinlat*sinlat)+navit_cos(lat1)*navit_cos(lat2)*(sinlong*sinlong);
 	navit_float c=2*navit_asin(minf(1,navit_sqrt(a)));
-#ifdef AVOID_FLOAT
-	return round(earth_radius*c);
-#else
 	return earth_radius*c;
-#endif
 #else
 #define GMETER 2.3887499999999999
 	navit_float dx,dy;
@@ -1055,63 +1051,14 @@ transform_scale(int y)
 	return 1/navit_cos(g.lat/180*M_PI);
 }
 
-#ifdef AVOID_FLOAT
-static int
-tab_sqrt[]={14142,13379,12806,12364,12018,11741,11517,11333,11180,11051,10943,10850,10770,10701,10640,10587,10540,10499,10462,10429,10400,10373,10349,10327,10307,10289,10273,10257,10243,10231,10219,10208};
-
-static int tab_int_step = 0x20000;
-static int tab_int_scale[]={10000,10002,10008,10019,10033,10052,10076,10103,10135,10171,10212,10257,10306,10359,10417,10479,10546,10617,10693,10773,10858,10947,11041,11140,11243,11352,11465,11582,11705,11833,11965,12103,12246,12394,12547,12706,12870,13039,13214,13395,13581,13773,13971,14174,14384,14600,14822,15050,15285,15526,15774,16028,16289,16557,16832,17114,17404,17700,18005,18316,18636,18964,19299,19643,19995,20355,20724,21102,21489,21885,22290,22705,23129,23563,24007,24461,24926,25401,25886,26383,26891};
-
-int transform_int_scale(int y)
-{
-	int i,size = sizeof(tab_int_scale)/sizeof(int);
-	if (y < 0)
-		y=-y;
-	i=y/tab_int_step;
-	if (i < size-1) 
-		return tab_int_scale[i]+((tab_int_scale[i+1]-tab_int_scale[i])*(y-i*tab_int_step))/tab_int_step;
-	return tab_int_scale[size-1];
-}
-#endif
-
 double
 transform_distance(enum projection pro, struct coord *c1, struct coord *c2)
 {
 	if (pro == projection_mg) {
-#ifndef AVOID_FLOAT 
 	double dx,dy,scale=transform_scale((c1->y+c2->y)/2);
 	dx=c1->x-c2->x;
 	dy=c1->y-c2->y;
 	return sqrt(dx*dx+dy*dy)/scale;
-#else
-	int dx,dy,f,scale=transform_int_scale((c1->y+c2->y)/2);
-	dx=c1->x-c2->x;
-	dy=c1->y-c2->y;
-	if (dx < 0)
-		dx=-dx;
-	if (dy < 0)
-		dy=-dy;
-	while (dx > 20000 || dy > 20000) {
-		dx/=10;
-		dy/=10;
-		scale/=10;
-	}
-	if (! dy)
-		return dx*10000/scale;
-	if (! dx)
-		return dy*10000/scale;
-	if (dx > dy) {
-		f=dx*8/dy-8;
-		if (f >= 32)
-			return dx*10000/scale;
-		return dx*tab_sqrt[f]/scale;
-	} else {
-		f=dy*8/dx-8;
-		if (f >= 32)
-			return dy*10000/scale;
-		return dy*tab_sqrt[f]/scale;
-	}
-#endif
 	} else if (pro == projection_garmin) {
 		return transform_distance_garmin(c1, c2);
 	} else {
@@ -1344,59 +1291,6 @@ transform_print_deg(double deg)
 	printf("%2.0f:%2.0f:%2.4f", floor(deg), fmod(deg*60,60), fmod(deg*3600,60));
 }
 
-#ifdef AVOID_FLOAT
-static int tab_atan[]={0,262,524,787,1051,1317,1584,1853,2126,2401,2679,2962,3249,3541,3839,4142,4452,4770,5095,5430,5774,6128,6494,6873,7265,7673,8098,8541,9004,9490,10000,10538};
-
-static int
-atan2_int_lookup(int val)
-{
-	int len=sizeof(tab_atan)/sizeof(int);
-	int i=len/2;
-	int p=i-1;
-	for (;;) {
-		i>>=1;
-		if (val < tab_atan[p])
-			p-=i;
-		else
-			if (val < tab_atan[p+1])
-				return p+(p>>1);
-			else
-				p+=i;
-	}
-}
-
-static int
-atan2_int(int dx, int dy)
-{
-	int mul=1,add=0,ret;
-	if (! dx) {
-		return dy < 0 ? 180 : 0;
-	}
-	if (! dy) {
-		return dx < 0 ? -90 : 90;
-	}
-	if (dx < 0) {
-		dx=-dx;
-		mul=-1;
-	}
-	if (dy < 0) {
-		dy=-dy;
-		add=180*mul;
-		mul*=-1;
-	}
-	while (dx > 20000 || dy > 20000) {
-		dx/=10;
-		dy/=10;
-	}
-	if (dx > dy) {
-		ret=90-atan2_int_lookup(dy*10000/dx);
-	} else {
-		ret=atan2_int_lookup(dx*10000/dy);
-	}
-	return ret*mul+add;
-}
-#endif
-
 /**
  * @brief Gets the bearing from one point to another
  *
@@ -1411,14 +1305,9 @@ transform_get_angle_delta(struct coord *c1, struct coord *c2, int dir)
 {
 	int dx=c2->x-c1->x;
 	int dy=c2->y-c1->y;
-#ifndef AVOID_FLOAT 
 	double angle;
 	angle=atan2(dx,dy);
 	angle*=180/M_PI;
-#else
-	int angle;
-	angle=atan2_int(dx,dy);
-#endif
 	if (dir == -1)
 		angle=angle-180;
 	if (angle < 0)
