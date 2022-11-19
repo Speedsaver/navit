@@ -41,8 +41,6 @@ navit/data/garmin/gentypes.c
 navit/data/garmin/gar2navit.c
 navit/data/garmin/garmin.c
 navit/osd/core/osd_core.c
-navit/binding/python/binding_python.c
-navit/binding/dbus/binding_dbus.c
 navit/country.c
 navit/track.c
 navit/util.c
