@@ -23,9 +23,7 @@
 #include <stdio.h>
 #include <glib.h>
 #include <time.h>
-#ifdef HAVE_SYS_TIME_H
 #include <sys/time.h>
-#endif
 #include <string.h>
 #include "item.h"
 #include "xmlconfig.h"

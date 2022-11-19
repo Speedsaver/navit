@@ -30,9 +30,7 @@
 #ifdef HAVE_UNISTD_H
 #include <unistd.h>
 #endif
-#ifdef HAVE_SYS_TIME_H
 #include <sys/time.h>
-#endif
 #include <fcntl.h>
 #include <stdarg.h>
 #include <stdio.h>
@@ -65,9 +63,7 @@ struct log {
 	int flush_time;
 	struct event_timeout *timer;
 	struct callback *timer_callback;
-#ifdef HAVE_SYS_TIME_H
 	struct timeval last_flush;
-#endif
 	char *filename;
 	char *filename_ex1;
 	char *filename_ex2;
@@ -136,9 +132,7 @@ expand_filenames(struct log *this_)
 static void
 log_set_last_flush(struct log *this_)
 {
-#ifdef HAVE_SYS_TIME_H
 	gettimeofday(&this_->last_flush, NULL);
-#endif
 }
 
 /** 
@@ -336,7 +330,6 @@ log_change_required(struct log *this_)
 static void
 log_timer(struct log *this_)
 {
-#ifdef HAVE_SYS_TIME_H
 	struct timeval tv;
 	int delta;
 	gettimeofday(&tv, NULL);
@@ -344,7 +337,6 @@ log_timer(struct log *this_)
 	dbg(lvl_debug,"delta=%d flush_time=%d\n", delta, this_->flush_time);
 	if (this_->flush_time && delta >= this_->flush_time*1000)
 		log_flush(this_,0);
-#endif
 }
 
 /** 
