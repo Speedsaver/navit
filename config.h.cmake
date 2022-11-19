@@ -7,5 +7,3 @@
 #cmakedefine PACKAGE_NAME "@PACKAGE_NAME@"
 #cmakedefine PACKAGE "@PACKAGE@"
 #cmakedefine LOCALEDIR "@LOCALEDIR@"
-
-#cmakedefine HAVE_ENDIAN_H 1

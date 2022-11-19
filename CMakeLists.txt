@@ -98,7 +98,6 @@ find_package(ZLIB REQUIRED)
 find_package(PkgConfig REQUIRED)
 pkg_check_modules(LIBGPS libgps REQUIRED)
 #Simple checks
-CHECK_INCLUDE_FILES(endian.h HAVE_ENDIAN_H)
 CHECK_INCLUDE_FILES(stdint.h HAVE_STDINT_H)
 CHECK_INCLUDE_FILES(byteswap.h HAVE_BYTESWAP_H)
 CHECK_SYMBOL_EXISTS(system stdlib.h HAVE_SYSTEM)
