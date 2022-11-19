@@ -141,12 +141,10 @@ void *plugin_get_category_##category(const char *name);
 
 #include "plugin_def.h"
 
-#ifndef USE_PLUGINS
 #define plugin_module_cat3(pre,mod,post) pre##mod##post
 #define plugin_module_cat2(pre,mod,post) plugin_module_cat3(pre,mod,post)
 #define plugin_module_cat(pre,post) plugin_module_cat2(pre,MODULE,post)
 #define plugin_init plugin_module_cat(module_,_init)
-#endif
 
 struct attr;
 

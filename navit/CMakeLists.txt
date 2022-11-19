@@ -11,9 +11,7 @@ set(NAVIT_SRC announcement.c atom.c attr.c cache.c callback.c command.c config_.
    profile.c profile_option.c projection.c roadprofile.c route.c script.c search.c speech.c start_real.c sunriset.c transform.c track.c
    search_houseno_interpol.c util.c vehicle.c vehicleprofile.c xmlconfig.c )
 
-if(NOT USE_PLUGINS)
-  list(APPEND NAVIT_SRC  ${CMAKE_CURRENT_BINARY_DIR}/builtin.c)
-endif(NOT USE_PLUGINS)
+list(APPEND NAVIT_SRC  ${CMAKE_CURRENT_BINARY_DIR}/builtin.c)
 
 list(APPEND NAVIT_SRC event_glib.c)
 
@@ -37,11 +35,7 @@ foreach ( MODULE_PATH ${ALL_MODULES})
       list(APPEND MODULES_PROTOTYPE "\nvoid\tmodule_${MODULE_INC}_init(void)")
       list(APPEND MODULES_FUNC "\nmodule_${MODULE_INC}_init()")
       
-      if (NOT USE_PLUGINS)
-         list(APPEND MODULES_NAME ${MODULE_INC})
-      else()
-         string(REGEX REPLACE "(^[^/]*)/.*" "\\1" ${MODULE_INC}_TYPE ${MODULE_PATH})
-      endif()
+      list(APPEND MODULES_NAME ${MODULE_INC})
    endif()
 endforeach()
 
@@ -121,7 +115,6 @@ install(FILES ${CMAKE_CURRENT_BINARY_DIR}/navit.xml
 
 get_directory_property(INCLUDE_DIRECTORIES INCLUDE_DIRECTORIES)
 WRITE_FILE("cmake_plugin_settings.txt"
-	"set(USE_PLUGINS ${USE_PLUGINS} CACHE BOOL init)\n"
 	"set(MODULE_BUILD_TYPE \"${MODULE_BUILD_TYPE}\" CACHE STRING init)\n"
 	"set(NAVIT_COMPILE_FLAGS \"${NAVIT_COMPILE_FLAGS}\" CACHE STRING init)\n"
 	"set(navit_SOURCE_DIR \"${navit_SOURCE_DIR}\" CACHE STRING init)\n"

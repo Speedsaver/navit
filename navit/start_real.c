@@ -60,9 +60,7 @@ print_usage(void)
 }
 
 
-#ifndef USE_PLUGINS
 extern void builtin_init(void);
-#endif /* USE_PLUGINS*/
 
 int main_real(int argc, char * const* argv)
 {
@@ -87,9 +85,7 @@ int main_real(int argc, char * const* argv)
 		debug_set_logfile(cp);
 	}
 	file_init();
-#ifndef USE_PLUGINS
 	builtin_init();
-#endif
 	route_init();
 	navigation_init();
 	tracking_init();

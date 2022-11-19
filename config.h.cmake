@@ -1,4 +1,3 @@
-#cmakedefine HAVE_GMODULE 1
 #define CACHE_SIZE ${CACHE_SIZE}
 #cmakedefine AVOID_FLOAT 1
 #cmakedefine AVOID_UNALIGNED 1
@@ -14,8 +13,6 @@
 #cmakedefine USE_ROUTING 1
 
 #cmakedefine HAVE_FONTCONFIG 1
-
-#cmakedefine USE_PLUGINS 1
 
 #cmakedefine HAVE_UNISTD_H 1
 
