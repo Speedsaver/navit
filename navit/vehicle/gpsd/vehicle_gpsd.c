@@ -111,11 +111,7 @@ vehicle_gpsd_callback(struct gps_data_t *data, const char *buf, size_t len)
         if(data->satellites_visible > 0) {
             sats_signal=0;
             for( i=0; i<data->satellites_visible; i++) {
-#if GPSD_API_MAJOR_VERSION >= 6
                 if (data->skyview[i].ss > 0)
-#else
-                if (data->ss[i] > 0)
-#endif
                     sats_signal++;
             }
         }
@@ -184,13 +180,8 @@ static int vehicle_gpsd_try_open(struct vehicle_priv *priv) {
     }
     dbg(lvl_debug,"Trying to connect to %s:%s\n",source+7,port?port:"default");
 
-#if GPSD_API_MAJOR_VERSION >= 5
     /* gps_open returns 0 on success */
     if (gps_open(source + 7, port, priv->gps)) {
-#else
-    priv->gps = gps_open(source + 7, port);
-    if(!priv->gps) {
-#endif
         dbg(lvl_error,"gps_open failed for '%s'. Retrying in %d seconds. Have you started gpsd?\n", priv->source,
             priv->retry_interval);
         g_free(source);
@@ -203,9 +194,6 @@ static int vehicle_gpsd_try_open(struct vehicle_priv *priv) {
     else
         gps_stream(priv->gps, WATCH_ENABLE|WATCH_JSON, NULL);
 
-#if GPSD_API_MAJOR_VERSION < 5
-    gps_set_raw_hook(priv->gps, vehicle_gpsd_callback);
-#endif
     priv->cb = callback_new_1(callback_cast(vehicle_gpsd_io), priv);
     priv->cbt = callback_new_1(callback_cast(vehicle_gpsd_try_open), priv);
     priv->evwatch = event_add_watch(priv->gps->gps_fd, event_watch_cond_read, priv->cb);
@@ -246,9 +234,7 @@ static void vehicle_gpsd_close(struct vehicle_priv *priv) {
     }
     if (priv->gps) {
         gps_close(priv->gps);
-#if GPSD_API_MAJOR_VERSION >= 5
         g_free(priv->gps);
-#endif
         priv->gps = NULL;
     }
 }
@@ -257,7 +243,6 @@ static void vehicle_gpsd_io(struct vehicle_priv *priv) {
     dbg(lvl_debug, "enter\n");
     if (priv->gps) {
         vehicle_last = priv;
-#if GPSD_API_MAJOR_VERSION >= 5
         int read_result;
         /* Read until EOF, in case we are lagging behind.
          * No point in processing old GPS reports. */
@@ -287,13 +272,6 @@ static void vehicle_gpsd_io(struct vehicle_priv *priv) {
                 dbg(lvl_info,"Skipped low quality GPS message\n");
             }
         }
-#else
-        if (gps_poll(priv->gps)) {
-            dbg(lvl_error,"gps_poll failed\n");
-            vehicle_gpsd_close(priv);
-            vehicle_gpsd_open(priv);
-        }
-#endif
     }
 }
 
@@ -303,9 +281,7 @@ static void vehicle_gpsd_destroy(struct vehicle_priv *priv) {
         g_free(priv->source);
     if (priv->gpsd_query)
         g_free(priv->gpsd_query);
-#if GPSD_API_MAJOR_VERSION >= 5
     g_free(priv->gps);
-#endif
     g_free(priv);
 }
 
@@ -386,9 +362,7 @@ static struct vehicle_priv *vehicle_gpsd_new_gpsd(struct vehicle_methods
     dbg(lvl_debug, "enter\n");
     source = attr_search(attrs, NULL, attr_source);
     ret = g_new0(struct vehicle_priv, 1);
-#if GPSD_API_MAJOR_VERSION >= 5
     ret->gps = g_new0(struct gps_data_t, 1);
-#endif
     ret->source = g_strdup(source->u.str);
     query = attr_search(attrs, NULL, attr_gpsd_query);
     if (query) {
