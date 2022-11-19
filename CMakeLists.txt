@@ -173,7 +173,6 @@ add_module(vehicle/demo "Default" TRUE)
 add_module(vehicle/file "Default" TRUE)
 add_module(vehicle/null "Default" FALSE)
 add_module(map/binfile "Default" TRUE)
-add_module(map/filter "Default" TRUE)
 
 #Modules without test yet
 add_module(plugin/pedestrian "Default" FALSE)
