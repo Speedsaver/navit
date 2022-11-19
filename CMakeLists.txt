@@ -204,7 +204,6 @@ CHECK_INCLUDE_FILES(getopt.h HAVE_GETOPT_H)
 CHECK_INCLUDE_FILES(string.h HAVE_STRING_H)
 CHECK_FUNCTION_EXISTS(gettimeofday HAVE_GETTIMEOFDAY)
 CHECK_SYMBOL_EXISTS(system stdlib.h HAVE_SYSTEM)
-CHECK_SYMBOL_EXISTS(CreateProcess windows.h HAVE_CREATEPROCESS)
 CHECK_SYMBOL_EXISTS(stpcpy string.h HAVE_STPCPY)
 CHECK_FUNCTION_EXISTS(sbrk HAVE_SBRK)
 CHECK_FUNCTION_EXISTS(getdelim HAVE_GETDELIM)
@@ -420,10 +419,6 @@ if (HAVE_SYSTEM)
    set_with_reason(speech/cmdline "system() call is available" TRUE)
 endif(HAVE_SYSTEM)
 
-if (HAVE_CREATEPROCESS)
-   set_with_reason(speech/cmdline "CreateProcess() call is available" TRUE)
-endif(HAVE_CREATEPROCESS)
-
 #Independent modules
 add_module(graphics/null "Default" TRUE)
 add_module(osd/core "Default" TRUE)
@@ -447,9 +442,6 @@ add_module(plugin/pedestrian "Default" FALSE)
 add_module(plugin/j1850 "Default" FALSE)
 # add_module(plugin/ssd1306 "Default" TRUE)
 add_module(speech/espeak "Default" FALSE)
-add_module(speech/iphone "Default" FALSE)
-add_module(vehicle/iphone "Default" FALSE)
-add_module(graphics/cocoa "Default" FALSE)
 
 # other features
 add_feature(USE_PLUGINS "default" TRUE)
