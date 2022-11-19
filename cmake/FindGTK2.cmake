@@ -183,7 +183,6 @@ else (GTK2_LIBRARIES AND GTK2_INCLUDE_DIRS)
         /sw/include/atk-1.0
     )
     gtk2_debug_message("GTK2_ATK_INCLUDE_DIR is ${GTK2_ATK_INCLUDE_DIR}")
-    if (UNIX)
     find_library(GTK2_GTK_LIBRARY
       NAMES
         gtk-x11-2.0
@@ -213,7 +212,6 @@ else (GTK2_LIBRARIES AND GTK2_INCLUDE_DIRS)
         /sw/lib
     )
     gtk2_debug_message("GTK2_GDK_LIBRARY is ${GTK2_GDK_LIBRARY}")
-    endif(UNIX)
     find_library(GTK2_GDK_PIXBUF_LIBRARY
       NAMES
         gdk_pixbuf-2.0
