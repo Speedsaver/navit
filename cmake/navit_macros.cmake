@@ -61,9 +61,6 @@ macro(module_add_library MODULE_NAME )
    INCLUDE_DIRECTORIES(${${MODULE_NAME}_INCLUDES}) 
    if (USE_PLUGINS)
        TARGET_LINK_LIBRARIES(${MODULE_NAME} ${NAVIT_LIBNAME})
-       if (APPLE)
-           set_target_properties( ${MODULE_NAME} PROPERTIES LINK_FLAGS "-Wl,-undefined -Wl,dynamic_lookup") 
-       endif()
       # workaround to be compatible with old paths
       set_target_properties( ${MODULE_NAME} PROPERTIES LIBRARY_OUTPUT_DIRECTORY "${CMAKE_CURRENT_BINARY_DIR}/.libs")
 

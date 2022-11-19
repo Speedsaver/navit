@@ -61,9 +61,6 @@ endforeach()
 add_subdirectory (fib-1.1)
 
 set(NAVIT_START_SRC start.c)
-if (APPLE)
-    set(NAVIT_START_SRC start_apple.m)
-endif()
 if (BUILD_BUNDLE)
    list(APPEND NAVIT_START_SRC resources/share resources/Icon.png resources/Default.png)
    add_custom_command(OUTPUT resources/Icon.png COMMAND convert -scale 79x79 -crop 60x60+8+19 ${CMAKE_CURRENT_SOURCE_DIR}/icons/desktop_icons/128x128/navit.png resources/Icon.png)
@@ -156,7 +153,6 @@ install(FILES ${CMAKE_CURRENT_BINARY_DIR}/navit.xml
 
 get_directory_property(INCLUDE_DIRECTORIES INCLUDE_DIRECTORIES)
 WRITE_FILE("cmake_plugin_settings.txt"
-	"set(APPLE ${APPLE} CACHE BOOL init)\n" 
 	"set(USE_PLUGINS ${USE_PLUGINS} CACHE BOOL init)\n"
 	"set(MODULE_BUILD_TYPE \"${MODULE_BUILD_TYPE}\" CACHE STRING init)\n"
 	"set(NAVIT_COMPILE_FLAGS \"${NAVIT_COMPILE_FLAGS}\" CACHE STRING init)\n"

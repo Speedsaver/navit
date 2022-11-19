@@ -59,32 +59,6 @@
 #define __LITTLE_ENDIAN _LITTLE_ENDIAN
 #define __BIG_ENDIAN _BIG_ENDIAN
 #endif
-#elif defined(__APPLE__)
-  #include <libkern/OSByteOrder.h>
-  #define __bswap_16 OSSwapInt16
-  #define __bswap_32 OSSwapInt32
-  #define __bswap_64 OSSwapInt64
-
-#ifndef __BYTE_ORDER
-  #define __LITTLE_ENDIAN 1234
-  #define __BIG_ENDIAN 4321
-
-  #if defined(__LITTLE_ENDIAN__)
-    #define __BYTE_ORDER __LITTLE_ENDIAN
-  #elif defined(__BIG_ENDIAN__)
-    #define __BYTE_ORDER __BIG_ENDIAN
-  #else
-    #error "No endianness defined for Mac OS!"
-  #endif
-#endif
-
-  #define __bswap_16(__bsx) ((((__bsx) >> 8) & 0xff) | (((__bsx) & 0xff) << 8))
-  #define __bswap_32(__bsx) ((((__bsx) & 0xff000000) >> 24) | \
-			     (((__bsx) & 0x00ff0000) >>  8) |\
-			     (((__bsx) & 0x0000ff00) <<  8) | \
-			     (((__bsx) & 0x000000ff) << 24))
-
-
 #endif
 
 #if  __BYTE_ORDER == __BIG_ENDIAN 

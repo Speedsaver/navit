@@ -71,11 +71,7 @@ typedef double GLdouble;
 #define glOrthof	glOrtho
 #undef USE_FLOAT
 #define USE_FLOAT 1
-#ifdef __APPLE__
-#include <GLUT/glut.h>
-#else
 #include <GL/glut.h>		/* glut.h includes gl.h and glu.h */
-#endif
 #endif
 
 #if USE_FLOAT
