@@ -15,9 +15,7 @@ if(NOT USE_PLUGINS)
   list(APPEND NAVIT_SRC  ${CMAKE_CURRENT_BINARY_DIR}/builtin.c)
 endif(NOT USE_PLUGINS)
 
-if (${HAVE_GLIB})
-   list(APPEND NAVIT_SRC event_glib.c)
-endif()
+list(APPEND NAVIT_SRC event_glib.c)
 
 set(NAVIT_LIBNAME navit_core)
 

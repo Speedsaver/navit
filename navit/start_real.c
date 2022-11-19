@@ -80,11 +80,7 @@ int main_real(int argc, char * const* argv)
 	main_argc=argc;
 	main_argv=argv;
 
-#ifdef HAVE_GLIB
 	event_glib_init();
-#else
-	_g_slice_thread_init_nomessage();
-#endif
 	atom_init();
 	main_init(argv[0]);
 	navit_nls_main_init();

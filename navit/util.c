@@ -112,15 +112,6 @@ g_strconcat_printf(gchar *buffer, gchar *fmt, ...)
 	return ret;
 }
 
-#ifndef HAVE_GLIB
-int g_utf8_strlen_force_link(gchar *buffer, int max);
-int
-g_utf8_strlen_force_link(gchar *buffer, int max)
-{
-	return g_utf8_strlen(buffer, max);
-}
-#endif
-
 /**
  * @brief Converts an ISO 8601-style time string into epoch time.
  *

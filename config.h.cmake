@@ -1,4 +1,3 @@
-#cmakedefine HAVE_GLIB 1
 #cmakedefine HAVE_GMODULE 1
 #define CACHE_SIZE ${CACHE_SIZE}
 #cmakedefine AVOID_FLOAT 1
