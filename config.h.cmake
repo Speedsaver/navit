@@ -21,8 +21,6 @@
 
 #cmakedefine SDL_IMAGE 1
 
-#cmakedefine HAVE_QT_SVG 1
-
 #cmakedefine HAVE_UNISTD_H 1
 
 #cmakedefine DBUS_USE_SYSTEM_BUS 1

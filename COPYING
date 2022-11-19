@@ -13,7 +13,6 @@ navit/gui/sdl/sdl_events.h
 navit/gui/sdl/cegui_keyboard.cpp
 navit/gui/sdl/gui_sdl_window.cpp
 navit/gui/internal/gui_internal.c
-navit/graphics/qt_qpainter/graphics_qt_qpainter.cpp
 navit/graphics/null/graphics_null.c
 navit/data/mg/tree.c
 navit/data/mg/poly.c
