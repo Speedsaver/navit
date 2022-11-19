@@ -1,6 +1,7 @@
 #include <glib.h>
 #include "item.h" /* needs to be first, as attr.h depends on it */
 #include "attr.h"
+#include "plugin.h"
 
 #include "debug.h"
 
