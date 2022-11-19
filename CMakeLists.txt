@@ -152,7 +152,6 @@ add_module(osd/core "Default" TRUE)
 add_module(map/binfile "Default" TRUE)
 
 #Modules without test yet
-add_module(plugin/pedestrian "Default" FALSE)
 # add_module(plugin/ssd1306 "Default" TRUE)
 
 # other features
