@@ -22,9 +22,7 @@
 #include <stdio.h>
 #include <errno.h>
 #include "config.h"
-#ifdef HAVE_UNISTD_H
 #include <unistd.h>
-#endif
 #include "file.h"
 #include "debug.h"
 #include "projection.h"

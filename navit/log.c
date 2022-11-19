@@ -27,9 +27,7 @@
  */
 
 #include "config.h"
-#ifdef HAVE_UNISTD_H
 #include <unistd.h>
-#endif
 #include <sys/time.h>
 #include <fcntl.h>
 #include <stdarg.h>

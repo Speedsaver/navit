@@ -18,9 +18,7 @@
  */
 
 #include "config.h"
-#ifdef HAVE_UNISTD_H
 #include <unistd.h>
-#endif
 #include <stdarg.h>
 #include <stdio.h>
 #include <string.h>

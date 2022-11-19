@@ -135,8 +135,6 @@ set(LOCALEDIR "${LOCALE_DIR}")
 
 set(CMAKE_APPBUNDLE_PATH "")
 
-CHECK_INCLUDE_FILES (unistd.h HAVE_UNISTD_H)
-
 CONFIGURE_FILE(${CMAKE_CURRENT_SOURCE_DIR}/config.h.cmake ${CMAKE_CURRENT_BINARY_DIR}/config.h)
 
 # Compile with -Wall -Wextra. We need all the help we can get from the compiler :-).
