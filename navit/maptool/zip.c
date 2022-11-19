@@ -65,7 +65,6 @@ zip_write(struct zip_info *info, void *data, int len)
 	return 1;
 }
 
-#ifdef HAVE_ZLIB
 static int
 compress2_int(Byte *dest, uLongf *destLen, const Bytef *source, uLong sourceLen, int level)
 {
@@ -95,7 +94,6 @@ compress2_int(Byte *dest, uLongf *destLen, const Bytef *source, uLong sourceLen,
 	err = deflateEnd(&stream);
 	return err;
 }
-#endif
 
 void
 write_zipmember(struct zip_info *zip_info, char *name, int filelen, char *data, int data_size)
@@ -174,7 +172,6 @@ write_zipmember(struct zip_info *zip_info, char *name, int filelen, char *data, 
 	}
 #endif
 	lfh.zipmthd=zip_info->compression_level ? 8:0;
-#ifdef HAVE_ZLIB
 	if (zip_info->compression_level) {
 		int error=compress2_int((Byte *)compbuffer, &destlen, (Bytef *)data, data_size, zip_info->compression_level);
 		if (error == Z_OK) {
@@ -187,7 +184,6 @@ write_zipmember(struct zip_info *zip_info, char *name, int filelen, char *data, 
 			fprintf(stderr,"compress2 returned %d\n", error);
 		}
 	}
-#endif
 	lfh.zipcrc=crc;
 	lfh.zipsize=comp_size;
 	lfh.zipuncmp=data_size;

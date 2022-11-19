@@ -12,8 +12,6 @@
 
 #cmakedefine HAVE_LIBCRYPTO 1
 
-#cmakedefine HAVE_ZLIB 1
-
 #cmakedefine USE_ROUTING 1
 
 #cmakedefine HAVE_GTK2 1

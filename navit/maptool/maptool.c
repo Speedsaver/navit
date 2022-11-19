@@ -503,11 +503,9 @@ parse_option(struct maptool_params *p, char **argv, int argc, int *option_index)
 	case 'x':
 		p->max_index_size=atoi(optarg);
 		break;
-#ifdef HAVE_ZLIB
 	case 'z':
 		p->compression_level=atoi(optarg);
 		break;
-#endif
         case '?':
 	default:
 		return 0;
@@ -911,9 +909,7 @@ int main(int argc, char **argv)
 	linguistics_init();
 
 	memset(&p, 0, sizeof(p));
-#ifdef HAVE_ZLIB
 	p.compression_level=9;
-#endif
 	p.start=1;
 	p.end=99;
 	p.input_file=stdin;
