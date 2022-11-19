@@ -162,7 +162,6 @@ endif()
 
 #Independent modules
 add_module(osd/core "Default" TRUE)
-add_module(vehicle/null "Default" FALSE)
 add_module(map/binfile "Default" TRUE)
 
 #Modules without test yet
