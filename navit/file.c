@@ -650,9 +650,7 @@ file_create_caseinsensitive(char *name, struct attr **options)
 void
 file_fsync(struct file *f)
 {
-#ifdef HAVE_FSYNC
 	fsync(f->fd);
-#endif
 }
 
 void

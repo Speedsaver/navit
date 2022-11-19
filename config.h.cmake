@@ -18,6 +18,4 @@
 
 #cmakedefine HAVE_SBRK 1
 
-#cmakedefine HAVE_FSYNC 1
-
 #cmakedefine HAVE_ENDIAN_H 1
