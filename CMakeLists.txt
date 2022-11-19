@@ -77,7 +77,6 @@ endif(EXTRA_LIBDIR)
 add_module(graphics/ssd1306 "Required library not found" TRUE)
 add_module(gui/speedsaver "Default" TRUE)
 add_module(vehicle/gpsd "gpsd lib not found" FALSE)
-add_module(vehicle/gpsd_dbus "dbus-glib-1 not found" FALSE)
 set(CPACK_PROJECT_CONFIG_FILE "${CMAKE_SOURCE_DIR}/cpack.cmake")
 set(CPACK_PACKAGE_VENDOR "Navit team")
 set(CPACK_PACKAGE_VERSION_MAJOR ${NAVIT_VERSION_MAJOR})
@@ -95,7 +94,6 @@ INCLUDE (CheckFunctionExists)
 INCLUDE (CheckSymbolExists)
 find_package(Glib REQUIRED)
 find_package(ZLIB REQUIRED)
-find_package(DBusGLib)
 find_package(OpenSSL)
 find_package(Threads)
 
@@ -149,11 +147,6 @@ if (LIBGPS_FOUND)
    set_with_reason(vehicle/gpsd ${VEHICLE_GPSD_REASON} TRUE ${LIBGPS_LDFLAGS})
 endif(LIBGPS_FOUND)
 
-if(DBusGLib_FOUND)
-   include_directories(${DBusGLib_INCLUDE_DIRS})
-   set_with_reason(vehicle/gpsd_dbus "dbus-glib-1 found" TRUE ${DBusGLib_LIBRARIES})
-endif()
-
 #Independent modules
 add_module(osd/core "Default" TRUE)
 add_module(map/binfile "Default" TRUE)
@@ -167,7 +160,6 @@ add_module(plugin/j1850 "Default" FALSE)
 add_feature(USE_ROUTING "default" TRUE)
 add_feature(NETWORK_INFO "default" FALSE)
 
-add_feature(DBUS_USE_SYSTEM_BUS "default" FALSE)
 add_feature(BUILD_MAPTOOL "default" TRUE)
 
 ### Platform specific settings

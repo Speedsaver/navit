@@ -16,8 +16,6 @@
 
 #cmakedefine HAVE_UNISTD_H 1
 
-#cmakedefine DBUS_USE_SYSTEM_BUS 1
-
 #cmakedefine HAVE_SOCKET 1
 
 #cmakedefine HAVE_SYS_TIME_H 1
