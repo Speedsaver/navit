@@ -21,10 +21,6 @@
 #include <string.h>
 #include <glib.h>
 #include <math.h>
-#ifdef HAVE_GPSBT
-#include <gpsbt.h>
-#include <errno.h>
-#endif
 #include "debug.h"
 #include "callback.h"
 #include "plugin.h"
@@ -58,9 +54,6 @@ static struct vehicle_priv {
 	struct event_timeout *retry_timer2;
 	struct attr ** attrs;
 	char fixiso8601[128];
-#ifdef HAVE_GPSBT
-	gpsbt_t context;
-#endif
 } *vehicle_last;
 
 #define DEFAULT_RETRY_INTERVAL 10 // seconds
@@ -229,29 +222,12 @@ static int vehicle_gpsd_try_open(struct vehicle_priv *priv) {
  * Open a connection to gpsd. Will re-try the connection if it fails
  */
 static void vehicle_gpsd_open(struct vehicle_priv *priv) {
-#ifdef HAVE_GPSBT
-    char errstr[256] = "";
-    /* We need to start gpsd (via gpsbt) first. */
-    errno = 0;
-    memset(&priv->context, 0, sizeof(gpsbt_t));
-    if(gpsbt_start(NULL, 0, 0, 0, errstr, sizeof(errstr),
-                   0, &priv->context) < 0) {
-        dbg(lvl_error,"Error connecting to GPS with gpsbt: (%d) %s (%s)\n",
-            errno, strerror(errno), errstr);
-    }
-    sleep(1);       /* give gpsd time to start */
-    dbg(lvl_debug,"gpsbt_start: completed\n");
-#endif
     priv->retry_timer2=NULL;
     if (vehicle_gpsd_try_open(priv))
         priv->retry_timer2=event_add_timeout(priv->retry_interval*1000, 1, priv->cbt);
 }
 
 static void vehicle_gpsd_close(struct vehicle_priv *priv) {
-#ifdef HAVE_GPSBT
-    int err;
-#endif
-
     if (priv->retry_timer2) {
         event_remove_timeout(priv->retry_timer2);
         priv->retry_timer2=NULL;
@@ -275,13 +251,6 @@ static void vehicle_gpsd_close(struct vehicle_priv *priv) {
 #endif
         priv->gps = NULL;
     }
-#ifdef HAVE_GPSBT
-    err = gpsbt_stop(&priv->context);
-    if (err < 0) {
-        dbg(lvl_error,"Error %d while gpsbt_stop\n", err);
-    }
-    dbg(lvl_debug,"gpsbt_stop: completed, (%d)\n",err);
-#endif
 }
 
 static void vehicle_gpsd_io(struct vehicle_priv *priv) {
