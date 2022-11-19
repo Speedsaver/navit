@@ -28,8 +28,6 @@
 
 #cmakedefine HAVE_ENDIAN_H 1
 
-#cmakedefine HAVE_FREEIMAGE 1
-
 #cmakedefine HAVE_SHMEM 1
 
 #cmakedefine HAVE_IMLIB2 1
