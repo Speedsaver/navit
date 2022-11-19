@@ -77,7 +77,6 @@ endif(EXTRA_LIBDIR)
 ### Detect environment
 
 add_plugin(support/libpng "native libpng found" FALSE)
-add_module(font/freetype "freetype not found" FALSE)
 add_module(graphics/ssd1306 "Required library not found" TRUE)
 add_module(gui/speedsaver "Default" TRUE)
 add_module(vehicle/gpsd "gpsd lib not found" FALSE)
@@ -102,12 +101,10 @@ INCLUDE (CheckSymbolExists)
 find_package(Glib REQUIRED)
 find_package(Gmodule)
 find_package(ZLIB REQUIRED)
-find_package(Freetype)
 find_package(PNG)
 find_package(DBusGLib)
 find_package(OpenSSL)
 find_package(Threads)
-libfind_pkg_check_modules(FONTCONFIG fontconfig)
 
 #pkg-config based detection
 find_package(PkgConfig)
@@ -160,15 +157,6 @@ else(PNG_FOUND)
    message(STATUS "using internal libpng")
    set_with_reason(support/libpng "native libpng missing" TRUE)
 endif(PNG_FOUND)
-
-if(FREETYPE_FOUND)
-   pkg_check_modules(FRIBIDI fribidi)
-   pkg_check_modules(FRIBIDI2 fribidi>=0.19.0)
-   include_directories(${FREETYPE_INCLUDE_DIRS})
-   set_with_reason(font/freetype "freetype found" TRUE "${FREETYPE_LIBRARY};${FONTCONFIG_LDFLAGS};${FRIBIDI_LIBRARIES}")
-else(FREETYPE_FOUND)
-   MESSAGE("No freetype library found, graphics modules may not be available")
-endif(FREETYPE_FOUND)
 
 if(FONTCONFIG_FOUND)
    set(HAVE_FONTCONFIG 1)
@@ -255,10 +243,6 @@ check_symbol_exists (getifaddrs "sys/types.h;ifaddrs.h" HAS_IFADDRS)
 if (HAS_IFADDRS)
     cfg_feature(NETWORK_INFO "ifaddrs.h found" TRUE)
 endif(HAS_IFADDRS)
-
-if(FREETYPE_FOUND AND NOT FONTCONFIG_FOUND)
-   add_subdirectory( "${CMAKE_CURRENT_SOURCE_DIR}/navit/fonts")
-endif()
 
 # Image conversion
 find_program(IMAGE_CONVERTER NAMES convert)
