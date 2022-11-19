@@ -19,12 +19,7 @@ if (${HAVE_GLIB})
    list(APPEND NAVIT_SRC event_glib.c)
 endif()
 
-if(ANDROID)
-   list(APPEND NAVIT_SRC android.c)
-   set(NAVIT_LIBNAME navit)
-else()
-   set(NAVIT_LIBNAME navit_core)
-endif()
+set(NAVIT_LIBNAME navit_core)
 
 
 foreach ( PLUGIN_PATH ${ALL_PLUGINS})
@@ -65,30 +60,28 @@ endforeach()
 
 add_subdirectory (fib-1.1)
 
-if(NOT ANDROID)
-   set(NAVIT_START_SRC start.c)
-   if (APPLE)
-       set(NAVIT_START_SRC start_apple.m)
-   endif()
-   if (BUILD_BUNDLE)
-      list(APPEND NAVIT_START_SRC resources/share resources/Icon.png resources/Default.png)
-      add_custom_command(OUTPUT resources/Icon.png COMMAND convert -scale 79x79 -crop 60x60+8+19 ${CMAKE_CURRENT_SOURCE_DIR}/icons/desktop_icons/128x128/navit.png resources/Icon.png)
-      add_custom_command(OUTPUT resources/Default.png COMMAND convert -scale 79x79 -crop 60x60+8+19 ${CMAKE_CURRENT_SOURCE_DIR}/icons/desktop_icons/128x128/navit.png resources/Default.png)
-   endif()
-   add_executable(navit ${NAVIT_START_SRC})
-   target_link_libraries (navit ${NAVIT_LIBNAME})
-   if(DEFINED NAVIT_BINARY)
-	   set_target_properties(navit PROPERTIES OUTPUT_NAME ${NAVIT_BINARY})
-   endif(DEFINED NAVIT_BINARY)
-   if (BUILD_BUNDLE)
-      add_custom_command(OUTPUT resources/share COMMAND mkdir -p resources/share)
-      set_source_files_properties(resources/share resources/Icon.png resources/Default.png PROPERTIES MACOSX_PACKAGE_LOCATION Resources)
-      set_target_properties(navit PROPERTIES MACOSX_BUNDLE TRUE)
-      set_target_properties(navit PROPERTIES MACOSX_BUNDLE_INFO_PLIST ${CMAKE_CURRENT_SOURCE_DIR}/Info.plist)
-      add_dependencies(navit navit_config_xml_resource)
-      add_dependencies(navit images_resource)
-      add_dependencies(navit locale_resource)
-   endif()
+set(NAVIT_START_SRC start.c)
+if (APPLE)
+    set(NAVIT_START_SRC start_apple.m)
+endif()
+if (BUILD_BUNDLE)
+   list(APPEND NAVIT_START_SRC resources/share resources/Icon.png resources/Default.png)
+   add_custom_command(OUTPUT resources/Icon.png COMMAND convert -scale 79x79 -crop 60x60+8+19 ${CMAKE_CURRENT_SOURCE_DIR}/icons/desktop_icons/128x128/navit.png resources/Icon.png)
+   add_custom_command(OUTPUT resources/Default.png COMMAND convert -scale 79x79 -crop 60x60+8+19 ${CMAKE_CURRENT_SOURCE_DIR}/icons/desktop_icons/128x128/navit.png resources/Default.png)
+endif()
+add_executable(navit ${NAVIT_START_SRC})
+target_link_libraries (navit ${NAVIT_LIBNAME})
+if(DEFINED NAVIT_BINARY)
+        set_target_properties(navit PROPERTIES OUTPUT_NAME ${NAVIT_BINARY})
+endif(DEFINED NAVIT_BINARY)
+if (BUILD_BUNDLE)
+   add_custom_command(OUTPUT resources/share COMMAND mkdir -p resources/share)
+   set_source_files_properties(resources/share resources/Icon.png resources/Default.png PROPERTIES MACOSX_PACKAGE_LOCATION Resources)
+   set_target_properties(navit PROPERTIES MACOSX_BUNDLE TRUE)
+   set_target_properties(navit PROPERTIES MACOSX_BUNDLE_INFO_PLIST ${CMAKE_CURRENT_SOURCE_DIR}/Info.plist)
+   add_dependencies(navit navit_config_xml_resource)
+   add_dependencies(navit images_resource)
+   add_dependencies(navit locale_resource)
 endif()
 
 if (SHARED_LIBNAVIT)
@@ -138,20 +131,10 @@ macro(process_xslt SRC_XML DEST_XML)
    )
 endmacro()
 
-if(ANDROID)
-   process_xslt(${CMAKE_CURRENT_SOURCE_DIR}/navit_shipped.xml ${CMAKE_CURRENT_BINARY_DIR}/navitxxxhdpi.xml OSD_SIZE=5.33 ICON_SMALL=128 ICON_MEDIUM=192 ICON_BIG=256)
-   process_xslt(${CMAKE_CURRENT_SOURCE_DIR}/navit_shipped.xml ${CMAKE_CURRENT_BINARY_DIR}/navitxxhdpi.xml OSD_SIZE=4 ICON_SMALL=96 ICON_MEDIUM=128 ICON_BIG=192)
-   process_xslt(${CMAKE_CURRENT_SOURCE_DIR}/navit_shipped.xml ${CMAKE_CURRENT_BINARY_DIR}/navitxhdpi.xml OSD_SIZE=2.67 ICON_SMALL=64 ICON_MEDIUM=96 ICON_BIG=128)
-   process_xslt(${CMAKE_CURRENT_SOURCE_DIR}/navit_shipped.xml ${CMAKE_CURRENT_BINARY_DIR}/navithdpi.xml OSD_SIZE=2 ICON_SMALL=48 ICON_MEDIUM=64 ICON_BIG=96)
-   process_xslt(${CMAKE_CURRENT_SOURCE_DIR}/navit_shipped.xml ${CMAKE_CURRENT_BINARY_DIR}/navitmdpi.xml OSD_SIZE=1.33 ICON_SMALL=32 ICON_MEDIUM=48 ICON_BIG=64)
-   process_xslt(${CMAKE_CURRENT_SOURCE_DIR}/navit_shipped.xml ${CMAKE_CURRENT_BINARY_DIR}/navitldpi.xml OSD_SIZE=1 ICON_SMALL=24 ICON_MEDIUM=32 ICON_BIG=48)
-   add_custom_target( navit_config_xml ALL DEPENDS navitxxxhdpi.xml navitxxhdpi.xml navitxhdpi.xml navithdpi.xml navitmdpi.xml navitldpi.xml)
-else()
-   process_xslt(${CMAKE_CURRENT_SOURCE_DIR}/navit_shipped.xml ${CMAKE_CURRENT_BINARY_DIR}/navit.xml "")
-   add_custom_target( navit_config_xml_resource DEPENDS ${CMAKE_CURRENT_BINARY_DIR}/navit.xml COMMAND mkdir -p resources/share/navit COMMAND cp ${CMAKE_CURRENT_BINARY_DIR}/navit.xml resources/share/navit)
-   add_custom_target( locale_resource DEPENDS locales COMMAND mkdir -p resources/share COMMAND cp -a ${CMAKE_CURRENT_BINARY_DIR}/../locale resources/share/locale)
-   add_custom_target( navit_config_xml ALL DEPENDS ${CMAKE_CURRENT_BINARY_DIR}/navit.xml)
-endif()
+process_xslt(${CMAKE_CURRENT_SOURCE_DIR}/navit_shipped.xml ${CMAKE_CURRENT_BINARY_DIR}/navit.xml "")
+add_custom_target( navit_config_xml_resource DEPENDS ${CMAKE_CURRENT_BINARY_DIR}/navit.xml COMMAND mkdir -p resources/share/navit COMMAND cp ${CMAKE_CURRENT_BINARY_DIR}/navit.xml resources/share/navit)
+add_custom_target( locale_resource DEPENDS locales COMMAND mkdir -p resources/share COMMAND cp -a ${CMAKE_CURRENT_BINARY_DIR}/../locale resources/share/locale)
+add_custom_target( navit_config_xml ALL DEPENDS ${CMAKE_CURRENT_BINARY_DIR}/navit.xml)
 
 ADD_DEPENDENCIES(${NAVIT_LIBNAME} git_version)
 if (USE_LIBGNUINTL AND NOT HAVE_GLIB)
@@ -162,9 +145,6 @@ endif()
 add_subdirectory (maptool)
 add_subdirectory (icons)
 add_subdirectory (maps)
-if(ANDROID)
-   add_subdirectory (android)
-endif()
 
 install(TARGETS navit
         DESTINATION ${BIN_DIR}
@@ -177,14 +157,11 @@ install(FILES ${CMAKE_CURRENT_BINARY_DIR}/navit.xml
 get_directory_property(INCLUDE_DIRECTORIES INCLUDE_DIRECTORIES)
 WRITE_FILE("cmake_plugin_settings.txt"
 	"set(APPLE ${APPLE} CACHE BOOL init)\n" 
-	"set(ANDROID ${ANDROID} CACHE BOOL init)\n"
 	"set(USE_PLUGINS ${USE_PLUGINS} CACHE BOOL init)\n"
 	"set(MODULE_BUILD_TYPE \"${MODULE_BUILD_TYPE}\" CACHE STRING init)\n"
 	"set(NAVIT_COMPILE_FLAGS \"${NAVIT_COMPILE_FLAGS}\" CACHE STRING init)\n"
 	"set(navit_SOURCE_DIR \"${navit_SOURCE_DIR}\" CACHE STRING init)\n"
 	"set(NAVIT_LIBNAME \"${NAVIT_LIBNAME}\" CACHE STRING init)\n"
-	"set(ANDROID_API_VERSION \"${ANDROID_API_VERSION}\" CACHE STRING init)\n"
-	"set(ANDROID_NDK_API_VERSION \"${ANDROID_NDK_API_VERSION}\" CACHE STRING init)\n"
 	"set(CMAKE_TOOLCHAIN_FILE \"${CMAKE_TOOLCHAIN_FILE}\" CACHE STRING init)\n"
 	"set(INCLUDE_DIRECTORIES \"${INCLUDE_DIRECTORIES}\" CACHE STRING init)\n"
 	"set(LIB_DIR \"${LIB_DIR}\" CACHE STRING init)\n"

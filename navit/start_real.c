@@ -222,12 +222,7 @@ int main_real(int argc, char * const* argv)
 	}
 	event_main_loop_run();
 
-	/* TODO: Android actually has no event loop, so we can't free all allocated resources here. Have to find better place to
-	 *  free all allocations on program exit. And don't forget to free all the stuff allocated in the code above.
-	 */
-#ifndef HAVE_API_ANDROID
 	linguistics_free();
 	debug_finished();
-#endif
 	return 0;
 }

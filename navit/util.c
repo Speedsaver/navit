@@ -123,7 +123,7 @@ g_utf8_strlen_force_link(gchar *buffer, int max)
 }
 #endif
 
-#if defined (__APPLE__) || defined(HAVE_API_ANDROID)
+#if defined (__APPLE__)
 char *stristr(const char *String, const char *Pattern)
 {
       char *pptr, *sptr, *start;

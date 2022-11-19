@@ -551,13 +551,7 @@ gui_internal_search(struct gui_priv *this, const char *what, const char *type, i
 		wnext->func=gui_internal_search_town;
 	} else if (!strcmp(type,"Town")) {
 		if (this->country_iso2) {
-#ifdef HAVE_API_ANDROID
-			char country_iso2[strlen(this->country_iso2)+1];
-			strtolower(country_iso2, this->country_iso2);
-			country=g_strdup_printf("country_%s", country_iso2);
-#else
 			country=g_strdup_printf("country_%s", this->country_iso2);
-#endif
 		} else
 			country=g_strdup("gui_select_country");
 		gui_internal_widget_append(we, wb=gui_internal_image_new(this, image_new_xs(this, country)));

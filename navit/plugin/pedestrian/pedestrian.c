@@ -53,9 +53,6 @@
 
 /* #define DEMO 1 */
 
-#ifdef HAVE_API_ANDROID
-#include <navit/android.h>
-#endif
 static struct map *global_map;
 
 int orientation,orientation_old;
@@ -935,7 +932,6 @@ map_route_occluded_new(struct map_methods *meth, struct attr **attrs)
 static void
 pedestrian_graphics_resize(struct graphics *gra, int w, int h)
 {
-#ifndef HAVE_API_ANDROID
 	static int done;
 	if (!done) {
 		int id=(int)graphics_get_data(gra, "xwindow_id");
@@ -944,7 +940,6 @@ pedestrian_graphics_resize(struct graphics *gra, int w, int h)
 		system(buffer);
 		done=1;
 	}
-#endif
 	pedestrian_data.w=w;
 	pedestrian_data.h=h;
 }
@@ -1027,7 +1022,6 @@ pedestrian_graphics_postdraw(struct graphics *gra)
 	pedestrian_draw_arrows(gra);
 }
 
-#ifndef HAVE_API_ANDROID
 struct tilt_data {
 	int len,axis;
 	char buffer[32];
@@ -1113,103 +1107,9 @@ pedestrian_setup_tilt(struct navit *nav)
 #else
 
 
-float sensors[2][3];
-
-static void
-android_sensors(struct navit *nav, int sensor, float *x, float *y, float *z)
-{
-	float yaw=0,pitch=0;
-	struct attr attr;
-	sensors[sensor-1][0]=*x;
-	sensors[sensor-1][1]=*y;
-	sensors[sensor-1][2]=*z;
-	if (sensors_locked)
-		return;
-	dbg(lvl_debug,"enter %d %f %f %f\n",sensor,*x,*y,*z);
-	if (sensor == 1) {
-		if (*x > 7.5)
-			orientation=1; /* landscape */
-		if (*y > 7.5)
-			orientation=0; /* portrait */
-		if (*z > 7.5)
-			orientation=2; /* flat */
-		dbg(lvl_debug,"orientation=%d\n",orientation);
-	}
-	if ((orientation_old == 2) != (orientation == 2)) {
-		struct attr attr, flags_graphics, osd_configuration;
-		navit_set_attr(nav, orientation == 2 ? &initial_layout:&main_layout);
-		navit_get_attr(nav, attr_transformation, &attr, NULL);
-		transform_set_scale(attr.u.transformation, orientation == 2 ? 64:16);
-		flags_graphics.type=attr_flags_graphics;
-		flags_graphics.u.num=orientation == 2 ? 0:10;
-		navit_set_attr(nav, &flags_graphics);
-		osd_configuration.type=attr_osd_configuration;
-		osd_configuration.u.num=orientation == 2 ? 1:2;
-		navit_set_attr(nav, &osd_configuration);
-	}
-	orientation_old=orientation;
-	switch (orientation) {
-	case 2:
-		if (sensor == 2) {
-			yaw=atan2f(-*y,-*x)*180/M_PI+180;
-		}
-		pitch=0;
-		break;
-	case 1:
-		if (sensor == 1) {
-			pitch=atan2f(*x,*z)*180/M_PI;	
-		}
-		if (sensor == 2) {
-			yaw=atan2f(-*y,*z)*180/M_PI+180;
-		}
-		break;
-	case 0:
-		if (sensor == 1) {
-			pitch=atan2f(*y,*z)*180/M_PI;
-		}
-		if (sensor == 2) {
-			yaw=atan2f(*x,*z)*180/M_PI+180;
-		}
-		break;
-	}
-	if (navit_get_attr(nav, attr_transformation, &attr, NULL)) {
-		struct transformation *trans=attr.u.transformation;
-		if (sensor == 1) {
-			if (orientation != 2)
-				pitch+=2.0;
-			transform_set_pitch(trans, (int)pitch);
-			dbg(lvl_debug,"pich %d %f\n",orientation,pitch);
-		} else {
-			struct attr attr;
-			attr.type=attr_orientation;
-			attr.u.num=yaw-1.0;
-			if (attr.u.num < 0)
-				attr.u.num+=360;
-			pedestrian_data.yaw=attr.u.num;
-			navit_set_attr(nav, &attr);
-			dbg(lvl_debug,"yaw %d %f\n",orientation,yaw);
-			if (orientation == 2) 
-				navit_set_center_cursor(nav, 1, 0);
-		}
-	}
-}
-#endif
-
 static void
 pedestrian_log(char **logstr)
 {
-#ifdef HAVE_API_ANDROID
-	char *tag=g_strdup_printf(
-		"\t\t<navit:compass:x>%f</navit:compass:x>\n"
-		"\t\t<navit:compass:y>%f</navit:compass:y>\n"
-		"\t\t<navit:compass:z>%f</navit:compass:z>\n"
-		"\t\t<navit:accel:x>%f</navit:accel:x>\n"
-		"\t\t<navit:accel:y>%f</navit:accel:y>\n"
-		"\t\t<navit:accel:z>%f</navit:accel:z>\n",
-		sensors[0][0],sensors[0][1],sensors[0][2],
-		sensors[1][0],sensors[1][1],sensors[1][2]);
-	vehicle_log_gpx_add_tag(tag, logstr);
-#endif
 }
 
 #ifdef DEMO
@@ -1238,26 +1138,6 @@ pedestrian_navit_init(struct navit *nav)
 	struct transformation *trans;
 	struct attr_iter *iter;
 
-#ifdef HAVE_API_ANDROID
-	struct callback *cb;
-	jclass navitsensorsclass;
-	jmethodID cid;
-	jobject navitsensors;
-
-	dbg(lvl_debug,"enter\n");
-	if (android_find_class_global("org/navitproject/navit/NavitSensors", &navitsensorsclass)) {
-		dbg(lvl_debug,"class found\n");
-		cid = (*jnienv)->GetMethodID(jnienv, navitsensorsclass, "<init>", "(Landroid/content/Context;I)V");
-		dbg(lvl_debug,"cid=%p\n",cid);
-		if (cid) {
-			cb=callback_new_1(callback_cast(android_sensors), nav);
-			navitsensors=(*jnienv)->NewObject(jnienv, navitsensorsclass, cid, android_activity, cb);
-			dbg(lvl_debug,"object=%p\n",navitsensors);
-			if (navitsensors)
-				navitsensors = (*jnienv)->NewGlobalRef(jnienv, navitsensors);
-		}
-	}
-#endif
 	pedestrian_data.nav=nav;
 	flags_graphics.type=attr_flags_graphics;
 	flags_graphics.u.num=10;
@@ -1357,17 +1237,6 @@ plugin_init(void)
 {
 	struct attr callback,navit;
 	struct attr_iter *iter;
-#ifdef HAVE_API_ANDROID
-	jclass ActivityClass;
-	jmethodID Activity_setRequestedOrientation;
-
-	if (!android_find_class_global("android/app/Activity", &ActivityClass))
-		dbg(lvl_error,"failed to get class android/app/Activity\n");
-        Activity_setRequestedOrientation = (*jnienv)->GetMethodID(jnienv, ActivityClass, "setRequestedOrientation", "(I)V");
-        if (Activity_setRequestedOrientation == NULL)
-		dbg(lvl_error,"failed to get method setRequestedOrientation from android/app/Activity\n");
-	(*jnienv)->CallVoidMethod(jnienv, android_activity, Activity_setRequestedOrientation, 0);
-#endif
 	
     	plugin_register_category_osd("marker", osd_marker_new);
 	plugin_register_category_map("route_occluded", map_route_occluded_new);

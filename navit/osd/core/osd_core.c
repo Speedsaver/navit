@@ -1511,8 +1511,7 @@ struct osd_button {
  *
  * If this is the case for height and/or width, the respective dimension will be updated to fit the image.
  *
- * Note that this method is used by several OSD items, notably {@code osd_image}, {@code osd_button} and
- * {@code osd_android_menu}.
+ * Note that this method is used by several OSD items, notably {@code osd_image}, and {@code osd_button}.
  *
  * @param opc The OSD item
  * @param img The image displayed by the item

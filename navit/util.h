@@ -32,7 +32,7 @@ int navit_utf8_strcasecmp(const char *s1, const char *s2);
 GList * g_hash_to_list(GHashTable *h);
 GList * g_hash_to_list_keys(GHashTable *h);
 gchar * g_strconcat_printf(gchar *buffer, gchar *fmt, ...);
-#if defined (__APPLE__) || defined(HAVE_API_ANDROID)
+#if defined (__APPLE__)
 char * newSysString(const char *toconvert);
 #endif
 unsigned int iso8601_to_secs(char *iso8601);

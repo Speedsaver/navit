@@ -109,11 +109,9 @@ main_init(const char *program)
 	spawn_process_init();
 
 	cbl=callback_list_new();
-#ifndef HAVE_API_ANDROID
 	setenv("LC_NUMERIC","C",1);
 	setlocale(LC_ALL,"");
 	setlocale(LC_NUMERIC,"C");
-#endif
 	if (file_exists("navit.c") || file_exists("navit.o") || file_exists("navit.lo") || file_exists("version.h")) {
 		char buffer[PATH_MAX];
 		printf("%s",_("Running from source directory\n"));
@@ -137,11 +135,7 @@ main_init(const char *program)
 			} else
 				setenv("NAVIT_PREFIX", PREFIX, 0);
 		}
-#ifdef HAVE_API_ANDROID
-		main_setup_environment(3);
-#else
 		main_setup_environment(1);
-#endif
 	}
 
 	s = getenv("NAVIT_WID");

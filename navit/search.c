@@ -36,9 +36,6 @@
 #include "util.h"
 #include "search_houseno_interpol.h"
 
-#ifdef HAVE_API_ANDROID
-#include "android.h"
-#endif
 #include "layout.h"
 
 static struct search_list_result *search_list_result_dup(struct search_list_result *slr);
@@ -518,12 +515,7 @@ search_list_country_new(struct item *item)
 	if (item_attr_get(item, attr_country_car, &attr))
 		ret->car=g_strdup(attr.u.str);
 	if (item_attr_get(item, attr_country_iso2, &attr)) {
-#ifdef HAVE_API_ANDROID
-		ret->iso2=g_malloc(strlen(attr.u.str)+1);
-		strtolower(ret->iso2, attr.u.str);
-#else
 		ret->iso2=g_strdup(attr.u.str);
-#endif
 		ret->flag=g_strdup_printf("country_%s", ret->iso2);
 	}
 	if (item_attr_get(item, attr_country_iso3, &attr))

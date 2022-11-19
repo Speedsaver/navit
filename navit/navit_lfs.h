@@ -35,11 +35,6 @@
 #include <unistd.h>
 #include <fcntl.h>
 
-#ifdef HAVE_API_ANDROID
-#undef lseek
-#define lseek lseek64
-#endif
-
 #ifndef O_LARGEFILE
 #define O_LARGEFILE 0
 #endif

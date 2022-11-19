@@ -30,10 +30,6 @@
 #include "item.h"
 #include "debug.h"
 
-#ifdef HAVE_API_ANDROID
-#include <android/log.h>
-#endif
-
 #ifdef HAVE_SOCKET
 #include <stdlib.h>
 #include <sys/socket.h>
@@ -73,10 +69,8 @@ static void sigsegv(int sig)
 void
 debug_init(const char *program_name)
 {
-#ifndef HAVE_API_ANDROID
 	gdb_program=g_strdup(program_name);
 	signal(SIGSEGV, sigsegv);
-#endif
 	debug_hash=g_hash_table_new_full(g_str_hash, g_str_equal, g_free, NULL);
 #ifdef __IPHONE_OS_VERSION_MIN_REQUIRED
 	debug_fp = stdout;
@@ -107,13 +101,11 @@ void
 debug_level_set(const char *name, dbg_level level)
 {
 	if (!strcmp(name, "segv")) {
-#ifndef HAVE_API_ANDROID
 		segv_level=level;
 		if (segv_level)
 			signal(SIGSEGV, sigsegv);
 		else
 			signal(SIGSEGV, NULL);
-#endif
 	} else if (!strcmp(name, "timestamps")) {
 		timestamp_prefix=level;
 	} else if (!strcmp(name, DEBUG_MODULE_GLOBAL)) {
@@ -235,26 +227,6 @@ static char* dbg_level_to_string(dbg_level level)
 	return "-invalid level-";
 }
 
-#ifdef HAVE_API_ANDROID
-static android_LogPriority
-dbg_level_to_android(dbg_level level)
-{
-	switch(level) {
-		case lvl_unset:
-			return ANDROID_LOG_UNKNOWN;
-		case lvl_error:
-			return ANDROID_LOG_ERROR;
-		case lvl_warning:
-			return ANDROID_LOG_WARN;
-		case lvl_info:
-			return ANDROID_LOG_INFO;
-		case lvl_debug:
-			return ANDROID_LOG_DEBUG;
-	}
-	return ANDROID_LOG_UNKNOWN;
-}
-#endif
-
 void
 debug_vprintf(dbg_level level, const char *module, const int mlen, const char *function, const int flen, int prefix, const char *fmt, va_list ap)
 {
@@ -273,9 +245,6 @@ debug_vprintf(dbg_level level, const char *module, const int mlen, const char *f
 			strcpy(debug_message+strlen(debug_message),":");
 		}
 		vsnprintf(debug_message+strlen(debug_message),4095-strlen(debug_message),fmt,ap);
-#ifdef HAVE_API_ANDROID
-		__android_log_print(dbg_level_to_android(level), "navit", "%s", debug_message);
-#else
 #ifdef HAVE_SOCKET
 		if (debug_socket != -1) {
 			sendto(debug_socket, debug_message, strlen(debug_message), 0, (struct sockaddr *)&debug_sin, sizeof(debug_sin));
@@ -287,7 +256,6 @@ debug_vprintf(dbg_level level, const char *module, const int mlen, const char *f
 			fp = stderr;
 		fprintf(fp,"%s",debug_message);
 		fflush(fp);
-#endif
 	}
 }
 

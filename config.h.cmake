@@ -1,7 +1,6 @@
 #cmakedefine HAVE_MALLOC_H 1
 #cmakedefine HAVE_SYS_MOUNT_H 1
 #cmakedefine HAVE_STDINT_H 1
-#cmakedefine HAVE_API_ANDROID 1
 #cmakedefine HAVE_API_TOMTOM 1
 #cmakedefine HAVE_GLIB 1
 #cmakedefine HAVE_GMODULE 1

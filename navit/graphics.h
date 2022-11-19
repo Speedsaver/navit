@@ -73,9 +73,7 @@ struct graphics_keyboard {
 	int w;										/**< The width of the area obscured by the keyboard (-1 for full width) */
 	int h;										/**< The height of the area obscured by the keyboard (-1 for full height) */
 	/* TODO mode is currently a copy of the respective value in the internal GUI and uses the same values.
-	 * This may need to be changed to something with globally available enum, possibly with revised values.
-	 * The Android implementation (the first to support a native on-screen keyboard) does not use this field
-	 * due to limitations of the platform. */
+	 * This may need to be changed to something with globally available enum, possibly with revised values. */
 	int mode;									/**< Mode flags for the keyboard */
 	char *lang;									/**< The preferred language for text input, may be {@code NULL}. */
 	void *gui_priv;								/**< Private data determined by the GUI. The GUI may store
@@ -97,7 +95,6 @@ struct graphics_keyboard {
  * This struct lists the functions that Navit graphics plugins must implement.
  * The plugin must supply its list of function implementations from its plugin_init() function.
  * @see graphics_gtk_drawing_area#plugin_init()
- * @see graphics_android#plugin_init()
  */
 
 /**

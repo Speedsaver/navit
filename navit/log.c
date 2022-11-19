@@ -117,17 +117,11 @@ expand_filenames(struct log *this_)
 	strftime_localtime(buffer, 4096, this_->filename);
 	this_->filename_ex1=g_strdup(buffer);
 	if ((pos=strstr(this_->filename_ex1,"%i"))) {
-#ifdef HAVE_API_ANDROID
-		pos[1]='d';
-#endif
 		i=0;
 		do {
 			g_free(this_->filename_ex2);
 			this_->filename_ex2=g_strdup_printf(this_->filename_ex1,i++);
 		} while (file_exists(this_->filename_ex2));
-#ifdef HAVE_API_ANDROID
-		pos[1]='i';
-#endif
 	} else 
 		this_->filename_ex2=g_strdup(this_->filename_ex1);
 }
