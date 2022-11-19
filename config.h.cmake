@@ -1,13 +1,8 @@
-#cmakedefine HAVE_MALLOC_H 1
-#cmakedefine HAVE_SYS_MOUNT_H 1
-#cmakedefine HAVE_STDINT_H 1
 #cmakedefine HAVE_GLIB 1
 #cmakedefine HAVE_GMODULE 1
-#cmakedefine HAVE_GETCWD 1
 #define CACHE_SIZE ${CACHE_SIZE}
 #cmakedefine AVOID_FLOAT 1
 #cmakedefine AVOID_UNALIGNED 1
-#cmakedefine USE_LIBGNUINTL 1
 #cmakedefine HAVE_BYTESWAP_H 1
 /* Versions */
 #cmakedefine PACKAGE_VERSION "@PACKAGE_VERSION@"
@@ -38,37 +33,14 @@
 #cmakedefine DBUS_USE_SYSTEM_BUS 1
 
 #cmakedefine HAVE_SOCKET 1
-#cmakedefine HAVE_SNPRINTF 1
-#cmakedefine HAVE_DECL__SNPRINTF 1
-
-#cmakedefine HAVE_MEMALIGN 1
-
-#cmakedefine HAVE_POSIX_MEMALIGN 1
-
-#cmakedefine HAVE_VALLOC 1
-
-#cmakedefine HAVE_LC_MESSAGES 1
 
 #cmakedefine HAVE_SYS_TIME_H 1
 
 #cmakedefine HAVE_POPEN 1
 
 #cmakedefine HAVE_GETOPT_H 1
-#cmakedefine HAVE_GETTIMEOFDAY 1
-
-#cmakedefine HAVE__ATOI64 1
-
-#cmakedefine HAVE_STRING_H 1
-
-#cmakedefine EZXML_NOMMAP 0
-
-#cmakedefine HAVE_STPCPY 1
 
 #cmakedefine HAVE_SBRK 1
-
-#cmakedefine HAVE_GETDELIM 1
-
-#cmakedefine HAVE_GETLINE 1
 
 #cmakedefine HAVE_FSYNC 1
 

@@ -134,9 +134,6 @@ add_custom_target( locale_resource DEPENDS locales COMMAND mkdir -p resources/sh
 add_custom_target( navit_config_xml ALL DEPENDS ${CMAKE_CURRENT_BINARY_DIR}/navit.xml)
 
 ADD_DEPENDENCIES(${NAVIT_LIBNAME} git_version)
-if (USE_LIBGNUINTL AND NOT HAVE_GLIB)
-   ADD_DEPENDENCIES(support_glib support_gettext_intl)
-endif()
 
 
 add_subdirectory (maptool)
