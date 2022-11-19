@@ -12,16 +12,8 @@ navit/gui/sdl/gui_sdl.h
 navit/gui/sdl/sdl_events.h
 navit/gui/sdl/cegui_keyboard.cpp
 navit/gui/sdl/gui_sdl_window.cpp
-navit/gui/gtk/gui_gtk.h
-navit/gui/gtk/gui_gtk_window.c
-navit/gui/gtk/datawindow.c
-navit/gui/gtk/destination.c
-navit/gui/gtk/gui_gtk_statusbar.c
-navit/gui/gtk/gui_gtk_action.c
 navit/gui/internal/gui_internal.c
-navit/graphics/gtk_gl_ext/graphics_gtk_gl_ext.c
 navit/graphics/qt_qpainter/graphics_qt_qpainter.cpp
-navit/graphics/gtk_drawing_area/graphics_gtk_drawing_area.c
 navit/graphics/null/graphics_null.c
 navit/data/mg/tree.c
 navit/data/mg/poly.c
@@ -96,7 +88,6 @@ navit/map_data.h
 navit/speech.h
 navit/data.h
 navit/attr.h
-navit/data_window_int.h
 navit/transform.h
 navit/plugin_def.h
 navit/projection.h
@@ -121,7 +112,6 @@ navit/mapset.h
 navit/plugin.h
 navit/data_window.h
 navit/search.h
-navit/gtkext.h
 navit/layer.h
 navit/map.h
 navit/maptype.h

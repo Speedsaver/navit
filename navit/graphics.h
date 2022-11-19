@@ -94,7 +94,6 @@ struct graphics_keyboard {
  *
  * This struct lists the functions that Navit graphics plugins must implement.
  * The plugin must supply its list of function implementations from its plugin_init() function.
- * @see graphics_gtk_drawing_area#plugin_init()
  */
 
 /**
