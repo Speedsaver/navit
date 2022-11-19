@@ -6,13 +6,6 @@ navit/vehicle/demo/vehicle_demo.c
 navit/vehicle/gpsd/vehicle_gpsd.c
 navit/gui/internal/gui_internal.c
 navit/graphics/null/graphics_null.c
-navit/data/mg/tree.c
-navit/data/mg/poly.c
-navit/data/mg/street.c
-navit/data/mg/town.c
-navit/data/mg/mg.h
-navit/data/mg/block.c
-navit/data/mg/map.c
 navit/data/binfile/binfile.c
 navit/data/garmin_img/garmin_img.c
 navit/data/garmin/gentypes.c
