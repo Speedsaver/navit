@@ -99,34 +99,9 @@ ADD_CUSTOM_TARGET(
                     -P ${PROJECT_SOURCE_DIR}/cmake/version.cmake
 )
 
-# additional parameter are passed to the stylesheet processor as parameter
-macro(process_xslt SRC_XML DEST_XML)
-   set(XSLT_COMMANDS COMMAND ${CMAKE_COMMAND} -E copy ${SRC_XML} ${DEST_XML}
-                     COMMAND ${CMAKE_COMMAND} -E copy ${PROJECT_SOURCE_DIR}/navit/navit.dtd ${CMAKE_CURRENT_BINARY_DIR}/navit.dtd)
-   if(XSL_PROCESSING AND XSLTS)
-       string(REPLACE "," ";" XSLTS "${XSLTS}")
-       foreach(tmp ${XSLTS})
-          set(XSLT_FILE "${PROJECT_SOURCE_DIR}/navit/xslt/${tmp}.xslt")
-          list(APPEND XSLT_FILES "${XSLT_FILE}")
-          list(APPEND XSLT_COMMANDS COMMAND ${CMAKE_COMMAND} -E echo  Applying ${tmp}.xslt)
-          compose_xslt_transform_command(CMD "${XSLT_FILE}" "${DEST_XML}" "${DEST_XML}.tmp" "${ARGN}")
-          list(APPEND XSLT_COMMANDS ${CMD})
-          list(APPEND XSLT_COMMANDS COMMAND ${CMAKE_COMMAND} -E rename ${DEST_XML}.tmp ${DEST_XML})
-       endforeach()
-   endif()
-   # Depend on all XSLT files, because the main XSLT file may pull in other files.
-   # Ideally we'd parse the main XSLT file for includes, but that is tricky to do reliably.
-   # Note that this list of files is only updated when (re)running CMake, so if files are
-   # added/deleted, CMake must be re-run manually.
-   file(GLOB ALL_XSLT_FILES "${PROJECT_SOURCE_DIR}/navit/xslt/*.xslt")
-   ADD_CUSTOM_COMMAND(
-      OUTPUT ${DEST_XML}
-      DEPENDS ${SRC_XML} ${ALL_XSLT_FILES}
-      ${XSLT_COMMANDS}
-   )
-endmacro()
+configure_file(${CMAKE_CURRENT_SOURCE_DIR}/navit_shipped.xml ${CMAKE_CURRENT_BINARY_DIR}/navit.xml COPYONLY)
+configure_file(${CMAKE_CURRENT_SOURCE_DIR}/navit.dtd ${CMAKE_CURRENT_BINARY_DIR}/navit.dtd COPYONLY)
 
-process_xslt(${CMAKE_CURRENT_SOURCE_DIR}/navit_shipped.xml ${CMAKE_CURRENT_BINARY_DIR}/navit.xml "")
 add_custom_target( navit_config_xml_resource DEPENDS ${CMAKE_CURRENT_BINARY_DIR}/navit.xml COMMAND mkdir -p resources/share/navit COMMAND cp ${CMAKE_CURRENT_BINARY_DIR}/navit.xml resources/share/navit)
 add_custom_target( locale_resource DEPENDS locales COMMAND mkdir -p resources/share COMMAND cp -a ${CMAKE_CURRENT_BINARY_DIR}/../locale resources/share/locale)
 add_custom_target( navit_config_xml ALL DEPENDS ${CMAKE_CURRENT_BINARY_DIR}/navit.xml)

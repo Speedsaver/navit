@@ -384,34 +384,6 @@ ENDIF()
 
 add_feature(DBUS_USE_SYSTEM_BUS "default" FALSE)
 add_feature(BUILD_MAPTOOL "default" TRUE)
-add_feature(XSL_PROCESSING "default" TRUE)
-
-set(SUPPORTED_XSLT_PROCESSORS "saxonb-xslt;saxon;saxon8;saxon-xslt;xsltproc;transform.exe")
-find_program(XSLT_PROCESSOR NAMES ${SUPPORTED_XSLT_PROCESSORS})
-if(XSLT_PROCESSOR)
-   message(STATUS "Found XSLT processor: ${XSLT_PROCESSOR}")
-   execute_process(COMMAND ${XSLT_PROCESSOR} -snone ${CMAKE_CURRENT_SOURCE_DIR}/cmake/test.xml ${CMAKE_CURRENT_SOURCE_DIR}/cmake/test.xslt
-      RESULT_VARIABLE SAXON_ERROR OUTPUT_QUIET ERROR_QUIET)
-   if (NOT SAXON_ERROR)
-      set (XSLT_PROCESSOR_OPTIONS -snone)
-   endif()
-   # additional parameter is passed to the stylesheet processor as transformation parameter
-   macro(compose_xslt_transform_command CMDVAR XSLT_FILE SRC_XML DEST_XML)
-      if(${XSLT_PROCESSOR} MATCHES "xsltproc")
-         set(${CMDVAR} COMMAND ${XSLT_PROCESSOR} ${XSLT_PROCESSOR_OPTIONS} ${XSLT_FILE} ${SRC_XML} >${DEST_XML})
-      else()
-         set(${CMDVAR} COMMAND ${XSLT_PROCESSOR} ${XSLT_PROCESSOR_OPTIONS} ${SRC_XML} ${XSLT_FILE} ${ARGN} >${DEST_XML})
-      endif()
-   endmacro()
-else()
-   cfg_feature(XSL_PROCESSING "Saxon missing" FALSE)
-endif(XSLT_PROCESSOR)
-
-if (NOT XSL_PROCESSING)
-   message(WARNING "No XSLT processor available. You have to configure "
-"navit.xml yourself, or install an XSLT processor (supported: "
-"${SUPPORTED_XSLT_PROCESSORS}).")
-endif()
 
 ### Platform specific settings
 if(NOT CACHE_SIZE)
@@ -470,8 +442,6 @@ if (XPM2PNG)
       set_with_reason(XPM2PNG "no converter found" FALSE)
    endif(NOT IMAGE_CONVERTER_XPM)
 endif(XPM2PNG)
-
-set(XSLTS ${XSLTS} CACHE STRING "define a semicolon seperated list of XSLTs to process")
 
 # Plugins
 if(USE_PLUGINS)
@@ -547,16 +517,6 @@ if (NOT NAVIT_DEPENDENCY_ERROR)
          message("Disabled  ${FEATURE} ( ${${FEATURE}_REASON} )")
       endif()
    endforeach()
-
-   if (XSL_PROCESSING)
-      if (XSLTS)
-         message("\nProcessing XSLT files: ${XSLTS}")
-      else()
-         message("\nProcessing XSLT files: NONE")
-      endif(XSLTS)
-      message("See navit/xslt for available XSLT files, and put them into "
-	      "cache variable 'XSLTS' (without extension .xslt).")
-   endif(XSL_PROCESSING)
 
    message("\nTo configure your build use 'cmake -L' to find changeable variables and run cmake again with 'cmake -D <var-name>=<your value> ...'.")
 endif(NOT NAVIT_DEPENDENCY_ERROR)
