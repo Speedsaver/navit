@@ -857,7 +857,6 @@ if (NOT NAVIT_DEPENDENCY_ERROR)
 endif(NOT NAVIT_DEPENDENCY_ERROR)
 
 add_subdirectory (navit)
-add_subdirectory (man)
 
 
 if (USE_NATIVE_LANGUAGE_SUPPORT)
