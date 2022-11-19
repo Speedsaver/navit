@@ -7,10 +7,6 @@ navit/vehicle/gpsd/vehicle_gpsd.c
 navit/gui/internal/gui_internal.c
 navit/graphics/null/graphics_null.c
 navit/data/binfile/binfile.c
-navit/data/garmin_img/garmin_img.c
-navit/data/garmin/gentypes.c
-navit/data/garmin/gar2navit.c
-navit/data/garmin/garmin.c
 navit/osd/core/osd_core.c
 navit/country.c
 navit/track.c
