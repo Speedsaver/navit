@@ -40,27 +40,6 @@
 #include "navit_nls.h"
 #include "bookmarks.h"
 
-#if 0
-static void
-popup_set_no_passing(struct popup_item *item, void *param)
-{
-#if 0
-	struct display_list *l=param;
-	struct segment *seg=(struct segment *)(l->data);
-	struct street_str *str=(struct street_str *)(seg->data[0]);
-	char log[256];
-	int segid=str->segid;
-	if (segid < 0)
-		segid=-segid;
-
-	sprintf(log,"Attributes Street 0x%x updated: limit=0x%x(0x%x)", segid, 0x33, str->limit);
-	str->limit=0x33;
-	log_write(log, seg->blk_inf.file, str, sizeof(*str));
-#endif
-}
-
-#endif
-
 static void
 popup_traffic_distortion(struct item *item, char *attr)
 {
@@ -181,23 +160,6 @@ popup_set_position(struct navit *nav, struct pcoord *pc)
 	navit_set_position(nav, pc);
 }
 
-#if 0
-static void
-popup_break_crossing(struct display_list *l)
-{
-	struct segment *seg=(struct segment *)(l->data);
-	struct street_str *str=(struct street_str *)(seg->data[0]);
-	char log[256];
-	int segid=str->segid;
-	if (segid < 0)
-		segid=-segid;
-
-	sprintf(log,"Coordinates Street 0x%x updated: limit=0x%x(0x%x)", segid, 0x33, str->limit);
-	str->limit=0x33;
-	log_write(log, seg->blk_inf.file, str, sizeof(*str));
-}
-#endif
-
 
 #define popup_printf(menu, type, ...) popup_printf_cb(menu, type, NULL, __VA_ARGS__)
 
@@ -266,29 +228,9 @@ popup_show_attr_val(struct map *map, void *menu, struct attr *attr)
 	g_free(str);
 }
 
-#if 0
-static void
-popup_show_attr(void *menu, struct item *item, enum attr_type attr_type)
-{
-	struct attr attr;
-	memset(&attr, 0, sizeof(attr));
-	attr.type=attr_type;
-	if (item_attr_get(item, attr_type, &attr)) 
-		popup_show_attr_val(menu, &attr);
-}
-#endif
-
 static void
 popup_show_attrs(struct map *map, void *menu, struct item *item)
 {
-#if 0
-	popup_show_attr(menu, item, attr_debug);
-	popup_show_attr(menu, item, attr_address);
-	popup_show_attr(menu, item, attr_phone);
-	popup_show_attr(menu, item, attr_phone);
-	popup_show_attr(menu, item, attr_entry_fee);
-	popup_show_attr(menu, item, attr_open_hours);
-#else
 	struct attr attr;
 	for (;;) {
 		memset(&attr, 0, sizeof(attr));
@@ -297,8 +239,6 @@ popup_show_attrs(struct map *map, void *menu, struct item *item)
 		else
 			break;
 	}
-	
-#endif
 }
 
 static void

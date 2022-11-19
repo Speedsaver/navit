@@ -326,9 +326,6 @@ map_rect_new(struct map *m, struct map_selection *sel)
 {
 	struct map_rect *mr;
 
-#if 0
-	printf("map_rect_new 0x%x,0x%x-0x%x,0x%x\n", r->lu.x, r->lu.y, r->rl.x, r->rl.y);
-#endif
 	mr=g_new0(struct map_rect, 1);
 	mr->m=m;
 	mr->priv=m->meth.map_rect_new(m->priv, sel);

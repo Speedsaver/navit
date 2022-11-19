@@ -208,18 +208,6 @@ is_double(struct result *res)
 static void
 dump(struct result *res)
 {
-#if 0
-	char object[res->varlen+1];
-	char attribute[res->attrnlen+1];
-	if (res->var)
-		strncpy(object, res->var, res->varlen);
-	object[res->varlen]='\0';
-	if (res->attrn)
-		strncpy(attribute, res->attrn, res->attrnlen);
-	attribute[res->attrnlen]='\0';
-	dbg(lvl_debug,"type:%s\n", attr_to_name(res->attr.type));
-	dbg(lvl_debug,"attribute '%s' from '%s'\n", attribute, object);
-#endif
 }
 
 static enum attr_type
@@ -1264,27 +1252,6 @@ eval_list(struct context *ctx)
 	}
 }
 
-#if 0
-
-void command(struct attr *attr, char *expr)
-{
-	struct result res;
-	struct context ctx;
-	memset(&res, 0, sizeof(res));
-	memset(&ctx, 0, sizeof(ctx));
-	ctx.attr=attr;
-	ctx.error=0;
-	ctx.expr=expr;
-	printf("command='%s'\n", expr);
-	eval_comma(&ctx,&res);
-	printf("err=%d %s\n", ctx.error, ctx.expr);
-	dump(&res);
-	printf("***\n");
-	resolve(&ctx, &res);
-	dump(&res);
-	printf("%s\n", get_string(&ctx, &res));
-}
-#endif
 
 static void
 command_evaluate_to(struct attr *attr, const char *expr, struct context *ctx, struct result *res)
@@ -1576,23 +1543,6 @@ command_evaluate(struct attr *attr, const char *expr)
 	}
 	g_free(expr_dup);
 }
-
-#if 0
-void
-command_interpreter(struct attr *attr)
-{
-                char buffer[4096];
-                int size;
-                for (;;) {
-                size=read(0, buffer, 4095);
-                buffer[size]='\0';
-                if (size) {
-                        buffer[size-1]='\0';
-                }
-                command(attr, buffer);
-                }
-}
-#endif
 
 static void
 command_table_call(struct command_table *table, int count, void *data, char *command, struct attr **in, struct attr ***out, int *valid)

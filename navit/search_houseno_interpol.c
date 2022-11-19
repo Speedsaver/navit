@@ -196,11 +196,7 @@ search_house_number_coordinate(struct item *item, struct house_number_interpolat
 				dbg(lvl_debug,"distance[%d]=%d\n",i,distances[i]);
 			}
 			dbg(lvl_debug,"sum=%d\n",distance_sum);
-#if 0
-			hn_distance=distance_sum*hn_pos/hn_length;
-#else
 			hn_distance=(distance_sum*hn_pos+distance_sum*inter_increment/2)/(hn_length+inter_increment);
-#endif
 			dbg(lvl_debug,"hn_distance=%d\n",hn_distance);
 			i=0;
 			while (i < count-1 && hn_distance > distances[i])

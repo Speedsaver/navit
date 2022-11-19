@@ -152,10 +152,6 @@ NPP_New(NPMIMEType pluginType, NPP instance, uint16_t mode, int16_t argc,
 		printf("Windowless mode not supported by the browser\n");
 		return NPERR_GENERIC_ERROR;
 	}
-#if 0
-	sBrowserFuncs->setvalue(instance, NPPVpluginWindowBool,
-				(void *) true);
-#endif
 
 	// set up our our instance data
 	InstanceData *instanceData =
@@ -250,25 +246,6 @@ NPP_HandleEvent(NPP instance, void *event)
 
 
 	return 0;
-
-#if 0
-	InstanceData *instanceData = (InstanceData *) (instance->pdata);
-	XEvent *nativeEvent = (XEvent *) event;
-
-	if (nativeEvent->type != GraphicsExpose)
-		return 0;
-
-	XGraphicsExposeEvent *expose = &nativeEvent->xgraphicsexpose;
-	instanceData->window.window = (void *) (expose->drawable);
-
-	GdkNativeWindow nativeWinId = (XID) (instanceData->window.window);
-	GdkDrawable *gdkWindow =
-	    GDK_DRAWABLE(gdk_window_foreign_new(nativeWinId));
-	drawWindow(instanceData, gdkWindow);
-	g_object_unref(gdkWindow);
-#endif
-
-	return 1;
 }
 
 void

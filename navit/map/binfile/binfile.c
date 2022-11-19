@@ -406,9 +406,6 @@ binfile_search_cd(struct map_priv *m, int offset, char *name, int partial, int s
 	int len=strlen(name);
 	long long cdoffset=m->eoc64?m->eoc64->zip64eofst:m->eoc->zipeofst;
 	struct zip_cd *cd;
-#if 0
-	dbg(lvl_debug,"end=%d\n",end);
-#endif
 	while (offset < end) {
 		cd=(struct zip_cd *)(m->search_data+offset-m->search_offset);
 		if (! m->search_data ||
@@ -416,9 +413,6 @@ binfile_search_cd(struct map_priv *m, int offset, char *name, int partial, int s
 		      offset-m->search_offset+sizeof(*cd) > m->search_size ||
 		      offset-m->search_offset+sizeof(*cd)+cd->zipcfnl+cd->zipcxtl > m->search_size
 		   ) {
-#if 0
-			dbg(lvl_debug,"reload %p %d %d\n", m->search_data, m->search_offset, offset);
-#endif
 			if (m->search_data)
 				file_data_free(m->fi,m->search_data);
 			m->search_offset=offset;
@@ -428,10 +422,6 @@ binfile_search_cd(struct map_priv *m, int offset, char *name, int partial, int s
 			m->search_data=file_data_read(m->fi,cdoffset+m->search_offset,m->search_size);
 			cd=(struct zip_cd *)m->search_data;
 		}
-#if 0
-		dbg(lvl_debug,"offset=%d search_offset=%d search_size=%d search_data=%p cd=%p\n", offset, m->search_offset, m->search_size, m->search_data, cd);
-		dbg(lvl_debug,"offset=%d fn='%s'\n",offset,cd->zipcfn);
-#endif
 		if (!skip &&
 		    (partial || cd->zipcfnl == len) &&
 		    !strncmp(cd->zipcfn, name, len))
@@ -1275,12 +1265,6 @@ download_initial_finish(struct map_download *download)
 	download->zip64_eoc->zip64eofst=download->cd1offset;
 	download->zip64_eocl->zip64lofst=download->offset;
 	download->zip_eoc->zipeofst=download->cd1offset;
-#if 0
-	file_data_write(download->file, download->offset, sizeof(*download->zip64_eoc), (unsigned char *)download->zip64_eoc);
-	download->offset+=sizeof(*download->zip64_eoc);
-	file_data_write(download->file, download->offset, sizeof(*download->zip64_eocl), (unsigned char *)download->zip64_eocl);
-	download->offset+=sizeof(*download->zip64_eocl);
-#endif
 	file_data_write(download->file, download->offset, sizeof(*download->zip_eoc), (unsigned char *)download->zip_eoc);
 	download->offset+=sizeof(*download->zip_eoc);
 	g_free(download->zip64_eoc);
@@ -1668,9 +1652,6 @@ setup_pos(struct map_rect_priv *mr)
 	size=le32_to_cpu(t->pos[0]);
 	if (size > 1024*1024 || size < 0) {
 		dbg(lvl_debug,"size=0x%x\n", size);
-#if 0
-		fprintf(stderr,"offset=%d\n", (unsigned char *)(mr->pos)-mr->m->f->begin);
-#endif
 		dbg(lvl_debug,"size error\n");
 	}
 	t->pos_next=t->pos+size+1;
@@ -2621,87 +2602,6 @@ map_binfile_zip_setup(struct map_priv *m, char *filename, int mmap)
 	return 1;
 }
 
-
-#if 0
-static int
-map_binfile_download_initial(struct map_priv *m)
-{
-	struct attr readwrite={attr_readwrite,{(void *)1}};
-	struct attr create={attr_create,{(void *)1}};
-	struct attr *attrs[4];
-	struct file *out;
-	long long woffset=0,planet_size;
-	int size_ret;
-	int cd1size,cdisize;
-	long long cd1offset,cdioffset;
-	struct zip64_eoc *zip64_eoc;
-	struct zip64_eocl *zip64_eocl;
-	struct zip_eoc *zip_eoc;
-	struct zip_cd *cd1,*cdn,*cdi;
-	int count,chunk,cdoffset=0;
-	int mode=1;
-	struct map_download *download=g_new0(struct map_download, 1);
-
-	attrs[0]=&readwrite;
-	attrs[1]=&create;
-	attrs[2]=NULL;
-	download->file=file_create(m->filename,attrs);
-	download->m=m;
-	download_planet_size(download);
-	download_eoc(download);
-	download_directory_start(download);
-	while (download_directory_do(download));
-	download_directory_finish(download);
-	download_initial_finish(download);
-	m->fi=download->file;
-	g_free(download);
-	return 1;
-
-
-		cd1size=sizeof(*cd1);
-		cd1offset=zip64_eoc->zip64eofst;
-		cd1=(struct zip_cd *)map_binfile_download_range(m, cd1offset, cd1size);
-		if (!cd1)
-			return 0;
-		cd1size=sizeof(*cd1)+binfile_cd_extra(cd1);
-		g_free(cd1);
-		cd1=(struct zip_cd *)map_binfile_download_range(m, cd1offset, cd1size);
-		if (!cd1)
-			return 0;
-		cd1->zipcunc=0;
-		cdisize=sizeof(*cdi)+strlen("index")+cd1->zipcxtl;
-		cdioffset=zip64_eoc->zip64eofst+zip64_eoc->zip64ecsz-cdisize;
-		cdi=(struct zip_cd *)map_binfile_download_range(m, cdioffset, cdisize);
-		if (!cdi) {
-			g_free(cd1);
-			return 0;
-		}
-		cdi->zipcunc=0;
-		cdn=g_malloc0(cd1size*256);
-
-		file_data_write(out, woffset, sizeof(*zip64_eoc), (unsigned char *)zip64_eoc);
-		woffset+=sizeof(*zip64_eoc);
-		cdoffset=woffset;
-
-		file_data_write(out, woffset, cd1size, (unsigned char *)cd1);
-		woffset+=cd1size;
-		count=(cdioffset-cd1offset)/cd1size-1;
-		while (count > 0) {
-			if (count > 256)
-				chunk=256;
-			else
-				chunk=count;
-			file_data_write(out, woffset, cd1size*chunk, (unsigned char *)cdn);
-			woffset+=cd1size*chunk;
-			count-=chunk;
-		}
-		g_free(cdn);
-		g_free(cd1);
-		file_data_write(out, woffset, cdisize, (unsigned char *)cdi);
-		woffset+=cdisize;
-
-}
-#endif
 
 static int
 map_binfile_open(struct map_priv *m)

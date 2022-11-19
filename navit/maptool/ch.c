@@ -249,9 +249,6 @@ ch_process_node(FILE *out, int node, int resolve)
 	memset(&ch_edge, 0, sizeof(ch_edge));
 	item_bin=init_item(type_ch_node);
 	oldnode=GPOINTER_TO_INT(g_hash_table_lookup(newnode_hash, GINT_TO_POINTER(node)));
-#if 0
-	dbg(lvl_debug,"0x%x,0x%x\n",node_index[oldnode].x,node_index[oldnode].y);
-#endif
 	item_bin_add_coord(item_bin, &node_index[oldnode], 1);
 	fwd.first=oldnode;
 	rev.last=oldnode;
@@ -276,23 +273,14 @@ ch_process_node(FILE *out, int node, int resolve)
 					exit(1);
 				} else {
 					ch_edge.middle=*id;
-#if 0
-					dbg(lvl_debug,"middle street id for is "ITEM_ID_FMT"\n",ITEM_ID_ARGS(*id));
-#endif
 				}
 			} else {
 				ch_edge.flags|=4;
 				id=g_hash_table_lookup(sgr_nodes_hash, GINT_TO_POINTER((int)edge->scmiddle));
 				dbg_assert(id != NULL);
 				ch_edge.middle=*id;
-#if 0
-				dbg(lvl_debug,"middle node id for is "ITEM_ID_FMT"\n",ITEM_ID_ARGS(*id));
-#endif
 			}
 			id=g_hash_table_lookup(sgr_nodes_hash, GINT_TO_POINTER((int)edge->target));
-#if 0
-			dbg(lvl_debug,"id for %d is "ITEM_ID_FMT"\n",edge->target,ITEM_ID_ARGS(*id));
-#endif
 			if (id == NULL) {
 				fprintf(stderr,"Failed to look up target %d\n",edge->target);
 			} else {
@@ -407,20 +395,6 @@ ch_close_tempfiles(FILE **files, int count)
 	}
 }
 
-#if 0
-static void
-ch_remove_tempfiles(char *suffix, int count)
-{
-	char name[256];
-	int i;
-
-	for (i = 0 ; i <= count ; i++) {
-		sprintf(name,"graph_%d",i);
-		tempfile_unlink(suffix, name);
-	}
-}
-#endif
-
 static void
 ch_copy_to_tiles(char *suffix, int count, struct tile_info *info, FILE *ref)
 {
@@ -508,9 +482,6 @@ ch_assemble_map(char *map_suffix, char *suffix, struct zip_info *zip_info)
 	while (fread(&id, sizeof(id), 1, ref)) {
 		struct item_id *id2=g_slice_new(struct item_id);
 		*id2=id;
-#if 0
-		dbg(lvl_debug,"%d is "ITEM_ID_FMT"\n",nodeid,ITEM_ID_ARGS(*id2));
-#endif
 		g_hash_table_insert(sgr_nodes_hash, GINT_TO_POINTER(nodeid), id2);
 		nodeid++;
 	}

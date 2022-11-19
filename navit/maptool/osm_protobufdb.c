@@ -94,21 +94,6 @@ osm_protobufdb_write_blob(OSMPBF__Blob *blob, FILE *out)
 	return 1;
 }
 
-#if 0
-void
-dump_block(OSMPBF__PrimitiveBlock *pb)
-{
-	int i,j;
-	printf("%d groups\n",pb->n_primitivegroup);
-	for (i = 0 ; i < pb->n_primitivegroup ; i++) {
-		printf("%d relations\n",pb->primitivegroup[i]->n_relations);
-		for (j = 0 ; j < pb->primitivegroup[i]->n_relations ; j++) {
-			printf("Info %d\n",pb->primitivegroup[i]->relations[j]->info->version);
-		}
-	}
-}
-#endif
-
 static int
 osm_protobufdb_finish_block(struct osm_protobufdb_context *ctx)
 {
@@ -177,35 +162,6 @@ osm_protobufdb_start_group(struct osm_protobufdb_context *ctx, int groupnum)
 	return 1;
 }
 
-#if 0
-static int
-osm_protobufdb_start_densenode(struct osm_protobufdb_context *ctx)
-{
-	OSMPBF__DenseInfo di=OSMPBF__DENSE_INFO__INIT;
-	OSMPBF__DenseNodes dn=OSMPBF__DENSE_NODES__INIT;
-
-	if (!ctx->pg->dense) {
-		ctx->dn=malloc(sizeof(*context.dn));
-		*ctx->dn=dn;
-		ctx->pg->dense=ctx->dn;
-	} else
-		ctx->dn=ctx->pg->dense;
-	if (!ctx->dn->denseinfo) {
-		ctx->di=malloc(sizeof(*context.di));
-		*ctx->di=di;
-		ctx->dn->denseinfo=ctx->di;
-	} else
-		ctx->di=ctx->dn->denseinfo;
-	return 1;
-}
-
-static void
-osm_protobufdb_write_primitive_group(OSMPBF__PrimitiveGroup *pg, OSMPBF__PrimitiveBlock *pb)
-{
-	pb->primitivegroup=realloc(pb->primitivegroup,(pb->n_primitivegroup+1)*sizeof(OSMPBF__PrimitiveGroup *));
-	pb->primitivegroup[pb->n_primitivegroup++]=pg;
-}
-#endif
 
 
 #define insert(struct, member, pos) {\
@@ -217,67 +173,6 @@ osm_protobufdb_write_primitive_group(OSMPBF__PrimitiveGroup *pg, OSMPBF__Primiti
 	struct->n_##member++;\
 }
 
-#if 0
-static int
-osm_protobufdb_insert_densenode(long long id, OSMPBF__Node *offset, OSMPBF__Info *offseti, OSMPBF__DenseNodes *dn)
-{
-	int i,l,p;
-	memset(offset, 0, sizeof(*offset));
-	offseti->timestamp=0;
-	offseti->changeset=0;
-	offseti->user_sid=0;
-	offseti->uid=0;
-	l=dn->n_id;
-	for (i = 0 ; i < l ; i++) {
-		offset->id+=dn->id[i];
-		offset->lat+=dn->lat[i];
-		offset->lon+=dn->lon[i];
-		offseti->timestamp+=dn->denseinfo->timestamp[i];
-		offseti->changeset+=dn->denseinfo->changeset[i];
-		offseti->user_sid+=dn->denseinfo->user_sid[i];
-		offseti->uid+=dn->denseinfo->uid[i];
-	}
-	p=l;
-	insert(dn, id, p);
-	insert(dn, lat, p);
-	insert(dn, lon, p);
-	insert(dn->denseinfo, version, p);
-	insert(dn->denseinfo, timestamp, p);
-	insert(dn->denseinfo, changeset, p);
-	insert(dn->denseinfo, user_sid, p);
-	insert(dn->denseinfo, uid, p);
-	return p;
-}
-
-static void
-osm_protobufdb_modify_densenode(OSMPBF__Node *node, OSMPBF__Info *info, OSMPBF__Node *offset, OSMPBF__Info *offseti, int pos, OSMPBF__DenseNodes *dn)
-{
-	int i;
-	if (pos+1 < dn->n_id) {
-		dn->id[pos+1]+=dn->id[pos]-node->id;
-		dn->lat[pos+1]+=dn->lat[pos]-node->lat;
-		dn->lon[pos+1]+=dn->lon[pos]-node->lon;
-		dn->denseinfo->timestamp[pos+1]+=dn->denseinfo->timestamp[pos]-info->timestamp;
-		dn->denseinfo->changeset[pos+1]+=dn->denseinfo->changeset[pos]-info->changeset;
-		dn->denseinfo->user_sid[pos+1]+=dn->denseinfo->user_sid[pos]-info->user_sid;
-		dn->denseinfo->uid[pos+1]+=dn->denseinfo->uid[pos]-info->uid;
-	}
-	dn->id[pos]=node->id-offset->id;
-	dn->lat[pos]=node->lat-offset->lat;
-	dn->lon[pos]=node->lon-offset->lon;
-	dn->keys_vals=realloc(dn->keys_vals, (dn->n_keys_vals+node->n_keys+node->n_vals+1)*sizeof(dn->keys_vals[0]));
-	for (i = 0 ; i < node->n_keys ; i++) {
-		dn->keys_vals[dn->n_keys_vals++]=node->keys[i];
-		dn->keys_vals[dn->n_keys_vals++]=node->vals[i];
-	}
-	dn->keys_vals[dn->n_keys_vals++]=0;
-	dn->denseinfo->version[pos]=info->version;
-	dn->denseinfo->timestamp[pos]=info->timestamp-offseti->timestamp;
-	dn->denseinfo->changeset[pos]=info->changeset-offseti->changeset;
-	dn->denseinfo->user_sid[pos]=info->user_sid-offseti->user_sid;
-	dn->denseinfo->uid[pos]=info->uid-offseti->uid;
-}
-#endif
 
 static int
 osm_protobufdb_insert_node(long long id, OSMPBF__PrimitiveGroup *pg)
@@ -474,86 +369,14 @@ osm_protobufdb_start_file(struct osm_protobufdb_context *ctx, int type, int num)
 static void
 test(void) 
 {
-#if 0
-	struct node n,o;
-	long long id=1;
-	long long lat=0;
-	long long lon=0;
-	long long timestamp=0;
-	long long changeset=0;
-	int version=1;
-	int user_sid=0;
-	int uid=0;
-	int p;
-	n.id=1;
-#endif
-#if 0
-	OSMPBF__DenseInfo di=OSMPBF__DENSE_INFO__INIT;
-	OSMPBF__DenseNodes dn=OSMPBF__DENSE_NODES__INIT;
-#endif
 
 	context.current_file=-1;
-
-#if 0
-	context.di=malloc(sizeof(*context.di));
-	*context.di=di;
-	context.dn=malloc(sizeof(*context.dn));
-	*context.dn=dn;
-#endif
-
-#if 0
-	di.n_version=1;
-	di.version=&version;
-	di.n_timestamp=1;
-	di.timestamp=&timestamp;
-	di.n_changeset=1;
-	di.changeset=&changeset;
-	di.n_user_sid=1;
-	di.user_sid=&user_sid;
-	di.n_uid=1;
-	di.uid=&uid;
-#endif
-#if 0
-	n.id=1;
-	n.lat=1;
-	n.lon=1;
-	n.timestamp=1;
-	n.changeset=1;
-	n.version=1;
-	n.user_sid=0;
-	n.uid=0;
-	p=osm_protobufdb_insert_densenode(&n.id, &o, &dn);
-	osm_protobufdb_modify(&n, &o, p, &dn);
-	p=osm_protobufdb_insert_densenode(&n.id, &o, &dn);
-	osm_protobufdb_modify(&n, &o, p, &dn);
-#endif
-
-
-#if 0
-	dn.n_id=1;
-	dn.id=&id;
-	dn.n_lat=1;
-	dn.lat=&lat;
-	dn.n_lon=1;
-	dn.lon=&lon;
-#endif
-#if 0
-	st.n_s=1;
-	data.data="Test";
-	data.len=4;
-	st.s=&data;
-#endif
 }
 
 static void
 finish(void)
 {
 	osm_protobufdb_finish_file(&context);
-#if 0
-	osm_protobufdb_write_primitive_group(context.pg, context.pb);
-	osm_protobufdb_write_primitive_block(context.pb, context.blob);
-	osm_protobufdb_write_blob_to_file();
-#endif
 }
 
 static long long
@@ -638,16 +461,8 @@ static int
 osm_protobufdb_end_node(struct osm_protobufdb_context *ctx)
 {
 	int p;
-#if 0
-	OSMPBF__Node *n=&ctx->n,offset;
-	OSMPBF__Info *i=&ctx->i,offseti;
-	osm_protobufdb_start_densenode(ctx);
-	p=osm_protobufdb_insert_densenode(n->id, &offset, &offseti, context.dn);
-	osm_protobufdb_modify_densenode(n, i, &offset, &offseti, p, context.dn);
-#else
 	p=osm_protobufdb_insert_node(ctx->n.id, ctx->pg);
 	osm_protobufdb_modify_node(&ctx->n, &ctx->i, p, ctx->pg);
-#endif
 	ctx->in_node=0;
 	return 1;
 }

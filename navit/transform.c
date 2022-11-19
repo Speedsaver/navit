@@ -500,9 +500,6 @@ static struct point
 transform_project_onto_view_plane(struct transformation *t, struct coord_3d c)
 {
 	struct point result;
-#if 0
-	dbg(lvl_debug,"z=%d\n",c.z);
-#endif
 	result.x = (long long)c.x*t->xscale/c.z;
 	result.y = (long long)c.y*t->yscale/c.z;
 	return result;
@@ -561,12 +558,6 @@ transform(struct transformation *t, enum projection required_projection, struct 
 	dbg(lvl_debug,"count=%d\n", count);
 	for (i=0; i < count; i++) {
 		dbg(lvl_debug, "input coord %d: (%d, %d)\n", i, input[i].x, input[i].y);
-#if 0 /* doesn't work as wanted */
-		if (i && input[i].x == input[0].x && input[i].y == input[0].y && result_idx && !width_result) {
-			result[result_idx++]=result[0];
-			continue;
-		}
-#endif
 		projected_coord = transform_correct_projection(t, required_projection, input[i]);
 		shifted_coord = transform_shift_by_center_and_scale(t, projected_coord);
 		rotated_coord = transform_rotate(t, shifted_coord);
@@ -579,9 +570,6 @@ transform(struct transformation *t, enum projection required_projection, struct 
 			} else if (clip_result.skip_coord){
 				continue;
 			}
-#if 0
-			clip_result.clipped_coord.z=2000000;
-#endif
 			screen_point = transform_project_onto_view_plane(t, clip_result.clipped_coord);
 		} else {
 			screen_point.x = rotated_coord.x>>POST_SHIFT;
@@ -762,12 +750,6 @@ transform_get_selection(struct transformation *this_, enum projection pro, int o
 		}
 		dbg(lvl_debug,"transform rect for %d is %d,%d - %d,%d\n", pro, curro->u.c_rect.lu.x, curro->u.c_rect.lu.y, curro->u.c_rect.rl.x, curro->u.c_rect.rl.y);
 		curro->order+=order;
-#if 0
-		curro->u.c_rect.lu.x-=500;
-		curro->u.c_rect.lu.y+=500;
-		curro->u.c_rect.rl.x+=500;
-		curro->u.c_rect.rl.y-=500;
-#endif
 		curro->range=item_range_all;
 		curri=curri->next;
 		curro=curro->next;

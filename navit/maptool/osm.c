@@ -1470,10 +1470,6 @@ node_item_find_index_in_ordered_list(osmid id)
       if (node_buffer_base[node_count-1].nd_id < id)
 	      return -1;
       while (node_buffer_base[search_index].nd_id != id) {
-#if 0
-	      fprintf(stderr,"search_index=%d node_count=%d search_step=%d id=%d node_buffer_base[search_index].id=%d\n",
-		  search_index, node_count, search_step, id, node_buffer_base[search_index].id);
-#endif
 	      if (node_buffer_base[search_index].nd_id < id) {
 		      search_index+=search_step;
 		      if (search_step == 1) {
@@ -1521,86 +1517,7 @@ node_item_get(osmid id)
       return result_index!=-1 ? node_buffer_base+result_index : NULL;
 }
 
-#if 0
-static int
-load_node(FILE *coords, int p, struct node_item *ret)
-{
-      fseek(coords, p*sizeof(struct node_item), SEEK_SET);
-      if (fread(ret, sizeof(*ret), 1, coords) != 1) {
-	      fprintf(stderr,"read failed\n");
-	      return 0;
-      }
-      return 1;
-}
-#endif
 
-#if 0
-static int
-node_item_get_from_file(FILE *coords, osmid id, struct node_item *ret)
-{
-      int count;
-      int interval;
-      int p;
-      if (node_hash) {
-	      int i;
-	      i=(int)(long)(g_hash_table_lookup(node_hash, (gpointer)(long)id));
-	      fseek(coords, i*sizeof(*ret), SEEK_SET);
-	      if (fread(ret, sizeof(*ret), 1, coords) == 1)
-		      return 1;
-	      else
-		      return 0;
-      }
-
-      fseek(coords, 0, SEEK_END);
-      count=ftello(coords)/sizeof(struct node_item);
-      interval=count/4;
-      p=count/2;
-      if(interval==0) {
-	      // If fewer than 4 nodes defined so far set interval to 1 to
-	      // avoid infinite loop
-	      interval = 1;
-      }
-      if (!load_node(coords, p, ret))
-	      return 0;
-      for (;;) {
-	      if (ret->id == id)
-		      return 1;
-	      if (ret->id < id) {
-		      p+=interval;
-		      if (interval == 1) {
-			      if (p >= count)
-				      return 0;
-			      if (!load_node(coords, p, ret))
-				      return 0;
-			      if (ret->id > id)
-				      return 0;
-		      } else {
-			      if (p >= count)
-				      p=count-1;
-			      if (!load_node(coords, p, ret))
-				      return 0;
-		      }
-	      } else {
-		      p-=interval;
-		      if (interval == 1) {
-			      if (p < 0)
-				      return 0;
-			      if (!load_node(coords, p, ret))
-				      return 0;
-			      if (ret->id < id)
-				      return 0;
-		      } else {
-			      if (p < 0)
-				      p=0;
-			      if (!load_node(coords, p, ret))
-				      return 0;
-		      }
-	      }
-	      if (interval > 1)
-		      interval/=2;
-      }
-}
-#endif 
 void
 osm_add_way(osmid id)
 {
@@ -1721,9 +1638,6 @@ static void
 relation_add_tag(char *k, char *v)
 {
 	int add_tag=1;
-#if 0
-	fprintf(stderr,"add tag %s %s\n",k,v);
-#endif
 	if (!strcmp(k,"type")) {
 		g_strlcpy(relation_type, v, sizeof(relation_type));
 		add_tag=0;
@@ -2410,118 +2324,8 @@ search_relation_member(struct item_bin *ib, char *role, struct relation_member *
 	return 0;
 }
 
-#if 0
-static int
-load_way_index(FILE *ways_index, int p, long long *idx)
-{
-	int step=sizeof(*idx)*2;
-	fseek(ways_index, p*step, SEEK_SET);
-	if (fread(idx, step, 1, ways_index) != 1) {
-		fprintf(stderr,"read failed\n");
-		return 0;
-	}
-	return 1;
-}
-#endif
 
-#if 0
-static int
-seek_to_way(FILE *way, FILE *ways_index, osmid wayid)
-{
-	long offset;
-	long long idx[2];
-	int count,interval,p;
-	if (way_hash) {
-		if (!(g_hash_table_lookup_extended(way_hash, (gpointer)(long)wayid, NULL, (gpointer)&offset)))
-			return 0;
-		fseek(way, offset, SEEK_SET);
-		return 1;
-	}
-	fseek(ways_index, 0, SEEK_END);
-	count=ftello(ways_index)/sizeof(idx);
-	interval=count/4;
-	p=count/2;
-	if(interval==0) {
-		// If fewer than 4 nodes defined so far set interval to 1 to
-		// avoid infinite loop
-		interval = 1;
-	}
-	if (!load_way_index(ways_index, p, idx))
-		return 0;
-	for (;;) {
-		if (idx[0] == wayid) {
-			fseek(way, idx[1], SEEK_SET);
-			return 1;
-		}
-		if (idx[0] < wayid) {
-			p+=interval;
-			if (interval == 1) {
-				if (p >= count)
-					return 0;
-				if (!load_way_index(ways_index, p, idx))
-					return 0;
-				if (idx[0] > wayid)
-					return 0;
-			} else {
-				if (p >= count)
-					p=count-1;
-				if (!load_way_index(ways_index, p, idx))
-					return 0;
-			}
-		} else {
-			p-=interval;
-			if (interval == 1) {
-				if (p < 0)
-					return 0;
-				if (!load_way_index(ways_index, p, idx))
-					return 0;
-				if (idx[0] < wayid)
-					return 0;
-			} else {
-				if (p < 0)
-					p=0;
-				if (!load_way_index(ways_index, p, idx))
-					return 0;
-			}
-		}
-		if (interval > 1)
-			interval/=2;
-	}
-}
-#endif
 
-#if 0
-static struct coord *
-get_way(FILE *way, FILE *ways_index, struct coord *c, long long wayid, struct item_bin *ret, int debug)
-{
-	long long currid;
-	int last;
-	struct coord *ic;
-	if (!seek_to_way(way, ways_index, wayid)) {
-		if (debug)
-			fprintf(stderr,"not found in index");
-		return NULL;
-	}
-	while (item_bin_read(ret, way)) {
-		currid=item_bin_get_wayid(ret);
-		if (debug)
-			fprintf(stderr,LONGLONG_FMT":",currid);
-		if (currid != wayid)
-			return NULL;
-		ic=(struct coord *)(ret+1);
-		last=ret->clen/2-1;
-		if (debug)
-			fprintf(stderr,"(0x%x,0x%x)-(0x%x,0x%x)",ic[0].x,ic[0].y,ic[last].x,ic[last].y);
-		if (!c)
-			return &ic[0];
-		if (ic[0].x == c->x && ic[0].y == c->y)
-			return &ic[last];
-		if (ic[last].x == c->x && ic[last].y == c->y)
-			return &ic[0];
-	}
-	return NULL;
-}
-#endif
 
 struct associated_street {
 	osmid relid;
@@ -2971,175 +2775,7 @@ process_turn_restrictions(FILE *in, FILE *coords, FILE *ways, FILE *ways_index, 
 	process_turn_restrictions_finish(turn_restrictions, out);
 	relations_destroy(relations);
 }
-#if 0
-void
-process_turn_restrictions_old(FILE *in, FILE *coords, FILE *ways, FILE *ways_index, FILE *out)
-{
-	struct relation_member fromm,tom,viam,tmpm;
-	struct node_item ni;
-	long long relid;
-	char from_buffer[65536],to_buffer[65536],via_buffer[65536];
-	struct item_bin *ib,*from=(struct item_bin *)from_buffer,*to=(struct item_bin *)to_buffer,*via=(struct item_bin *)via_buffer;
-	struct coord *fromc,*toc,*viafrom,*viato,*tmp;
-	int min_count;
-	while ((ib=read_item(in))) {
-		relid=item_bin_get_relationid(ib);
-		min_count=0;
-		if (!search_relation_member(ib, "from",&fromm,&min_count)) {
-			osm_warning("relation",relid,0,"turn restriction: from member missing\n");
-			continue;
-		}
-		if (search_relation_member(ib, "from",&tmpm,&min_count)) {
-			osm_warning("relation",relid,0,"turn restriction: multiple from members\n");
-			continue;
-		}
-		min_count=0;
-		if (!search_relation_member(ib, "to",&tom,&min_count)) {
-			osm_warning("relation",relid,0,"turn restriction: to member missing\n");
-			continue;
-		}
-		if (search_relation_member(ib, "to",&tmpm,&min_count)) {
-			osm_warning("relation",relid,0,"turn restriction: multiple to members\n");
-			continue;
-		}
-		min_count=0;
-		if (!search_relation_member(ib, "via",&viam,&min_count)) {
-			osm_warning("relation",relid,0,"turn restriction: via member missing\n");
-			continue;
-		}
-		if (search_relation_member(ib, "via",&tmpm,&min_count)) {
-			osm_warning("relation",relid,0,"turn restriction: multiple via member\n");
-			continue;
-		}
-		if (fromm.type != 2) {
-			osm_warning("relation",relid,0,"turn restriction: wrong type for from member ");
-			osm_warning(osm_types[fromm.type],fromm.id,1,"\n");
-			continue;
-		}
-		if (tom.type != 2) {
-			osm_warning("relation",relid,0,"turn restriction: wrong type for to member ");
-			osm_warning(osm_types[tom.type],tom.id,1,"\n");
-			continue;
-		}
-		if (viam.type != 1 && viam.type != 2) {
-			osm_warning("relation",relid,0,"turn restriction: wrong type for via member ");
-			osm_warning(osm_types[viam.type],viam.id,1,"\n");
-			continue;
-		}
-		if (viam.type == 1) {
-			if (!node_item_get_from_file(coords, viam.id, &ni)) {
-				osm_warning("relation",relid,0,"turn restriction: failed to get via member ");
-				osm_warning(osm_types[viam.type],viam.id,1,"\n");
-				continue;
-			}
-			viafrom=&ni.c;
-			viato=&ni.c;
-		} else {
-			if (!(viafrom=get_way(ways, ways_index, NULL, viam.id, via, 0))) {
-				osm_warning("relation",relid,0,"turn restriction: failed to get first via coordinate from ");
-				osm_warning(osm_types[viam.type],viam.id,1,"\n");
-				continue;
-			}
-			if (!(viato=get_way(ways, ways_index, viafrom, viam.id, via, 0))) {
-				osm_warning("relation",relid,0,"turn restriction: failed to get last via coordinate from ");
-				osm_warning(osm_types[viam.type],viam.id,1,"\n");
-				continue;
-			}
 
-		}
-#if 0
-		fprintf(stderr,"via "LONGLONG_FMT" vs %d\n",viam.id, ni.id);
-		fprintf(stderr,"coord 0x%x,0x%x\n",ni.c.x,ni.c.y);
-		fprintf(stderr,"Lookup "LONGLONG_FMT"\n",fromm.id);
-#endif
-		if (!(fromc=get_way(ways, ways_index, viafrom, fromm.id, from, 0))) {
-			if (viam.type == 1 || !(fromc=get_way(ways, ways_index, viato, fromm.id, from, 0))) {
-				osm_warning("relation",relid,0,"turn restriction: failed to connect via ");
-				osm_warning(osm_types[viam.type],viam.id,1," 0x%x,0x%x-0x%x,0x%x to from member ",viafrom->x,viafrom->y,viato->x,viato->y);
-				osm_warning(osm_types[fromm.type],fromm.id,1," (");
-				get_way(ways, ways_index, viafrom, fromm.id, from, 1);
-				fprintf(stderr,")\n");
-				continue;
-			} else {
-				tmp=viato;
-				viato=viafrom;
-				viafrom=tmp;
-			}
-		}
-		if (!(toc=get_way(ways, ways_index, viato, tom.id, to, 0))) {
-			osm_warning("relation",relid,0,"turn restriction: failed to connect via ");
-			osm_warning(osm_types[viam.type],viam.id,1," 0x%x,0x%x-0x%x,0x%x to to member ",viafrom->x,viafrom->y,viato->x,viato->y);
-			osm_warning(osm_types[tom.type],tom.id,1," (");
-			get_way(ways, ways_index, viato, tom.id, to, 1);
-			fprintf(stderr,")\n");
-			continue;
-		}
-#if 0
-		fprintf(stderr,"(0x%x,0x%x)-(0x%x,0x%x)-(0x%x,0x%x)\n",fromc->x,fromc->y, ni.c.x, ni.c.y, toc->x, toc->y);
-#endif
-		item_bin_init(ib,ib->type);
-		item_bin_add_coord(ib, fromc, 1);
-		item_bin_add_coord(ib, viafrom, 1);
-		if (viam.type == 2)
-			item_bin_add_coord(ib, viato, 1);
-		item_bin_add_coord(ib, toc, 1);
-		item_bin_write(item_bin, out);
-	}
-}
-#endif
-
-#if 0
-static void
-process_countries(FILE *way, FILE *ways_index)
-{
-	FILE *in=fopen("country_de.tmp","r");
-	struct item_bin *ib;
-	char buffer2[400000];
-	struct item_bin *ib2=(struct item_bin *)buffer2;
-	GList *segments=NULL,*sort_segments;
-	fseek(in, 0, SEEK_SET);
-	while ((ib=read_item(in))) {
-		char *str=NULL;
-		struct relation_member member;
-		while ((str=item_bin_get_attr(ib, attr_osm_member, str))) {
-			if (!parse_relation_member_string(str, &member))
-				break;
-			if (member.type == 2) {
-				if (!seek_to_way(way, ways_index, member.id)) {
-					fprintf(stderr,"not found in index");
-					break;
-				}
-				while (item_bin_read(ib2, way)) {
-					if (item_bin_get_wayid(ib2) != member.id)
-						break;
-					segments=g_list_prepend(segments,item_bin_to_poly_segment(ib2, geom_poly_segment_type_way_unknown));
-					break;
-				}
-			}
-		}
-	}
-	sort_segments=geom_poly_segments_sort(segments, geom_poly_segment_type_way_left_side);
-	FILE *tmp=fopen("tst.txt","w");
-	while (sort_segments) {
-		struct geom_poly_segment *seg=sort_segments->data;
-		if (!seg) {
-			fprintf(stderr,"is null\n");
-		} else {
-			fprintf(stderr,"segment %p %s area "LONGLONG_FMT"\n",sort_segments,coord_is_equal(*seg->first, *seg->last) ? "closed":"open",geom_poly_area(seg->first,seg->last-seg->first+1));
-		}
-#if 0
-		int count=seg->last-seg->first+1;
-		item_bin_init(ib, type_border_country);
-		item_bin_add_coord(ib, seg->first, count);
-		item_bin_dump(ib, tmp);
-#endif
-
-		sort_segments=g_list_next(sort_segments);
-	}
-	fclose(tmp);
-	fclose(in);
-}
-#endif
 
 static void
 node_ref_way(osmid node)
@@ -3201,17 +2837,9 @@ write_item_way_subsection(FILE *out, FILE *out_index, FILE *out_graph, struct it
 	new.len=new.clen+attr_len+2;
 	if (out_index)
 		write_item_way_subsection_index(out, out_index, out_graph, orig, last_id);
-#if 0
-	fprintf(stderr,"first %d last %d type 0x%x len %d clen %d attr_len %d\n", first, last, new.type, new.len, new.clen, attr_len);
-#endif
 	dbg_assert(fwrite(&new, sizeof(new), 1, out)==1);
 	dbg_assert(fwrite(c+first, new.clen*4, 1, out)==1);
 	dbg_assert(fwrite(attr, attr_len*4, 1, out)==1);
-#if 0
-		fwrite(&new, sizeof(new), 1, out_graph);
-		fwrite(c+first, new.clen*4, 1, out_graph);
-		fwrite(attr, attr_len*4, 1, out_graph);
-#endif
 }
 
 void
@@ -3302,9 +2930,6 @@ map_resolve_coords_and_split_at_intersections(FILE *in, FILE *out, FILE *out_ind
 	processed_nodes=processed_nodes_out=processed_ways=processed_relations=processed_tiles=0;
 	sig_alrm(0);
 	while ((ib=read_item(in))) {
-#if 0
-		fprintf(stderr,"type 0x%x len %d clen %d\n", ib->type, ib->len, ib->clen);
-#endif
 		ccount=ib->clen/2;
 		if (ccount <= 1)
 			continue;

@@ -778,12 +778,6 @@ static int
 strncmp_len(const char *s1, int s1len, const char *s2)
 {
 	int ret;
-#if 0
-	char c[s1len+1];
-	strncpy(c, s1, s1len);
-	c[s1len]='\0';
-	dbg(lvl_debug,"'%s' vs '%s'\n", c, s2);
-#endif
 
 	ret=strncmp(s1, s2, s1len);
 	if (ret)
@@ -822,13 +816,6 @@ xpointer_test(const char *test, int len, struct xistate *elem)
 	int eq,i,count,vlen,cond_req=1,cond=0;
 	char c;
 	const char *tmp[16];
-#if 0
-	char test2[len+1];
-
-	strncpy(test2, test, len);
-	test2[len]='\0';
-	dbg(lvl_debug,"%s\n", test2);
-#endif
 	if (!len)
 		return 0;
 	c=test[len-1];

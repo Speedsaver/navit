@@ -258,16 +258,6 @@ osd_std_calculate_sizes_and_redraw(struct osd_item *item, struct osd_priv *priv,
 static void
 osd_std_keypress(struct osd_item *item, struct navit *nav, char *key) 
 {
-#if 0
-	int i;
-	dbg(lvl_debug,"key=%s\n",key);
-	for (i = 0 ; i < strlen(key) ; i++) {
-		dbg(lvl_debug,"key:0x%02x\n",key[i]);
-	}
-	for (i = 0 ; i < strlen(item->accesskey) ; i++) {
-		dbg(lvl_debug,"accesskey:0x%02x\n",item->accesskey[i]);
-	}
-#endif
 	if ( ! graphics_is_disabled(item->gr) && item->accesskey && key && !strcmp(key, item->accesskey)) 
 		osd_evaluate_command(item, nav);
 }

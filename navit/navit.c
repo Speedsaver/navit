@@ -2347,20 +2347,6 @@ navit_get_cursor_pnt(struct navit *this_, struct point *p, int keep_orientation,
 	struct padding *padding = NULL;
 
         float offset=this_->radius;      // Cursor offset from the center of the screen (percent).
-#if 0 /* Better improve track.c to get that issue resolved or make it configurable with being off the default, the jumping back to the center is a bit annoying */
-        float min_offset = 0.;      // Percent offset at min_offset_speed.
-        float max_offset = 30.;     // Percent offset at max_offset_speed.
-        int min_offset_speed = 2;   // Speed in km/h
-        int max_offset_speed = 50;  // Speed in km/h
-        // Calculate cursor offset from the center of the screen, upon speed.
-        if (nv->speed <= min_offset_speed) {
-            offset = min_offset;
-        } else if (nv->speed > max_offset_speed) {
-            offset = max_offset;
-        } else {
-            offset = (max_offset - min_offset) / (max_offset_speed - min_offset_speed) * (nv->speed - min_offset_speed);
-        }
-#endif
 
 	if (this_->gra) {
 		padding = graphics_get_data(this_->gra, "padding");
@@ -2570,10 +2556,6 @@ navit_set_attr_do(struct navit *this_, struct attr *attr, int init)
 			}
 			transform_set_yaw(this_->trans, dir);
 			if (orient_old != this_->orientation) {
-#if 0
-				if (this_->ready == 3)
-					navit_draw(this_);
-#endif
 				attr_updated=1;
 			}
 		}

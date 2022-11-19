@@ -727,12 +727,6 @@ search_list_search_free(struct search_list *sl, int level)
 		mapset_search_destroy(le->search);
 		le->search=NULL;
 	}
-#if 0 /* FIXME */
-	if (le->hash) {
-		g_hash_table_destroy(le->hash);
-		le->hash=NULL;
-	}
-#endif
 	curr=le->list;
 	while (curr)
 	{
@@ -998,13 +992,6 @@ search_list_get_result(struct search_list *this_)
 				this_->result.town=this_->result.street->common.parent;
 				this_->result.country=this_->result.town->common.parent;
 				this_->result.c=this_->result.house_number->common.c;
-
-#if 0
-				if(!has_street_name) {
-					static struct search_list_street null_street;
-					this_->result.street=&null_street;
-				}
-#endif
 			}
 			if (p)
 			{

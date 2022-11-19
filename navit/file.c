@@ -202,13 +202,6 @@ file_create(char *name, struct attr **options)
 	return file;
 }
 
-#if 0
-struct file *
-file_create_url(char *url)
-{
-}
-#endif
-
 #ifndef S_ISDIR
 #define S_ISDIR(m) (((m) & S_IFMT) == S_IFDIR)
 #endif
@@ -271,11 +264,7 @@ int file_mkdir(char *name, int pflag)
 int
 file_mmap(struct file *file)
 {
-#if 0
-	int mmap_size=file->size+1024*1024;
-#else
 	int mmap_size=file->size;
-#endif
 	file->begin=mmap(NULL, mmap_size, PROT_READ|PROT_WRITE, MAP_PRIVATE, file->fd, 0);
 	dbg_assert(file->begin != NULL);
 	if (file->begin == (void *)0xffffffff) {

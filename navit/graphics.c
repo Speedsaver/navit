@@ -1573,10 +1573,6 @@ draw_shape(struct draw_polyline_context *ctx, struct point *pnt, int wi)
 	struct draw_polyline_shape *shape=&ctx->shape;
 	struct draw_polyline_shape *prev=&ctx->prev_shape;
 
-#if 0
-	dbg(lvl_debug,"enter %d,%d - %d,%d %d\n",pnt[0].x,pnt[0].y,pnt[1].x,pnt[1].y,wi);
-#endif
-
 	*prev=*shape;
 	if (prev->wi != wi && prev->l) {
 		prev->wi=wi;
@@ -1591,9 +1587,6 @@ draw_shape(struct draw_polyline_context *ctx, struct point *pnt, int wi)
 		shape->step=8;
 	else
 		shape->step=16;
-#if 0
-	l = int_sqrt(dx * dx * lscale * lscale + dy * dy * lscale * lscale);
-#else
 	dxs=shape->dx*shape->dx;
 	dys=shape->dy*shape->dy;
 	lscales=lscale*lscale;
@@ -1601,7 +1594,6 @@ draw_shape(struct draw_polyline_context *ctx, struct point *pnt, int wi)
 		l = int_sqrt(dxs+dys)*lscale;
 	else
 		l = int_sqrt((dxs+dys)*lscales);
-#endif
 	shape->fow=fowler(-shape->dy, shape->dx);
 	dbg(lvl_debug,"fow=%d\n",shape->fow);
 	if (! l)
@@ -1711,11 +1703,6 @@ graphics_draw_polyline_as_polygon(struct graphics_priv *gra_priv, struct graphic
 	int max_circle_points=20;
 	if (count < 2)
 		return;
-#if 0
-	dbg(lvl_debug,"count=%d\n",count);
-	for (i = 0 ; i < count ; i++)
-		dbg(lvl_debug,"%d,%d width %d\n",pnt[i].x,pnt[i].y,width[i]);
-#endif
 	ctx.shape.l=0;
 	ctx.shape.wi=0;
 	ctx.res=g_alloca(sizeof(struct point)*maxpoints);
@@ -1882,9 +1869,6 @@ graphics_draw_polyline_clipped(struct graphics *gra, struct graphics_gc *gc, str
 				if (points_to_draw_cnt > 1) {
 					if (poly) {
 						graphics_draw_polyline_as_polygon(gra->priv, gc->priv, points_to_draw, points_to_draw_cnt, w, gra->meth.draw_polygon);
-#if 0
-						gra->meth.draw_lines(gra->priv, gc->priv, points_to_draw, points_to_draw_cnt);
-#endif
 					} else
 						gra->meth.draw_lines(gra->priv, gc->priv, points_to_draw, points_to_draw_cnt);
 					points_to_draw_cnt=0;
@@ -1946,12 +1930,6 @@ graphics_draw_polygon_clipped(struct graphics *gra, struct graphics_gc *gc, stru
 	struct point *pa2=g_alloca(sizeof(struct point) * (count_in < limit ? count_in*8+1:0));
 	int count_out,edge=3;
 	int i;
-#if 0
-	r.lu.x+=20;
-	r.lu.y+=20;
-	r.rl.x-=20;
-	r.rl.y-=20;
-#endif
 	if (count_in < limit) {
 		p1=pa1;
 		p2=pa2;
@@ -2104,18 +2082,6 @@ displayitem_draw(struct displayitem *di, void *dummy, struct display_context *dc
 		count=limit_count(di->c, count);
 	if (dc->type == type_poly_water_tiled)
 		mindist=0;
-#if 0
-	if (dc->e->type == element_polygon) {
-		int max=1000;
-		int offset=5600;
-		c+=offset;
-		count-=offset;
-		if (count < 0)
-			count=0;
-		if (count > max)
-			count=max;
-	}
-#endif
 	if (dc->e->type == element_polyline)
 		count=transform(dc->trans, dc->pro, di->c, pa, count, mindist, e->u.polyline.width, width);
 	else
@@ -2495,9 +2461,6 @@ do_draw(struct displaylist *displaylist, int cancel, int flags)
 				count=item_coord_get_within_selection(item, ca, item->type < type_line ? 1: max, displaylist->sel);
 				if (! count)
 					continue;
-#if 0
-				dbg(lvl_debug,"%s 0x%x 0x%x\n",item_to_name(item->type), item->id_hi, item->id_lo);
-#endif
 				if (displaylist->dc.pro != pro)
 					transform_from_to_count(ca, displaylist->dc.pro, ca, pro, count);
 				if (count == max) {
@@ -2930,39 +2893,6 @@ int graphics_displayitem_within_dist(struct displaylist *displaylist, struct dis
 static void
 graphics_process_selection_item(struct displaylist *dl, struct item *item)
 {
-#if 0 /* FIXME */
-	struct displayitem di,*di_res;
-	GHashTable *h;
-	int count,max=dl->dc.maxlen;
-	struct coord ca[max];
-	struct attr attr;
-	struct map_rect *mr;
-
-	di.item=*item;
-	di.label=NULL;
-	di.count=0;
-	h=g_hash_table_lookup(dl->dl, GINT_TO_POINTER(di.item.type));
-	if (h) {
-		di_res=g_hash_table_lookup(h, &di);
-		if (di_res) {
-			di.item.type=(enum item_type)item->priv_data;
-			display_add(dl, &di.item, di_res->count, di_res->c, NULL, 0);
-			return;
-		}
-	}
-	mr=map_rect_new(item->map, NULL);
-	item=map_rect_get_item_byid(mr, item->id_hi, item->id_lo);
-	count=item_coord_get(item, ca, item->type < type_line ? 1: max);
-	if (!item_attr_get(item, attr_label, &attr))
-		attr.u.str=NULL;
-	if (dl->conv && attr.u.str && attr.u.str[0]) {
-		char *str=map_convert_string(item->map, attr.u.str);
-		display_add(dl, item, count, ca, &str, 1);
-		map_convert_free(str);
-	} else
-		display_add(dl, item, count, ca, &attr.u.str, 1);
-	map_rect_destroy(mr);
-#endif
 }
 
 void
@@ -2988,19 +2918,6 @@ graphics_remove_selection(struct graphics *gra, struct item *item, enum item_typ
 		while (curr) {
 			struct item *sitem=curr->data;
 			if (item_is_equal(*item,*sitem)) {
-#if 0 /* FIXME */
-				if (dl) {
-					struct displayitem di;
-					GHashTable *h;
-					di.item=*sitem;
-					di.label=NULL;
-					di.count=0;
-					di.item.type=type;
-					h=g_hash_table_lookup(dl->dl, GINT_TO_POINTER(di.item.type));
-					if (h)
-						g_hash_table_remove(h, &di);
-				}
-#endif
 				g_free(sitem);
 				gra->selection=g_list_remove(gra->selection, curr->data);
 				found=1;

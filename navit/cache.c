@@ -264,12 +264,6 @@ cache_replace(struct cache *cache)
 		if (!cache_move(cache, &cache->t2, &cache->b2))
 			cache_move(cache, &cache->t1, &cache->b1);
 	}
-#if 0
-	if (! entry) {
-		cache_dump(cache);
-		exit(0);
-	}
-#endif
 	return 1;
 }
 

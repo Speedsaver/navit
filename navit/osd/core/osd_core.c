@@ -3906,9 +3906,6 @@ osd_auxmap_draw(struct osd_priv_common *opc)
 	transform_set_yaw(this->trans, transform_get_yaw(this->ntrans));
 	transform_setup_source_rect(this->trans);
 	transform_set_projection(this->trans, transform_get_projection(this->ntrans));
-#if 0
-	graphics_displaylist_draw(opc->osd_item.gr, this->displaylist, this->trans, this->layout, 4);
-#endif
 	graphics_draw(opc->osd_item.gr, this->displaylist, mapset.u.mapset, this->trans, this->layout, 0, NULL, 1);
 	graphics_draw_circle(opc->osd_item.gr, this->red, &p, d);
 	graphics_draw_mode(opc->osd_item.gr, draw_mode_end);
@@ -3951,9 +3948,6 @@ osd_auxmap_init(struct osd_priv_common *opc, struct navit *nav)
 	this->trans=transform_new(&center, 16, 0);
 	transform_set_screen_selection(this->trans, &sel);
         graphics_set_rect(opc->osd_item.gr, &sel.u.p_rect);
-#if 0
-	osd_auxmap_draw(opc, nav);
-#endif
 }
 
 static struct osd_priv *
