@@ -124,8 +124,6 @@ add_module(map/binfile "Default" TRUE)
 # add_module(plugin/ssd1306 "Default" TRUE)
 
 # other features
-add_feature(NETWORK_INFO "default" FALSE)
-
 add_feature(BUILD_MAPTOOL "default" TRUE)
 
 ### Platform specific settings
@@ -138,11 +136,6 @@ if(CMAKE_SIZEOF_VOID_P LESS 8)
 endif()
 
 set(LOCALEDIR "${LOCALE_DIR}")
-
-check_symbol_exists (getifaddrs "sys/types.h;ifaddrs.h" HAS_IFADDRS)
-if (HAS_IFADDRS)
-    cfg_feature(NETWORK_INFO "ifaddrs.h found" TRUE)
-endif(HAS_IFADDRS)
 
 set(CMAKE_APPBUNDLE_PATH "")
 

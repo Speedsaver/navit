@@ -23,5 +23,3 @@
 #cmakedefine HAVE_ENDIAN_H 1
 
 #cmakedefine HAVE_SHMEM 1
-
-#cmakedefine HAS_IFADDRS 1
