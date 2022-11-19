@@ -37,12 +37,7 @@
 #ifdef HAVE_UNISTD_H
 #include <unistd.h>
 #endif
-#ifdef HAVE_API_WIN32_BASE
-#include <windows.h>
-#endif
-#ifndef _MSC_VER
 #include <sys/time.h>
-#endif /* _MSC_VER */
 #include "item.h"
 #include "xmlconfig.h"
 #include "file.h"
@@ -1243,8 +1238,6 @@ gui_internal_cmd_position_do(struct gui_priv *this, struct pcoord *pc_in, struct
 		wbc->data_free=g_free_func;
 		wbc->c=pc;
 	}
-#ifndef _MSC_VER
-//POIs are not operational under MSVC yet
 	if (flags & 64) {
 		gui_internal_widget_append(wtable,row=gui_internal_widget_table_row_new(this,gravity_left|orientation_horizontal|flags_fill));
 		gui_internal_widget_append(row,
@@ -1253,7 +1246,6 @@ gui_internal_cmd_position_do(struct gui_priv *this, struct pcoord *pc_in, struct
 				gui_internal_cmd_pois, NULL));
 		wbc->c=pc;
 	}
-#endif /* _MSC_VER */
 #if 0
 	gui_internal_widget_append(wtable,row=gui_internal_widget_table_row_new(this,gravity_left|orientation_horizontal|flags_fill));
 	gui_internal_widget_append(row,

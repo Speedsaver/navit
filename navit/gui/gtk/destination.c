@@ -396,11 +396,6 @@ int kbd_pid;
 static int
 spawn_xkbd (char *xkbd_path, char *xkbd_str)
 {
-#ifdef _WIN32 // AF FIXME for WIN32
-    #ifndef F_SETFD
-        #define F_SETFD 2
-    #endif
-#else
 	char *xkbd_args[MAX_ARGS + 1];
 	int fd[2];
 	char buf[256];
@@ -442,7 +437,6 @@ spawn_xkbd (char *xkbd_path, char *xkbd_str)
 		buf[a] = 0;
 		return atoi (buf);
 	}
-#endif
 	return 0;
 }
 
@@ -560,9 +554,7 @@ int destination_address(struct navit *nav)
 #endif
 	gtk_widget_show_all(window2);
 
-#ifndef _WIN32
 	gtk_socket_steal(GTK_SOCKET(keyboard), spawn_xkbd("xkbd","-geometry 200x100"));
-#endif
 
 	country_attr=country_default();
 	tracking=navit_get_tracking(nav);

@@ -18,9 +18,6 @@
  */
 
 #include "config.h"
-#ifdef _MSC_VER
-#define _USE_MATH_DEFINES 1
-#endif /* _MSC_VER */
 #include <stdlib.h>
 #include <math.h>
 #include <stdio.h>
@@ -58,20 +55,6 @@
 #include "event.h"
 #include "mapset.h"
 #include "util.h"
-
-#ifdef HAVE_API_WIN32_CE
-#include "libc.h"
-#endif
-
-#ifdef _MSC_VER
-static double round(double x)
-{
-   if (x >= 0.0)
-      return floor(x + 0.5);
-   else
-      return ceil(x - 0.5);
-}
-#endif /* MSC_VER */
 
 struct osd_priv_common {
 	struct osd_item osd_item;

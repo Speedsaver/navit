@@ -46,10 +46,6 @@
 #include "atom.h"
 #include "command.h"
 #include "geom.h"
-#ifdef HAVE_API_WIN32_CE
-#include <windows.h>
-#include <winbase.h>
-#endif
 
 char *version="dev-version"; // PACKAGE_VERSION"+git:"GIT_VERSION""NAVIT_VARIANT;
 int main_argc;
@@ -98,11 +94,6 @@ int main_real(int argc, char * const* argv)
 	if (cp) {
 		debug_set_logfile(cp);
 	}
-#ifdef HAVE_API_WIN32_CE
-	else {	
-		debug_set_logfile("/Storage Card/navit.log");
-	}
-#endif
 	file_init();
 #ifndef USE_PLUGINS
 	builtin_init();
@@ -116,7 +107,7 @@ int main_real(int argc, char * const* argv)
 	config_file=NULL;
 #ifdef HAVE_GETOPT_H
 	opterr=0;  //don't bomb out on errors.
-#endif /* _MSC_VER */
+#endif
 	/* ingore iphone command line argument */
 	if (argc == 2 && !strcmp(argv[1],"-RegisterForSystemEvents"))
 		argc=1;
@@ -171,9 +162,7 @@ int main_real(int argc, char * const* argv)
 		list = g_list_append(list,g_strdup("navit.xml"));
 		list = g_list_append(list,g_strjoin(NULL,getenv("NAVIT_SHAREDIR"), "/navit.xml.local" , NULL));
 		list = g_list_append(list,g_strjoin(NULL,getenv("NAVIT_SHAREDIR"), "/navit.xml" , NULL));
-#ifndef _WIN32
 		list = g_list_append(list,g_strdup("/etc/navit/navit.xml"));
-#endif
 	}
 	li = list;
 	for (;;) {

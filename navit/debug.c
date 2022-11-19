@@ -24,9 +24,7 @@
 #include <string.h>
 #include <time.h>
 #include <glib.h>
-#ifndef _MSC_VER
 #include <sys/time.h>
-#endif /* _MSC_VER */
 #include "config.h"
 #include "file.h"
 #include "item.h"
@@ -34,11 +32,6 @@
 
 #ifdef HAVE_API_ANDROID
 #include <android/log.h>
-#endif
-
-#if defined HAVE_API_WIN32_CE || defined _MSC_VER
-#include <windows.h>
-#include <windowsx.h>
 #endif
 
 #ifdef HAVE_SOCKET
@@ -65,13 +58,6 @@ static gchar *gdb_program;
 
 static FILE *debug_fp;
 
-#if defined(_WIN32) || defined(__CEGCC__)
-
-static void sigsegv(int sig)
-{
-}
-
-#else
 #include <unistd.h>
 static void sigsegv(int sig)
 {
@@ -83,7 +69,6 @@ static void sigsegv(int sig)
 	system(buffer);
 	exit(1);
 }
-#endif
 
 void
 debug_init(const char *program_name)
@@ -220,16 +205,6 @@ debug_level_get(const char *message_category)
 
 static void debug_timestamp(char *buffer)
 {
-#if defined HAVE_API_WIN32_CE || defined _MSC_VER
-	LARGE_INTEGER counter, frequency;
-	double val;
-	QueryPerformanceCounter(&counter);
-	QueryPerformanceFrequency(&frequency);
-	val=counter.HighPart * 4294967296.0 + counter.LowPart;
-	val/=frequency.HighPart * 4294967296.0 + frequency.LowPart;
-	sprintf(buffer,"%.6f|",val);
-
-#else
 	struct timeval tv;
 
 	if (gettimeofday(&tv, NULL) == -1)
@@ -241,7 +216,6 @@ static void debug_timestamp(char *buffer)
 		(int)(tv.tv_sec/60)%60,
 		(int)tv.tv_sec % 60,
 		(int)tv.tv_usec/1000);
-#endif
 }
 
 static char* dbg_level_to_string(dbg_level level)
@@ -284,17 +258,10 @@ dbg_level_to_android(dbg_level level)
 void
 debug_vprintf(dbg_level level, const char *module, const int mlen, const char *function, const int flen, int prefix, const char *fmt, va_list ap)
 {
-#if defined HAVE_API_WIN32_CE || defined _MSC_VER
-	char message_origin[4096];
-#else
 	char message_origin[mlen+flen+3];
-#endif
 
 	sprintf(message_origin, "%s:%s", module, function);
 	if (global_debug_level >= level || debug_level_get(module) >= level || debug_level_get(message_origin) >= level) {
-#if defined(DEBUG_WIN32_CE_MESSAGEBOX)
-		wchar_t muni[4096];
-#endif
 		char debug_message[4096];
 		debug_message[0]='\0';
 		if (prefix) {
@@ -305,14 +272,7 @@ debug_vprintf(dbg_level level, const char *module, const int mlen, const char *f
 			strcpy(debug_message+strlen(debug_message),message_origin);
 			strcpy(debug_message+strlen(debug_message),":");
 		}
-#if defined HAVE_API_WIN32_CE
-#define vsnprintf _vsnprintf
-#endif
 		vsnprintf(debug_message+strlen(debug_message),4095-strlen(debug_message),fmt,ap);
-#ifdef DEBUG_WIN32_CE_MESSAGEBOX
-		mbstowcs(muni, debug_message, strlen(debug_message)+1);
-		MessageBoxW(NULL, muni, TEXT("Navit - Error"), MB_APPLMODAL|MB_OK|MB_ICONERROR);
-#else
 #ifdef HAVE_API_ANDROID
 		__android_log_print(dbg_level_to_android(level), "navit", "%s", debug_message);
 #else
@@ -327,7 +287,6 @@ debug_vprintf(dbg_level level, const char *module, const int mlen, const char *f
 			fp = stderr;
 		fprintf(fp,"%s",debug_message);
 		fflush(fp);
-#endif
 #endif
 	}
 }

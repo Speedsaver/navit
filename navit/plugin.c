@@ -24,11 +24,7 @@
 #ifdef HAVE_GMODULE
 #include <gmodule.h>
 #else
-#ifdef HAVE_API_WIN32_BASE
-#include <windows.h>
-#else
 #include <dlfcn.h>
-#endif
 #endif
 #endif
 #include "plugin.h"
@@ -49,56 +45,6 @@ g_module_supported(void)
 	return 1;
 }
 
-#ifdef HAVE_API_WIN32_BASE
-
-static DWORD last_error;
-static char errormsg[64];
-
-static void *
-g_module_open(char *name, int flags)
-{
-	HINSTANCE handle;
-	int len=MultiByteToWideChar(CP_ACP, MB_PRECOMPOSED, name, -1, 0, 0);
-	wchar_t filename[len];
-	MultiByteToWideChar(CP_ACP, MB_PRECOMPOSED, name, -1, filename, len) ;
-
-	handle = LoadLibraryW (filename);
-	if (!handle)
-		last_error=GetLastError();
-	return handle;
-}
-
-static char *
-g_module_error(void)
-{
-	sprintf(errormsg,"dll error %d",(int)last_error);
-	return errormsg;
-}
-
-static int
-g_module_symbol(GModule *handle, char *symbol, gpointer *addr)
-{
-#ifdef HAVE_API_WIN32_CE
-	int len=MultiByteToWideChar(CP_ACP, MB_PRECOMPOSED, symbol, -1, 0, 0);
-	wchar_t wsymbol[len+1];
-	MultiByteToWideChar(CP_ACP, MB_PRECOMPOSED, symbol, -1, wsymbol, len) ;
-	*addr=GetProcAddress ((HANDLE)handle, wsymbol);
-#else
-	*addr=GetProcAddress ((HANDLE)handle, symbol);
-#endif
-	if (*addr)
-		return 1;
-	last_error=GetLastError();
-	return 0;
-}
-
-static void
-g_module_close(GModule *handle)
-{
-	FreeLibrary((HANDLE)handle);
-}
-
-#else
 static void *
 g_module_open(char *name, int flags)
 {
@@ -125,7 +71,6 @@ g_module_close(GModule *handle)
 {
 	dlclose(handle);
 }
-#endif
 #endif
 #endif
 

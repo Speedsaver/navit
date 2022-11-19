@@ -32,23 +32,11 @@ int navit_utf8_strcasecmp(const char *s1, const char *s2);
 GList * g_hash_to_list(GHashTable *h);
 GList * g_hash_to_list_keys(GHashTable *h);
 gchar * g_strconcat_printf(gchar *buffer, gchar *fmt, ...);
-#if defined(_WIN32) || defined(__CEGCC__) || defined (__APPLE__) || defined(HAVE_API_ANDROID)
-#if defined(_UNICODE)
-wchar_t* newSysString(const char *toconvert);
-#else
+#if defined (__APPLE__) || defined(HAVE_API_ANDROID)
 char * newSysString(const char *toconvert);
-#endif
 #endif
 unsigned int iso8601_to_secs(char *iso8601);
 char * current_to_iso8601(void);
-
-#if defined(_MSC_VER) || (!defined(HAVE_GETTIMEOFDAY) && defined(HAVE_API_WIN32_BASE))
-
-#include <winsock.h>
-
-int gettimeofday(struct timeval *time, void *);
-
-#endif
 
 struct spawn_process_info;
 char * shell_escape(char *arg);

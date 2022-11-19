@@ -325,12 +325,10 @@ static struct item *
 map_rect_get_item_byid_textfile(struct map_rect_priv *mr, int id_hi, int id_lo)
 {
 	if (mr->m->is_pipe) {
-#ifndef _MSC_VER
 		pclose(mr->f);
 		mr->f=popen(mr->args, "r");
 		mr->pos=0;
 		mr->lastlen=0;
-#endif /* _MSC_VER */
 	} else
 		fseek(mr->f, id_lo, SEEK_SET);
 	get_line(mr);

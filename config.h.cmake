@@ -2,9 +2,6 @@
 #cmakedefine HAVE_SYS_MOUNT_H 1
 #cmakedefine HAVE_STDINT_H 1
 #cmakedefine HAVE_API_ANDROID 1
-#cmakedefine HAVE_API_WIN32_BASE 1
-#cmakedefine HAVE_API_WIN32 1
-#cmakedefine HAVE_API_WIN32_CE 1
 #cmakedefine HAVE_API_TOMTOM 1
 #cmakedefine HAVE_GLIB 1
 #cmakedefine HAVE_GMODULE 1
@@ -46,8 +43,6 @@
 #cmakedefine HAVE_SNPRINTF 1
 #cmakedefine HAVE_DECL__SNPRINTF 1
 
-#cmakedefine HAVE_WINSOCK 1
-
 #cmakedefine HAVE_MEMALIGN 1
 
 #cmakedefine HAVE_POSIX_MEMALIGN 1
@@ -72,8 +67,6 @@
 #cmakedefine HAVE_STPCPY 1
 
 #cmakedefine HAVE_SBRK 1
-
-#cmakedefine HAVE_PRAGMA_PACK 1
 
 #cmakedefine HAVE_GETDELIM 1
 

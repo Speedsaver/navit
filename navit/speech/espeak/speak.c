@@ -17,17 +17,9 @@
  * Boston, MA  02110-1301, USA.
  */
 
-#define _WIN32_WINNT 0x0500
-
 #include "config.h"
 
-#ifdef HAVE_API_WIN32_BASE
-#include <windows.h>
-#include <mmsystem.h>
-#include <winreg.h>
-#else
 #include <unistd.h>
-#endif
 
 #include <sys/types.h>
 #include <sys/stat.h>
@@ -341,9 +333,7 @@ static DWORD startThread( LPVOID sp_priv)
     }
 
     hWndParent = NULL;
-#ifndef HAVE_API_WIN32_CE
     hWndParent = HWND_MESSAGE;
-#endif
 
     // create a message only window
     hwnd = CreateWindow(

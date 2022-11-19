@@ -28,9 +28,6 @@
 #include "file.h"
 #include "speech.h"
 #include "util.h"
-#ifdef HAVE_API_WIN32_BASE
-#include <windows.h>
-#endif
 #ifdef USE_EXEC
 #include <sys/types.h>
 #include <unistd.h>

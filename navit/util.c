@@ -31,9 +31,6 @@
 #include <sys/types.h>
 #include <sys/wait.h>
 #endif
-#ifdef _MSC_VER
-typedef int ssize_t ;
-#endif
 #include "util.h"
 #include "debug.h"
 #include "config.h"
@@ -126,12 +123,7 @@ g_utf8_strlen_force_link(gchar *buffer, int max)
 }
 #endif
 
-#if defined(_WIN32) || defined(__CEGCC__)
-#include <windows.h>
-#include <sys/types.h>
-#endif
-
-#if defined(_WIN32) || defined(__CEGCC__) || defined (__APPLE__) || defined(HAVE_API_ANDROID)
+#if defined (__APPLE__) || defined(HAVE_API_ANDROID)
 char *stristr(const char *String, const char *Pattern)
 {
       char *pptr, *sptr, *start;
@@ -278,37 +270,12 @@ getline (char **lineptr, size_t *n, FILE *stream)
 }
 #endif
 
-#if defined(_UNICODE)
-wchar_t* newSysString(const char *toconvert)
-{
-	int newstrlen = MultiByteToWideChar(CP_ACP, MB_PRECOMPOSED, toconvert, -1, 0, 0);
-	wchar_t *newstring = g_new(wchar_t,newstrlen);
-	MultiByteToWideChar(CP_ACP, MB_PRECOMPOSED, toconvert, -1, newstring, newstrlen) ;
-	return newstring;
-}
-#else
 char * newSysString(const char *toconvert)
 {
 	return g_strdup(toconvert);
 }
 #endif
-#endif
 
-#if defined(_MSC_VER) || (!defined(HAVE_GETTIMEOFDAY) && defined(HAVE_API_WIN32_BASE))
-/**
- * Impements a simple incomplete version of gettimeofday. Only usefull for messuring
- * time spans, not the real time of day.
- */
-int gettimeofday(struct timeval *time, void *local)
-{
-  int milliseconds = GetTickCount();
-
-  time->tv_sec = milliseconds/1000;
-  time->tv_usec = (milliseconds - (time->tv_sec * 1000)) * 1000;
-
-  return 0;
-}
-#endif
 /**
  * @brief Converts an ISO 8601-style time string into epoch time.
  *
@@ -353,11 +320,6 @@ char *
 current_to_iso8601(void)
 {
 	char *timep=NULL;
-#ifdef HAVE_API_WIN32_BASE
-	SYSTEMTIME ST;
-	GetSystemTime(&ST);
-	timep=g_strdup_printf("%d-%02d-%02dT%02d:%02d:%02dZ",ST.wYear,ST.wMonth,ST.wDay,ST.wHour,ST.wMinute,ST.wSecond);
-#else
 	char buffer[32];
 	time_t tnow;
 	struct tm *tm;
@@ -367,18 +329,13 @@ current_to_iso8601(void)
 		strftime(buffer, sizeof(buffer), "%Y-%m-%dT%TZ", tm);
 		timep=g_strdup(buffer);	
 	}
-#endif
 	return timep;
 }
 
 
 struct spawn_process_info {
-#ifdef HAVE_API_WIN32_BASE
-	PROCESS_INFORMATION pr;
-#else
 	pid_t pid; // = -1 if non-blocking spawn isn't supported
 	int status; // exit status if non-blocking spawn isn't supported
-#endif
 };
 
 
@@ -394,51 +351,6 @@ shell_escape(char *arg)
 	char *r;
 	int arglen=strlen(arg);
 	int i,j,rlen;
-#ifdef HAVE_API_WIN32_BASE
-	{
-		int bscount=0;
-		rlen=arglen+3;
-		r=g_new(char,rlen);
-		r[0]='"';
-		for(i=0,j=1;i<arglen;i++) {
-			if(arg[i]=='\\') {
-				bscount++;
-				if(i==(arglen-1)) {
-					// Most special case - last char is 
-					// backslash. We can't escape it inside
-					// quoted string due to Win unescaping 
-					// rules so quote should be closed 
-					// before backslashes and these
-					// backslashes shouldn't be doubled
-					rlen+=bscount;
-					r=g_realloc(r,rlen);
-					r[j++]='"';
-					memset(r+j,'\\',bscount);
-					j+=bscount;
-				}
-			} else {
-				//Any preceeding backslashes will be doubled.
-				bscount*=2;
-				// Double quote needs to be preceeded by 
-				// at least one backslash
-				if(arg[i]=='"')
-					bscount++;
-				if(bscount>0) {
-					rlen+=bscount;
-					r=g_realloc(r,rlen);
-					memset(r+j,'\\',bscount);
-					j+=bscount;
-					bscount=0;
-				}
-				r[j++]=arg[i];
-				if(i==(arglen-1)) {
-					r[j++]='"';
-				}
-			}
-		}
-		r[j++]=0;
-	}
-#else
 	{
 		// Will use hard quoting for the whole string
 		// and replace each singular quote found with a '\'' sequence.
@@ -457,7 +369,6 @@ shell_escape(char *arg)
 		r[j++]='\'';
 		r[j++]=0;
 	}
-#endif
 	return r;
 }
 
@@ -531,42 +442,6 @@ spawn_process(char **argv)
 		return r;
 	}
 #else
-#ifdef HAVE_API_WIN32_BASE
-	{
-		char *cmdline;
-		DWORD dwRet;
-
-		// For [desktop] Windows it's adviceable not to use
-		// first CreateProcess parameter because PATH is not used
-		// if it is defined.
-		//
-		// On WinCE 6.0 I was unable to launch anything
-		// without first CreateProcess parameter, also it seems that
-		// no WinCE program has support for quoted strings in arguments.
-		// So...
-#ifdef HAVE_API_WIN32_CE
-		LPWSTR cmd,args;
-		cmdline=g_strjoinv(" ",argv+1);
-		args=newSysString(cmdline);
-		cmd = newSysString(argv[0]);
-		dwRet=CreateProcess(cmd, args, NULL, NULL, 0, 0, NULL, NULL, NULL, &(r->pr));
-		dbg(lvl_debug, "CreateProcess(%s,%s), PID=%i\n",argv[0],cmdline,r->pr.dwProcessId);
-		g_free(cmd);
-#else
-		TCHAR* args;
-		STARTUPINFO startupInfo;
-		memset(&startupInfo, 0, sizeof(startupInfo));
-		startupInfo.cb = sizeof(startupInfo);
-		cmdline=spawn_process_compose_cmdline(argv);
-		args=newSysString(cmdline);
-		dwRet=CreateProcess(NULL, args, NULL, NULL, 0, 0, NULL, NULL, &startupInfo, &(r->pr));
-		dbg(lvl_debug, "CreateProcess(%s), PID=%i\n",cmdline,r->pr.dwProcessId);
-#endif
-		g_free(cmdline);
-		g_free(args);
-		return r;
-	}
-#else
 	{
 		char *cmdline=spawn_process_compose_cmdline(argv);
 		int status;
@@ -577,7 +452,6 @@ spawn_process(char **argv)
 		r->pid=0;
 		return r;
 	}
-#endif
 #endif
 }
 
@@ -596,31 +470,6 @@ int spawn_process_check_status(struct spawn_process_info *pi, int block)
 		dbg(lvl_error,"Trying to get process status of NULL, assuming process is terminated.\n");
 		return 255;
 	}
-#ifdef HAVE_API_WIN32_BASE
-	{int failcount=0;
-		while(1){
-			DWORD dw;
-			if(GetExitCodeProcess(pi->pr.hProcess,&dw)) {
-				if(dw!=STILL_ACTIVE) {
-					return dw;
-					break;
-				}
-			} else {
-				dbg(lvl_error,"GetExitCodeProcess failed. Assuming the process is terminated.");
-				return 255;
-			}
-			if(!block)
-				return -1;
-		
-			dw=WaitForSingleObject(pi->pr.hProcess,INFINITE);
-			if(dw==WAIT_FAILED && failcount++==1) {
-				dbg(lvl_error,"WaitForSingleObject failed twice. Assuming the process is terminated.");
-				return 0;
-				break;
-			}
-		}
-	}
-#else
 #ifdef _POSIX_C_SOURCE
 	if(pi->status!=-1) {
 		return pi->status;
@@ -655,17 +504,12 @@ int spawn_process_check_status(struct spawn_process_info *pi, int block)
 	dbg(lvl_error, "Non-blocking spawn_process isn't availiable for this platform, repoting process exit status.\n");
 	return pi->status;
 #endif
-#endif
 }
 
 void spawn_process_info_free(struct spawn_process_info *pi)
 {
 	if(pi==NULL)
 		return;
-#ifdef HAVE_API_WIN32_BASE
-	CloseHandle(pi->pr.hProcess);
-	CloseHandle(pi->pr.hThread);
-#endif
 #ifdef _POSIX_C_SOURCE
 	{
 		sigset_t set, old;

@@ -27,9 +27,7 @@ extern "C" {
 #ifndef PATH_MAX
 #define PATH_MAX 4096
 #endif
-#ifndef __CEGCC__
 #include <time.h>
-#endif
 #include "param.h"
 #include <stdio.h>
 
@@ -41,15 +39,9 @@ struct file {
 	long long size;
 	int name_id;
 	int fd;
-#ifndef __CEGCC__
 	time_t mtime;
 	time_t ctime;
 	int version;			
-#endif
-#if defined(_WIN32) || defined(__CEGCC__)
-	long map_handle;
-	long map_file;
-#endif
 	char *name;
 	int special;
 	int cache;

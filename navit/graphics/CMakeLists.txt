@@ -3,9 +3,4 @@
 
 add_subdirectory (ezxml)
 
-if (HAVE_API_WIN32_BASE)
-add_subdirectory (glib)
-add_subdirectory (win32)
-endif (HAVE_API_WIN32_BASE)
-
 add_subdirectory (zlib)

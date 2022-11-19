@@ -113,24 +113,10 @@ public slots:
 		return QString()+"LANG="+getenv("LANG");
 	}
 	QString langName() {
-#ifdef HAVE_API_WIN32_BASE
-		char str[32];
-
-		GetLocaleInfo(LOCALE_USER_DEFAULT, LOCALE_SABBREVLANGNAME, str, sizeof(str));
-		return QString()+"LOCALE_SABBREVLANGNAME="+str;
-#else
 		return QString();
-#endif
 	}
 	QString ctryName() {
-#ifdef HAVE_API_WIN32_BASE
-		char str[32];
-
-		GetLocaleInfo(LOCALE_USER_DEFAULT, LOCALE_SABBREVCTRYNAME, str, sizeof(str));
-		return QString()+"LOCALE_SABBREVCTRYNAME="+str;
-#else
 		return QString();
-#endif
 	}
 protected:
 	int getAttrFunc(enum attr_type type, struct attr* attr, struct attr_iter* iter) { return gui_get_attr(this->object->gui, type, attr, iter); }

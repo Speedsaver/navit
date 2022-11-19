@@ -17,12 +17,7 @@
  * Boston, MA  02110-1301, USA.
  */
 #include "navit_lfs.h"
-#ifdef _MSC_VER
-#define strcasecmp _stricmp
-#define snprintf _snprintf
-#else
 #include <unistd.h>
-#endif
 #include <string.h>
 #include <stdlib.h>
 #include <math.h>

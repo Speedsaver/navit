@@ -19,9 +19,6 @@
 #include <stdio.h>
 #include <string.h>
 #include "maptool.h"
-#ifdef _MSC_VER
-#define strcasecmp _stricmp
-#endif
 
 char *
 osm_tag_value(struct item_bin *ib, char *key)

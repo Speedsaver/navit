@@ -30,29 +30,10 @@
 
 #define _LARGEFILE_SOURCE
 #define _FILE_OFFSET_BITS 64
-#ifdef __MSVCRT__
-#define __USE_MINGW_FSEEK
-#endif
 
 #include <stdio.h>
 #include <unistd.h>
 #include <fcntl.h>
-
-#ifdef __MSVCRT__
-
-#undef lseek
-#define lseek(fd,offset,whence) _lseeki64(fd,offset,whence)
-
-#undef ftello
-#define ftello(f) ftello64(f)
-
-#undef fseeko
-#define fseeko(f,offset,whence) fseeko64(f,offset,whence)
-
-#undef off_t
-#define off_t long long
-
-#endif
 
 #ifdef HAVE_API_ANDROID
 #undef lseek

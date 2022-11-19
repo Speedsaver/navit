@@ -365,15 +365,11 @@ item_id_equal(const void *a, const void *b)
 void
 item_id_from_ptr(struct item *item, void *id) 
 {
-#if !defined(__LP64__) && !defined(__LLP64__) && !defined(WIN64)
+#if !defined(__LP64__) && !defined(__LLP64__)
 	item->id_lo=(int) id;
 	item->id_hi=0;
 #else
-#	ifndef _MSC_VER
 		item->id_lo=((long long)id)&0xFFFFFFFFll;
-#	else
-		item->id_lo=((long long)id)&0xFFFFFFFFi64;
-#	endif
 		item->id_hi=((long long)id)>>32;
 #endif
 }

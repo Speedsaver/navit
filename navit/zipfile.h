@@ -20,11 +20,6 @@
 #ifndef __ZIPFILE_H__
 #define __ZIPFILE_H__
 
-#ifdef HAVE_PRAGMA_PACK
-#pragma pack(push)
-#pragma pack(1)
-#endif
-
 #ifdef  __GNUC__
 #define ATTRIBUTE_PACKED __attribute__ ((packed))
 #else
@@ -170,8 +165,4 @@ struct zip64_eocl {
 struct zip_alignment_check {
 	int x[sizeof(struct zip_cd) == 46 ? 1:-1];
 };
-
-#ifdef HAVE_PRAGMA_PACK
-#pragma pack(pop)
-#endif
 #endif

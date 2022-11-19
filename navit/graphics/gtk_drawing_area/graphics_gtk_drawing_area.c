@@ -26,7 +26,7 @@
 #include <gtk/gtk.h>
 #include <gdk/gdkkeysyms.h>
 #include <cairo.h>
-#include <locale.h> /* For WIN32 */
+#include <locale.h>
 #if !defined(GDK_Book) || !defined(GDK_Calendar)
 #include <X11/XF86keysym.h>
 #endif
@@ -34,9 +34,7 @@
 #include <Imlib2.h>
 #endif
 
-#ifndef _WIN32
 #include <gdk/gdkx.h>
-#endif
 #include "event.h"
 #include "debug.h"
 #include "point.h"
@@ -599,9 +597,7 @@ configure(GtkWidget * widget, GdkEventConfigure * event, gpointer user_data)
 	struct graphics_priv *gra=user_data;
 	if (! gra->visible)
 		return TRUE;
-#ifndef _WIN32
 	dbg(lvl_debug,"window=%lu\n", GDK_WINDOW_XID(widget->window));
-#endif
 	gra->width=widget->allocation.width;
 	gra->height=widget->allocation.height;
 	cairo_surface_t *surface = cairo_image_surface_create(CAIRO_FORMAT_ARGB32, gra->width, gra->height);
@@ -1005,12 +1001,8 @@ graphics_gtk_drawing_area_disable_suspend(struct window *w)
 {
 	struct graphics_priv *gr=w->priv;
 
-#ifndef _WIN32
 	if (gr->pid)
 		kill(gr->pid, SIGWINCH);
-#else
-    dbg(lvl_warning, "failed to kill() under Windows\n");
-#endif
 }
 
 
@@ -1020,10 +1012,8 @@ get_data(struct graphics_priv *this, char const *type)
 	FILE *f;
 	if (!strcmp(type,"gtk_widget"))
 		return this->widget;
-#ifndef _WIN32
 	if (!strcmp(type,"xwindow_id"))
 		return (void *)GDK_WINDOW_XID(this->win ? this->win->window : this->widget->window);
-#endif
 	if (!strcmp(type,"window")) {
 		char *cp = getenv("NAVIT_XID");
 		unsigned xid = 0;
@@ -1034,14 +1024,12 @@ get_data(struct graphics_priv *this, char const *type)
 		this->window.fullscreen=graphics_gtk_drawing_area_fullscreen;
 		this->window.disable_suspend=graphics_gtk_drawing_area_disable_suspend;
 		this->window.priv=this;
-#if !defined(_WIN32) && !defined(__CEGCC__)
 		f=popen("pidof /usr/bin/ipaq-sleep","r");
 		if (f) {
 			fscanf(f,"%d",&this->pid);
 			dbg(lvl_debug,"ipaq_sleep pid=%d\n", this->pid);
 			pclose(f);
 		}
-#endif
 		return &this->window;
 	}
 	return NULL;
@@ -1147,8 +1135,5 @@ plugin_init(void)
 {
 	gtk_init(&gtk_argc, &gtk_argv);
 	gtk_set_locale();
-#ifdef HAVE_API_WIN32
-	setlocale(LC_NUMERIC, "C"); /* WIN32 gtk resets LC_NUMERIC */
-#endif
 	plugin_register_category_graphics("gtk_drawing_area", graphics_gtk_drawing_area_new);
 }

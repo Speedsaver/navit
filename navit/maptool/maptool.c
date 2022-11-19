@@ -26,14 +26,9 @@
 #include <signal.h>
 #include <stdio.h>
 #include <math.h>
-#ifdef _MSC_VER
-#include "getopt_long.h"
-#define atoll _atoi64
-#else
 #include <getopt.h>
 #include <unistd.h>
 #include <sys/time.h>
-#endif
 #include <fcntl.h>
 #include <sys/stat.h>
 #include <zlib.h>
@@ -72,9 +67,6 @@ int overlap=1;
 int bytes_read;
 
 static long start_brk;
-#ifdef _WIN32
-#define timespec timeval
-#endif
 static struct timespec start_ts;
 
 /*
@@ -131,11 +123,7 @@ progress_time(void)
 	char buf[buflen];
 	int pos=1;
 	buf[0]=' ';
-#ifdef _WIN32
-	gettimeofday(&ts, NULL);
-#else
 	clock_gettime(CLOCK_REALTIME, &ts);
-#endif
 	seconds=ts.tv_sec-start_ts.tv_sec;
 	pos+=assafe_lltoa(seconds/60, buflen-pos, buf+pos);
 	seconds%=60;
@@ -165,10 +153,8 @@ sig_alrm_do(int sig)
 	const int buflen=1024;
 	char buf[buflen];
 	int pos=0;
-#ifndef _WIN32
 	signal(SIGALRM, sig_alrm_do);
 	alarm(30);
-#endif
 	pos+=assafe_strcp2buf("PROGRESS", buflen-pos, buf+pos);
 	pos+=assafe_lltoa(phase, buflen-pos, buf+pos);
 	pos+=assafe_strcp2buf(": Processed ", buflen-pos, buf+pos);
@@ -185,11 +171,7 @@ sig_alrm_do(int sig)
 	write(2,buf,pos);
 	progress_time();
 	progress_memory();
-#ifndef _WIN32
 	write(2,"\r\n",2);
-#else
-	write(2,"\n",1);
-#endif
 }
 
 void
@@ -204,9 +186,7 @@ sig_alrm(int sig)
 void
 sig_alrm_end(void)
 {
-#ifndef _WIN32
 	alarm(0);
-#endif
 }
 
 static struct files_relation_processing *
@@ -591,11 +571,7 @@ osm_read_input_data(struct maptool_params *p, char *suffix)
 		}
 	}
 	else if (p->protobuf) {
-#ifdef _MSC_VER
-		exit_with_error("Option -P not yet supported on MSVC\n");
-#else
 		map_collect_data_osm_protobuf(p->input_file,&p->osm);
-#endif
 	}
 	else if (p->o5m)
 		map_collect_data_osm_o5m(p->input_file,&p->osm);
@@ -950,11 +926,7 @@ int main(int argc, char **argv)
 #ifdef HAVE_SBRK
 	start_brk=(long)sbrk(0);
 #endif
-#ifdef _WIN32
-	gettimeofday(&start_ts,NULL);
-#else
 	clock_gettime(CLOCK_REALTIME, &start_ts);
-#endif
 	while (1) {
 		int parse_result=parse_option(&p, argv, argc, &option_index);
 		if (!parse_result) {
@@ -986,12 +958,8 @@ int main(int argc, char **argv)
 	// initialize plugins and OSM mappings
 	maptool_init(p.rule_file);
 	if (p.protobufdb_operation) {
-#ifdef _MSC_VER
-		exit_with_error("Option -O not yet supported on MSVC\n");
-#else
 		osm_protobufdb_load(p.input_file, p.protobufdb);
 		return 0;
-#endif
 	}
 	phase=0;
 

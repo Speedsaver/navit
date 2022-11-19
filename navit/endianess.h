@@ -78,11 +78,6 @@
   #endif
 #endif
 
-#elif  defined(_WIN32) || defined(__CEGCC__)
-  #define __BIG_ENDIAN 4321
-  #define __LITTLE_ENDIAN 1234
-  #define __BYTE_ORDER __LITTLE_ENDIAN
-#else
   #define __bswap_16(__bsx) ((((__bsx) >> 8) & 0xff) | (((__bsx) & 0xff) << 8))
   #define __bswap_32(__bsx) ((((__bsx) & 0xff000000) >> 24) | \
 			     (((__bsx) & 0x00ff0000) >>  8) |\

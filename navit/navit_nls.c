@@ -3,9 +3,6 @@
 #include <glib.h>
 #include <navit_nls.h>
 #include <stdlib.h>
-#ifdef HAVE_API_WIN32_CE
-#include "libc.h"
-#endif
 
 char *
 navit_nls_add_textdomain(const char *package, const char *dir)

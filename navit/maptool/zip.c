@@ -351,9 +351,7 @@ zip_write_directory(struct zip_info *info)
 	eoc.zipeofst=info->offset;
 	zip_write(info, &eoc, sizeof(eoc));
 	sig_alrm(0);
-#ifndef _WIN32
 	alarm(0);
-#endif
 	return 0;
 }
 

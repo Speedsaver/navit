@@ -28,10 +28,8 @@
 #include <signal.h>
 #include <stdio.h>
 #include <math.h>
-#ifndef _MSC_VER
 #include <getopt.h>
 #include <unistd.h>
-#endif
 #include <fcntl.h>
 #include <sys/stat.h>
 #include <zlib.h>

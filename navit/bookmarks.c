@@ -38,19 +38,6 @@
 #include "navit_nls.h"
 #include "util.h"
 
-/* FIXME: Move this to support directory */
-#ifdef _MSC_VER
-#include <windows.h>
-static int ftruncate(int fd, __int64 length)
-{
-	HANDLE fh = (HANDLE)_get_osfhandle(fd);
-	if (!fh || _lseeki64(fd, length, SEEK_SET)) {
-		return -1;
-	}
-	return SetEndOfFile(fh) ? 0 : -1;
-}
-#endif /* _MSC_VER */
-
 struct bookmarks {
 	//data storage
 	struct map *bookmark;

@@ -214,37 +214,6 @@ else (GTK2_LIBRARIES AND GTK2_INCLUDE_DIRS)
     )
     gtk2_debug_message("GTK2_GDK_LIBRARY is ${GTK2_GDK_LIBRARY}")
     endif(UNIX)
-    if (WIN32)
-
-    find_library(GTK2_GTK_LIBRARY
-      NAMES
-        gtk-win32-2.0
-      PATHS
-        ${_GTK2LinkDir}
-        /usr/lib
-        /usr/local/lib
-        /usr/openwin/lib
-        /usr/X11R6/lib
-        /opt/gnome/lib
-        /opt/lib
-        /sw/lib
-    )
-    gtk2_debug_message("GTK2_GTK_LIBRARY is ${GTK2_GTK_LIBRARY}")
-
-    find_library(GTK2_GDK_LIBRARY
-      NAMES
-        gdk-win32-2.0
-      PATHS
-        ${_GDK2LinkDir}
-        /usr/lib
-        /usr/local/lib
-        /usr/openwin/lib
-        /usr/X11R6/lib
-        /opt/gnome/lib
-        /opt/lib
-        /sw/lib
-    )
-    endif (WIN32)
     find_library(GTK2_GDK_PIXBUF_LIBRARY
       NAMES
         gdk_pixbuf-2.0

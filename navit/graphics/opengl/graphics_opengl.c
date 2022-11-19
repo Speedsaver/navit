@@ -42,13 +42,7 @@
 #include "navit/font/freetype/font_freetype.h"
 #include "graphics_opengl.h"
 
-#if defined(WINDOWS) || defined(WIN32)
-#define PIXEL_FORMAT GL_RGBA
-#include <windows.h>
-# define sleep(i) Sleep(i * 1000)
-#else
 #define PIXEL_FORMAT GL_BGRA
-#endif
 
 #if HAVE_FREEIMAGE
 #include <FreeImage.h>

@@ -803,9 +803,6 @@ plugin_init(void)
 {
 	gtk_init(&gtk_argc, &gtk_argv);
 	gtk_set_locale();
-#ifdef HAVE_API_WIN32
-	setlocale(LC_NUMERIC,"C");
-#endif
 
 
 	plugin_register_category_gui("gtk", gui_gtk_new);

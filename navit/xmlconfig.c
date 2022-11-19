@@ -52,11 +52,6 @@
 #include "callback.h"
 #include "config_.h"
 
-#if (defined __MINGW32__) || (defined _MSC_VER)
-/* This only works if a is a string constant, i.e. "name" */
-#define unsetenv(a) putenv(a "=")
-#endif
-
 struct xistate {
 	struct xistate *parent;
 	struct xistate *child;

@@ -1,12 +1,7 @@
 #include <glib.h>
 #include <stdlib.h>
 #include "config.h"
-#ifdef HAVE_API_WIN32_BASE
-#include <windows.h>
-#endif
-#ifndef _MSC_VER
 #include <sys/time.h>
-#endif /* _MSC_VER */
 #include "color.h"
 #include "coord.h"
 #include "point.h"
@@ -46,13 +41,9 @@ void
 gui_internal_gesture_ring_add(struct gui_priv *this, struct point *p)
 {
 	long long msec;
-#ifndef HAVE_API_WIN32_CE
 	struct timeval tv;
 	gettimeofday(&tv,NULL);
 	msec=((long long)tv.tv_sec)*1000+tv.tv_usec/1000;
-#else
-	msec=GetTickCount();
-#endif
 	this->gesture_ring_last++;
 	this->gesture_ring_last%=GESTURE_RINGSIZE;
 	if(this->gesture_ring_last==this->gesture_ring_first) {

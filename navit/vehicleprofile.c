@@ -50,7 +50,6 @@ vehicleprofile_set_attr_do(struct vehicleprofile *this_, struct attr *attr)
 	case attr_name:
 		if(this_->name)
 			g_free(this_->name);
-		/* previously used strdupn not available on win32 */
 		this_->name = g_strdup(attr->u.str);
 		break;
 	case attr_route_depth:

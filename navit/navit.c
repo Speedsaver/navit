@@ -68,13 +68,6 @@
 #include "vehicleprofile.h"
 #include "sunriset.h"
 #include "bookmarks.h"
-#ifdef HAVE_API_WIN32_BASE
-#include <windows.h>
-#include "util.h"
-#endif
-#ifdef HAVE_API_WIN32_CE
-#include "libc.h"
-#endif
 
 /* define string for bookmark handling */
 #define TEXTFILE_COMMENT_NAVI_STOPPED "# navigation stopped\n"

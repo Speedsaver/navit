@@ -2,9 +2,6 @@
 #include <stdlib.h>
 #include <math.h>
 #include "config.h"
-#ifdef HAVE_API_WIN32_BASE
-#include <windows.h>
-#endif
 #include "color.h"
 #include "coord.h"
 #include "point.h"
@@ -748,33 +745,6 @@ gui_internal_cmd2_locale(struct gui_priv *this, char *function, struct attr **in
 	gui_internal_widget_append(wb, w=gui_internal_label_new(this, text));
 	w->flags=gravity_left_center|orientation_horizontal|flags_fill;
 	g_free(text);
-#ifdef HAVE_API_WIN32_BASE
-	{
-		char country[32],lang[32];
-#ifdef HAVE_API_WIN32_CE
-		wchar_t wcountry[32],wlang[32];
-
-		GetLocaleInfo(LOCALE_USER_DEFAULT, LOCALE_SABBREVLANGNAME, wlang, sizeof(wlang));
-		WideCharToMultiByte(CP_ACP,0,wlang,-1,lang,sizeof(lang),NULL,NULL);
-#else
-		GetLocaleInfo(LOCALE_USER_DEFAULT, LOCALE_SABBREVLANGNAME, lang, sizeof(lang));
-#endif
-		text=g_strdup_printf("LOCALE_SABBREVLANGNAME=%s",lang);
-		gui_internal_widget_append(wb, w=gui_internal_label_new(this, text));
-		w->flags=gravity_left_center|orientation_horizontal|flags_fill;
-		g_free(text);
-#ifdef HAVE_API_WIN32_CE
-		GetLocaleInfo(LOCALE_USER_DEFAULT, LOCALE_SABBREVCTRYNAME, wcountry, sizeof(wcountry));
-		WideCharToMultiByte(CP_ACP,0,wcountry,-1,country,sizeof(country),NULL,NULL);
-#else
-		GetLocaleInfo(LOCALE_USER_DEFAULT, LOCALE_SABBREVCTRYNAME, country, sizeof(country));
-#endif
-		text=g_strdup_printf("LOCALE_SABBREVCTRYNAME=%s",country);
-		gui_internal_widget_append(wb, w=gui_internal_label_new(this, text));
-		w->flags=gravity_left_center|orientation_horizontal|flags_fill;
-		g_free(text);
-	}
-#endif
 
 	gui_internal_menu_render(this);
 	graphics_draw_mode(this->gra, draw_mode_end);

@@ -545,9 +545,6 @@ popup_deactivate(GtkWidget *widget, struct menu_priv *menu)
 static void
 popup_activate(struct menu_priv *menu)
 {
-#ifdef _WIN32
-	menu->widget=gtk_ui_manager_get_widget(menu->gui->ui_manager, menu->path );
-#endif
 	gtk_menu_popup(GTK_MENU(menu->widget), NULL, NULL, NULL, NULL, 0, gtk_get_current_event_time ());
 	menu->handler_id=g_signal_connect(menu->widget, "selection-done", G_CALLBACK(popup_deactivate), menu);
 }

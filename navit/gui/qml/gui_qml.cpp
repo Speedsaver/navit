@@ -4,9 +4,6 @@
 #include <QtDeclarative>
 #include <QtXml>
 #include "config.h"
-#ifdef HAVE_API_WIN32_BASE
-#include <windows.h>
-#endif
 #include "plugin.h"
 #include "item.h"
 #include "attr.h"

@@ -27,11 +27,7 @@
 #include <string.h>
 #include <glib.h>
 #include <sys/stat.h>
-#ifdef _WIN32
-    #include <serial_io.h>
-#else
 #include <termios.h>
-#endif
 #include <math.h>
 #include "debug.h"
 #include "callback.h"
@@ -46,17 +42,6 @@
 #include <sys/socket.h>
 #include <netinet/in.h>
 #include <arpa/inet.h>
-#endif
-#ifdef HAVE_WINSOCK
-#include <winsock2.h>
-int inet_aton(const char *cp, struct in_addr *inp);
-
-int inet_aton(const char *cp, struct in_addr *inp)
-{
-	unsigned long addr = inet_addr(cp);
-	inp->S_un.S_addr = addr;
-	return addr!=-1;
-}
 #endif
 
 static void vehicle_file_disable_watch(struct vehicle_priv *priv);
@@ -106,11 +91,6 @@ struct vehicle_priv {
 	int sats_signal;
 	int time;
 	int on_eof;
-#ifdef _WIN32
-	int no_data_count;
-	struct event_timeout * timeout;
-	struct callback *timeout_callback;
-#endif
 	enum file_type file_type;
 	FILE *file;
 	struct event_watch *watch;
@@ -130,84 +110,6 @@ struct vehicle_priv {
 };
 
 //***************************************************************************
-/** @fn static int vehicle_win32_serial_track(struct vehicle_priv *priv)
-*****************************************************************************
-* @b Description: Callback of the plugin
-*****************************************************************************
-* @param      priv : pointer on the private data of the plugin
-*****************************************************************************
-* @return     always 1
-*****************************************************************************
-**/
-#ifdef _WIN32
-static int vehicle_win32_serial_track(struct vehicle_priv *priv)
-{
-    static char buffer[2048] = {0,};
-    static int current_index = 0;
-    const int chunk_size = 1024;
-    int rc = 0;
-    int dwBytes;
-
-    dbg(lvl_debug, "enter, *priv='%x', priv->source='%s'\n", priv, priv->source);
-
-    if ( priv->no_data_count > 5 )
-    {
-        vehicle_file_close( priv );
-        priv->no_data_count = 0;
-        vehicle_file_open( priv );
-        vehicle_file_enable_watch(priv);
-    }
-
-    //if ( priv->fd <= 0 )
-    //{
-    //    vehicle_file_open( priv );
-    //}
-
-    if ( current_index >= ( sizeof( buffer ) - chunk_size ) )
-    {
-        // discard
-        current_index = 0;
-        memset( buffer, 0 , sizeof( buffer ) );
-    }
-
-    dwBytes = serial_io_read( priv->fd, &buffer[ current_index ], chunk_size );
-    if ( dwBytes > 0 )
-    {
-        char* return_pos = NULL;
-        current_index += dwBytes;
-
-        while ( ( return_pos = strchr( buffer, '\n' ) ) != NULL )
-        {
-            char return_buffer[1024];
-            int bytes_to_copy = return_pos - buffer + 1;
-            memcpy( return_buffer, buffer, bytes_to_copy );
-            return_buffer[ bytes_to_copy + 1 ] = '\0';
-            return_buffer[ bytes_to_copy ] = '\0';
-
-            // printf( "received %d : '%s' bytes to copy\n", bytes_to_copy, return_buffer );
-            rc += vehicle_file_parse( priv, return_buffer );
-
-            current_index -= bytes_to_copy;
-            memmove( buffer, &buffer[ bytes_to_copy ] , sizeof( buffer ) - bytes_to_copy );
-        }
-        if (rc) {
-            priv->no_data_count = 0;
-            callback_list_call_attr_0(priv->cbl, attr_position_coord_geo);
-            if (rc > 1)
-                dbg(lvl_error, "Can not keep with gps data delay is %d seconds\n", rc - 1);
-
-        }
-    }
-    else
-    {
-        priv->no_data_count++;
-    }
-    dbg(lvl_info, "leave, return '1', priv->no_data_count='%d'\n", priv->no_data_count);
-    return 1;
-}
-#endif
-
-//***************************************************************************
 /** @fn static int vehicle_file_open(struct vehicle_priv *priv)
 *****************************************************************************
 * @b Description: open dialogue with the GPS
@@ -222,11 +124,7 @@ static int
 vehicle_file_open(struct vehicle_priv *priv)
 {
 	char *name;
-#ifndef _WIN32
 	struct termios tio;
-#else
-	#define O_NDELAY 0
-#endif
 
 	name = priv->source + 5;
 	if (!strncmp(priv->source, "file:", 5)) {
@@ -236,7 +134,6 @@ vehicle_file_open(struct vehicle_priv *priv)
 		if (file_is_reg(name)) {
 			priv->file_type = file_type_file;
 		}
-#ifndef _WIN32
 		else {
 			tcgetattr(priv->fd, &tio);
 			cfmakeraw(&tio);
@@ -253,13 +150,8 @@ vehicle_file_open(struct vehicle_priv *priv)
 			return 0;
 		priv->fd = fileno(priv->file);
 		priv->file_type = file_type_pipe;
-#endif //!_WIN32
-#if defined(HAVE_SOCKET) || defined(HAVE_WINSOCK) 
+#if defined(HAVE_SOCKET)
 	} else if (!strncmp(priv->source,"socket:", 7)) {
-		#ifdef _WIN32
-		WSADATA wsi;
-		WSAStartup(0x00020002,&wsi);
-		#endif
 		char *p,*s=g_strdup(priv->source+7);
 		struct sockaddr_in sin;
 		p=strchr(s,':');
@@ -292,28 +184,7 @@ vehicle_file_open(struct vehicle_priv *priv)
 		priv->file_type = file_type_socket;
 #endif //HAVE_SOCKET
 	} else if (!strncmp(priv->source,"serial:",7)) {
-#ifdef _WIN32
-		char* raw_setting_str = g_strdup( priv->source );
-
-		char* strport = strchr(raw_setting_str, ':' );
-		char* strsettings = strchr(raw_setting_str, ' ' );
-
-		if ( strport && strsettings )
-		{
-		    strport++;
-		    *strsettings = '\0';
-		    strsettings++;
-
-		    priv->fd=serial_io_init( strport, strsettings );
-		}
-		g_free( raw_setting_str );
-		priv->file_type = file_type_serial;
-		// Add the callback
-		dbg(lvl_info, "Add the callback ...\n", priv->source);
-			priv->timeout_callback=callback_new_1(callback_cast(vehicle_win32_serial_track), priv);
-#else
 		//TODO - add linux serial
-#endif //!_WIN32
     }
     return(priv->fd != -1);
 }
@@ -331,22 +202,9 @@ vehicle_file_close(struct vehicle_priv *priv)
 {
     dbg(lvl_debug, "enter, priv->fd='%d'\n", priv->fd);
 	vehicle_file_disable_watch(priv);
-#ifdef _WIN32
-    if(priv->file_type == file_type_serial)
-    {
-        if (priv->timeout_callback) {
-   		callback_destroy(priv->timeout_callback);
-		priv->timeout_callback=NULL;	// dangling pointer! prevent double freeing.
-        }
-	serial_io_shutdown( priv->fd );
-    }
-    else
-#endif
     {
 	if (priv->file) {
-#ifndef _MSC_VER
 		pclose(priv->file);
-#endif /* _MSC_VER */
     }
 	else if (priv->fd >= 0) {
 		close(priv->fd);
@@ -696,16 +554,6 @@ static void
 vehicle_file_enable_watch(struct vehicle_priv *priv)
 {
 	dbg(lvl_debug, "enter\n");
-#ifdef _WIN32
-	// add an event : don't use glib timers and g_timeout_add
-    if (priv->file_type == file_type_serial)
-    {
-	if (priv->timeout_callback != NULL)
-            priv->timeout = event_add_timeout(500, 1, priv->timeout_callback);
-        else
-            dbg(lvl_warning, "error : watch not enabled : priv->timeout_callback is null\n"); }
-    else
-#endif
     {
 	if (! priv->watch)
 		priv->watch = event_add_watch(priv->fd, event_watch_cond_read, priv->cb);
@@ -724,16 +572,6 @@ static void
 vehicle_file_disable_watch(struct vehicle_priv *priv)
 {
 	dbg(lvl_debug, "vehicle_file_disable_watch : enter\n");
-#ifdef _WIN32
-    if(priv->file_type == file_type_serial)
-    {
-    if (priv->timeout) {
-		event_remove_timeout(priv->timeout);
-		priv->timeout=NULL;		// dangling pointer! prevent double freeing.
-        }
-    }
-    else
-#endif //!_WIN32
     {
 	if (priv->watch)
 		event_remove_watch(priv->watch);
@@ -1021,9 +859,6 @@ vehicle_file_new_file(struct vehicle_methods
 	ret->sat_item.id_hi=ret->sat_item.id_lo=0;
 	ret->sat_item.priv_data=ret;
 	ret->sat_item.meth=&vehicle_file_sat_methods;
-#ifdef _WIN32
-	ret->no_data_count = 0;
-#endif
 
 	dbg(lvl_debug, "vehicle_file_new_file:open\n");
 	if (!vehicle_file_open(ret)) {

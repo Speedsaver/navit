@@ -19,11 +19,7 @@
 #include <string.h>
 #include <stdlib.h>
 #include <math.h>
-#ifdef _MSC_VER
-#define atoll _atoi64
-#else
 #include <unistd.h>
-#endif
 #include "maptool.h"
 
 int

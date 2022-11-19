@@ -27,9 +27,6 @@
 #include "navit.h"
 #include "config_.h"
 #include "file.h"
-#ifdef HAVE_API_WIN32_CE
-#include "libc.h"
-#endif
 
 struct config {
 	NAVIT_OBJECT
@@ -68,16 +65,8 @@ static void
 config_new_int(void)
 {
 	config=g_new0(struct config, 1);
-#ifndef HAVE_API_WIN32_CE
 	signal(SIGTERM, config_terminate);
-#ifndef HAVE_API_WIN32
-#ifndef _MSC_VER
-#ifndef __MINGW32__
 	signal(SIGPIPE, SIG_IGN);
-#endif /* __MINGW32__ */
-#endif
-#endif
-#endif
 }
 
 int

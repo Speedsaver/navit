@@ -17,9 +17,7 @@
  * Boston, MA  02110-1301, USA.
  */
 #include "navit_lfs.h"
-#ifndef _MSC_VER
 #include <unistd.h>
-#endif
 #include "maptool.h"
 #include "debug.h"
 

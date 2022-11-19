@@ -40,9 +40,6 @@ extern "C" {
 #include "navit/window.h"
 }
 
-#if defined(WINDOWS) || defined(WIN32) || defined(HAVE_API_WIN32_CE)
-#include <windows.h>
-#endif
 #include "event_qt5.h"
 #include "event_qt5.moc"
 #include "graphics_qt5.h"

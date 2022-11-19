@@ -41,17 +41,8 @@
    XXX: should we use stdint.h?
  */
 #ifndef PROTOBUF_C_SKIP_INTTYPES_H
-#  if defined(_MSC_VER)
-     /* On windows, in ms visual studio, define the types ourselves */
-#    define int32_t      signed __int32
-#    define uint32_t     unsigned __int32
-#    define int64_t      signed __int64
-#    define uint64_t     unsigned __int64
-#    define uint8_t      unsigned char
-#  else
      /* Use the system inttypes.h */
 #    include <inttypes.h>
-#  endif
 #endif
 
 PROTOBUF_C_BEGIN_DECLS

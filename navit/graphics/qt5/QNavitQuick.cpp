@@ -38,9 +38,6 @@ extern "C" {
 #include "plugin.h"
 #include "window.h"
 }
-#if defined(WINDOWS) || defined(WIN32) || defined(HAVE_API_WIN32_CE)
-#include <windows.h>
-#endif
 #include "QNavitQuick.h"
 #include "graphics_qt5.h"
 #include <QPainter>

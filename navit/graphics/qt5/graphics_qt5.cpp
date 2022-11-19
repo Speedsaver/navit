@@ -59,9 +59,6 @@ extern "C" {
 #include "QNavitWidget.h"
 #include <QApplication>
 #endif
-#if defined(WINDOWS) || defined(WIN32) || defined(HAVE_API_WIN32_CE)
-#include <windows.h>
-#endif
 
 #if USE_QML
 GraphicsPriv::GraphicsPriv(struct graphics_priv* gp)

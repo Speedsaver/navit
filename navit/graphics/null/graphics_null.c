@@ -31,10 +31,6 @@
 #include "debug.h"
 #include "window.h"
 #include "callback.h"
-#if defined(WINDOWS) || defined(WIN32) || defined (HAVE_API_WIN32_CE)
-#include <windows.h>
-# define sleep(i) Sleep(i * 1000)
-#endif
 
 static struct callback_list* callbacks;
 

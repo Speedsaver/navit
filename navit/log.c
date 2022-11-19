@@ -228,7 +228,7 @@ log_close(struct log *this_)
  * <br>
  * {@code log_flag_keep_buffer}: prevents clearing of the buffer after a successful write (default is to clear the buffer).
  * <br>
- * {@code log_flag_truncate}: truncates the log file at the current position. On the Win32 Base API, this flag has no effect.
+ * {@code log_flag_truncate}: truncates the log file at the current position.
  */
 static void
 log_flush(struct log *this_, enum log_flags flags)
@@ -248,12 +248,10 @@ log_flush(struct log *this_, enum log_flags flags)
 			this_->empty=0;
 	}
 	fwrite(this_->data.data, 1, this_->data.len, this_->f);
-#ifndef HAVE_API_WIN32_BASE
 	if (flags & log_flag_truncate) {
 		pos=ftell(this_->f);
 		ftruncate(fileno(this_->f), pos);
 	}
-#endif
 	if (this_->trailer.len) {
 		pos=ftell(this_->f);
 		if (pos > 0) {

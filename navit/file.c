@@ -19,11 +19,7 @@
 
 #include "config.h"
 #include "navit_lfs.h"
-#ifdef _MSC_VER
-#include <windows.h>
-#else
 #include <dirent.h>
-#endif /* _MSC_VER */
 #include <string.h>
 #include <sys/stat.h>
 #include <sys/mman.h>
@@ -60,21 +56,12 @@ static GHashTable *file_name_hash;
 
 static struct cache *file_cache;
 
-#ifdef HAVE_PRAGMA_PACK
-#pragma pack(push)
-#pragma pack(1)
-#endif
-
 struct file_cache_id {
 	long long offset;
 	int size;
 	int file_name_id;
 	int method;
 } ATTRIBUTE_PACKED;
-
-#ifdef HAVE_PRAGMA_PACK
-#pragma pack(pop)
-#endif
 
 #ifdef HAVE_SOCKET
 static int
@@ -286,11 +273,7 @@ int file_mkdir(char *name, int pflag)
 	if (!pflag) {
 		if (file_is_dir(name))
 			return 0;
-#if defined HAVE_API_WIN32_BASE || defined _MSC_VER
-		return mkdir(name);
-#else
 		return mkdir(name, 0777);
-#endif
 	}
 	strcpy(buffer, name);
 	next=buffer;
@@ -316,16 +299,12 @@ file_mmap(struct file *file)
 #else
 	int mmap_size=file->size;
 #endif
-#ifdef HAVE_API_WIN32_BASE
-	file->begin = (unsigned char*)mmap_readonly_win32( file->name, &file->map_handle, &file->map_file );
-#else
 	file->begin=mmap(NULL, mmap_size, PROT_READ|PROT_WRITE, MAP_PRIVATE, file->fd, 0);
 	dbg_assert(file->begin != NULL);
 	if (file->begin == (void *)0xffffffff) {
 		perror("mmap");
 		return 0;
 	}
-#endif
 	dbg_assert(file->begin != (void *)0xffffffff);
 	file->mmap_end=file->begin+mmap_size;
 	file->end=file->begin+file->size;
@@ -672,47 +651,25 @@ file_exists(char const *name)
 void
 file_remap_readonly(struct file *f)
 {
-#if defined(_WIN32) || defined(__CEGCC__)
-#else
 	void *begin;
 	munmap(f->begin, f->size);
 	begin=mmap(f->begin, f->size, PROT_READ, MAP_PRIVATE, f->fd, 0);
 	if (f->begin != begin)
 		printf("remap failed\n");
-#endif
 }
 
 void
 file_unmap(struct file *f)
 {
-#if defined(_WIN32) || defined(__CEGCC__)
-    mmap_unmap_win32( f->begin, f->map_handle , f->map_file );
-#else
 	munmap(f->begin, f->size);
-#endif
 }
 
-#ifndef _MSC_VER
 void *
 file_opendir(char *dir)
 {
 	return opendir(dir);
 }
-#else 
-void *
-file_opendir(char *dir)
-{
-	WIN32_FIND_DATAA FindFileData;
-	HANDLE hFind = INVALID_HANDLE_VALUE;
-#undef UNICODE         // we need FindFirstFileA() which takes an 8-bit c-string
-	char* fname=g_alloca(sizeof(char)*(strlen(dir)+4));
-	sprintf(fname,"%s\\*",dir);
-	hFind = FindFirstFileA(fname, &FindFileData);
-	return hFind;
-}
-#endif
 
-#ifndef _MSC_VER
 char *
 file_readdir(void *hnd)
 {
@@ -723,33 +680,12 @@ file_readdir(void *hnd)
 		return NULL;
 	return ent->d_name;
 }
-#else
-char *
-file_readdir(void *hnd)
-{
-	WIN32_FIND_DATA FindFileData;
 
-	if (FindNextFile(hnd, &FindFileData) ) {
-		return FindFileData.cFileName;
-	} else {
-		return NULL;
-	}
-}
-#endif /* _MSC_VER */
-
-#ifndef _MSC_VER
 void
 file_closedir(void *hnd)
 {
 	closedir(hnd);
 }
-#else
-void
-file_closedir(void *hnd)
-{
-	FindClose(hnd);
-}
-#endif /* _MSC_VER */
 
 struct file *
 file_create_caseinsensitive(char *name, struct attr **options)
@@ -865,7 +801,6 @@ file_wordexp_destroy(struct file_wordexp *wexp)
 int
 file_version(struct file *file, int mode)
 {
-#ifndef HAVE_API_WIN32_BASE
 	struct stat st;
 	int error;
 	if (mode == 3) {
@@ -890,9 +825,6 @@ file_version(struct file *file, int mode)
 		}
 	}
 	return file->version;
-#else
-	return 0;
-#endif
 }
 
 void *
