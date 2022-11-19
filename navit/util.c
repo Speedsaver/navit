@@ -31,7 +31,6 @@
 #include <sys/wait.h>
 #include "util.h"
 #include "debug.h"
-#include "config.h"
 
 void
 strtoupper(char *dest, const char *src)

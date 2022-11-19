@@ -38,7 +38,6 @@
 #include "navigation.h"
 #include "attr.h"
 #include "map.h"
-#include "config.h"
 #include "endianess.h"
 #include "util.h"
 #include "types.h"

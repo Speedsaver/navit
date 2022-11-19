@@ -18,7 +18,6 @@
  */
 
 #define _USE_MATH_DEFINES 1
-#include "config.h"
 #include <unistd.h>
 #include <stdio.h>
 #include <errno.h>

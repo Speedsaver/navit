@@ -21,7 +21,6 @@
 #define NAVIT_types_H
 
 #include <ctype.h>
-#include "config.h"
 
 #define max(a,b) ((a) > (b) ? (a) : (b))
 #define min(a,b) ((a) < (b) ? (a) : (b))

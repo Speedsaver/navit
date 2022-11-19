@@ -25,7 +25,6 @@
 extern "C" {
 #endif
 #include <stdio.h>
-#include "config.h"
 #include "projection.h"
 
 #define coord_is_equal(a,b) ((a).x==(b).x && (a).y==(b).y)

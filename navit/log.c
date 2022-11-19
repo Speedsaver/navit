@@ -26,7 +26,6 @@
  * @date 2005-2014
  */
 
-#include "config.h"
 #include <unistd.h>
 #include <sys/time.h>
 #include <fcntl.h>

@@ -50,7 +50,6 @@
 #endif
 #include "navit_nls.h"
 #include "glib_slice.h"
-#include "config.h"
 #include "point.h"
 #include "graphics.h"
 #include "profile.h"

@@ -1,4 +1,3 @@
-#include "config.h"
 #include "debug.h"
 #include <glib.h>
 #include <navit_nls.h>

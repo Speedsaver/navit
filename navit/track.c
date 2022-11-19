@@ -37,7 +37,6 @@
 #include "vehicle.h"
 #include "roadprofile.h"
 #include "util.h"
-#include "config.h"
 #include "callback.h"
 
 struct object_func tracking_func;

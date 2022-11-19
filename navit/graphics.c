@@ -30,7 +30,6 @@
 #include <glib.h>
 #include <stdio.h>
 #include <math.h>
-#include "config.h"
 #include "debug.h"
 #include "string.h"
 #include "draw_info.h"

@@ -24,7 +24,6 @@
 extern "C" {
 #endif
 
-#include "config.h"
 
 #define XML_ATTR_DISTANCE 1
 typedef GMarkupParseContext xml_context;

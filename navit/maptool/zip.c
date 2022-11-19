@@ -22,7 +22,6 @@
 #include <stdlib.h>
 #include "debug.h"
 #include "maptool.h"
-#include "config.h"
 #include "zipfile.h"
 
 struct zip_info {

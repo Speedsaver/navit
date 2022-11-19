@@ -20,7 +20,6 @@
 #include <stdio.h>
 #include <stdlib.h>
 #include <glib.h>
-#include "config.h"
 #include <getopt.h>
 #include "config_.h"
 //#include "version.h"

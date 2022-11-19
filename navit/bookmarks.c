@@ -21,7 +21,6 @@
 #include <glib.h>
 #include <stdio.h>
 #include <errno.h>
-#include "config.h"
 #include <unistd.h>
 #include "file.h"
 #include "debug.h"

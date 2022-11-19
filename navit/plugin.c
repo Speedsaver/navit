@@ -19,7 +19,6 @@
 
 #include <string.h>
 #include <glib.h>
-#include "config.h"
 #include "plugin.h"
 #include "file.h"
 #define PLUGIN_C

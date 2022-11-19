@@ -37,7 +37,6 @@
 #include "item.h"
 #include "map.h"
 #include "main.h"
-#include "config.h"
 #include "zipfile.h"
 #include "linguistics.h"
 #include "plugin.h"

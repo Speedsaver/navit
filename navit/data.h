@@ -20,7 +20,6 @@
 #ifndef NAVIT_DATA_H
 #define NAVIT_DATA_H
 
-#include "config.h"
 
 #ifdef WORDS_BIGENDIAN
 #include <byteswap.h>

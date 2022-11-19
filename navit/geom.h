@@ -24,7 +24,6 @@ extern "C" {
 #endif
 
 #include <glib.h>
-#include "config.h"
 #include "coord.h"
 #include "item.h"
 #include "attr.h"

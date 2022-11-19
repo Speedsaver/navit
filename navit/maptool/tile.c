@@ -38,7 +38,6 @@
 #include "map.h"
 #include "zipfile.h"
 #include "main.h"
-#include "config.h"
 #include "linguistics.h"
 #include "plugin.h"
 

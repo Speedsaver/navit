@@ -25,7 +25,6 @@
 #include <glib.h>
 #include <sys/types.h>
 
-#include "config.h"
 
 #include <unistd.h>
 

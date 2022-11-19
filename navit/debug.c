@@ -25,7 +25,6 @@
 #include <time.h>
 #include <glib.h>
 #include <sys/time.h>
-#include "config.h"
 #include "file.h"
 #include "item.h"
 #include "debug.h"
