@@ -124,7 +124,6 @@ add_module(map/binfile "Default" TRUE)
 # add_module(plugin/ssd1306 "Default" TRUE)
 
 # other features
-add_feature(USE_ROUTING "default" TRUE)
 add_feature(NETWORK_INFO "default" FALSE)
 
 add_feature(BUILD_MAPTOOL "default" TRUE)

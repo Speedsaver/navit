@@ -8,8 +8,6 @@
 #cmakedefine PACKAGE "@PACKAGE@"
 #cmakedefine LOCALEDIR "@LOCALEDIR@"
 
-#cmakedefine USE_ROUTING 1
-
 #cmakedefine HAVE_UNISTD_H 1
 
 #cmakedefine HAVE_SOCKET 1

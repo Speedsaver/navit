@@ -587,15 +587,11 @@ tracking_is_no_stop(struct tracking *tr, struct coord *c1, struct coord *c2)
 static int
 tracking_is_on_route(struct tracking *tr, struct route *rt, struct item *item)
 {
-#ifdef USE_ROUTING
 	if (! rt)
 		return 0;
 	if (route_contains(rt, item))
 		return 0;
 	return tr->route_pref;
-#else
-	return 0;
-#endif	
 }
 
 static int
