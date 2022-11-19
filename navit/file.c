@@ -40,9 +40,7 @@
 
 extern char *version;
 
-#ifdef CACHE_SIZE
 static GHashTable *file_name_hash;
-#endif
 
 static struct cache *file_cache;
 
@@ -199,10 +197,8 @@ file_create(char *name, struct attr **options)
 		dbg(lvl_debug,"size="LONGLONG_FMT"\n", file->size);
 		file->name_id = (long)atom(name);
 	}
-#ifdef CACHE_SIZE
 	if (!options || !(attr=attr_search(options, NULL, attr_cache)) || attr->u.num)
 		file->cache=1;
-#endif
 	dbg_assert(file != NULL);
 	return file;
 }
@@ -747,21 +743,16 @@ file_get_os_handle(struct file *file)
 int
 file_set_cache_size(int cache_size)
 {
-#ifdef CACHE_SIZE
 	cache_resize(file_cache, cache_size);
 	return 1;
-#else
-	return 0;
-#endif
 }
 
 void
 file_init(void)
 {
-#ifdef CACHE_SIZE
+	int CACHE_SIZE = 1048576;
 	file_name_hash=g_hash_table_new(g_str_hash, g_str_equal);
 	file_cache=cache_new(sizeof(struct file_cache_id), CACHE_SIZE);
-#endif
 	if(sizeof(off_t)<8)
 		dbg(lvl_error,"Maps larger than 2GB are not supported by this binary, sizeof(off_t)=%zu\n",sizeof(off_t));
 }

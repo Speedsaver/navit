@@ -120,10 +120,6 @@ add_module(map/binfile "Default" TRUE)
 add_feature(BUILD_MAPTOOL "default" TRUE)
 
 ### Platform specific settings
-if(NOT CACHE_SIZE)
-   SET(CACHE_SIZE 1048576)
-endif(NOT CACHE_SIZE)
-
 if(CMAKE_SIZEOF_VOID_P LESS 8)
    set_with_reason(BUILD_MAPTOOL "maptool works only on 64 bit architectures" FALSE)
 endif()
