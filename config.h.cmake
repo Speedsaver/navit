@@ -35,8 +35,6 @@
 
 #cmakedefine HAVE_POPEN 1
 
-#cmakedefine HAVE_GETOPT_H 1
-
 #cmakedefine HAVE_SBRK 1
 
 #cmakedefine HAVE_FSYNC 1

@@ -21,11 +21,7 @@
 #include <stdlib.h>
 #include <glib.h>
 #include "config.h"
-#ifdef HAVE_GETOPT_H
 #include <getopt.h>
-#else
-#include <XGetopt.h>
-#endif
 #include "config_.h"
 //#include "version.h"
 #include "item.h"
@@ -101,9 +97,7 @@ int main_real(int argc, char * const* argv)
 	linguistics_init();
 	geom_init();
 	config_file=NULL;
-#ifdef HAVE_GETOPT_H
 	opterr=0;  //don't bomb out on errors.
-#endif
 	if (argc > 1) {
 		/* Don't forget to update the manpage if you modify theses options */
 		while((opt = getopt(argc, argv, ":hvc:d:e:s:")) != -1) {
@@ -129,7 +123,6 @@ int main_real(int argc, char * const* argv)
 			case 's':
 				startup_file=optarg;
 				break;
-#ifdef HAVE_GETOPT_H
 			case ':':
 				fprintf(stderr, "navit: Error - Option `%c' needs a value\n", optopt);
 				print_usage();
@@ -139,7 +132,6 @@ int main_real(int argc, char * const* argv)
 				fprintf(stderr, "navit: Error - No such option: `%c'\n", optopt);
 				print_usage();
 				exit(3);
-#endif
 			}
 	  }
 		// use 1st cmd line option that is left for the config file
