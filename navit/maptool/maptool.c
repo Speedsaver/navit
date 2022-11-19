@@ -135,7 +135,6 @@ progress_time(void)
 static void
 progress_memory(void)
 {
-#ifdef HAVE_SBRK
 	long mem=(long)sbrk(0)-start_brk;
 	const int buflen=20;
 	char buf[buflen];
@@ -144,7 +143,6 @@ progress_memory(void)
 	pos+=assafe_lltoa(mem/1024/1024, buflen-pos, buf+pos);
 	pos+=assafe_strcp2buf(" MB", buflen-pos, buf+pos);
 	write(2,buf,pos);
-#endif
 }
 
 void
@@ -917,9 +915,7 @@ int main(int argc, char **argv)
 	p.timestamp=current_to_iso8601();
 	p.max_index_size=65536;
 
-#ifdef HAVE_SBRK
 	start_brk=(long)sbrk(0);
-#endif
 	clock_gettime(CLOCK_REALTIME, &start_ts);
 	while (1) {
 		int parse_result=parse_option(&p, argv, argc, &option_index);

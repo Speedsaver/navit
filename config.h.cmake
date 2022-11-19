@@ -16,6 +16,4 @@
 
 #cmakedefine HAVE_POPEN 1
 
-#cmakedefine HAVE_SBRK 1
-
 #cmakedefine HAVE_ENDIAN_H 1
