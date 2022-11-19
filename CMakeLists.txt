@@ -98,7 +98,6 @@ add_module(gui/gtk "GTK libs not found" FALSE)
 add_module(gui/speedsaver "Default" TRUE)
 add_module(vehicle/gpsd "gpsd lib not found" FALSE)
 add_module(vehicle/gypsy "gypsy lib not found" FALSE)
-add_module(vehicle/maemo "Default" FALSE)
 add_module(binding/dbus "dbus-glib-1 not found" FALSE)
 add_module(binding/python "python libraries not found" FALSE)
 add_module(speech/dbus "dbus-glib-1 not found" FALSE)
@@ -171,8 +170,6 @@ endif (NOT DISABLE_QT)
 #pkg-config based detection
 find_package(PkgConfig)
 if(PKG_CONFIG_FOUND)
-   pkg_check_modules(LIBLOCATION liblocation)
-   pkg_check_modules(LIBOSSO libosso)
    # Accept even old versions of libgps, because N810 uses an old version (see #1179).
    pkg_check_modules(LIBGPS libgps)
    pkg_check_modules(LIBGPS19 libgps>=2.90)
@@ -426,14 +423,6 @@ endif(HAVE_SYSTEM)
 if (HAVE_CREATEPROCESS)
    set_with_reason(speech/cmdline "CreateProcess() call is available" TRUE)
 endif(HAVE_CREATEPROCESS)
-
-if (LIBLOCATION_FOUND)
-    set_with_reason(vehicle/maemo "Maemo location library found" TRUE ${LIBLOCATION_LIBRARIES})
-endif(LIBLOCATION_FOUND)
-
-if (LIBOSSO_FOUND)
-    set_with_reason(autoload/osso "Maemo osso library found" TRUE ${LIBOSSO_LIBRARIES})
-endif(LIBOSSO_FOUND)
 
 #Independent modules
 add_module(graphics/null "Default" TRUE)
