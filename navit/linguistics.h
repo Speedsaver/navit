@@ -1,6 +1,3 @@
-#ifdef __cplusplus
-extern "C" {
-#endif
 #define LINGUISTICS_WORD_SEPARATORS_ASCII " -/()'`"
 char *linguistics_expand_special(const char *str, int mode);
 char *linguistics_next_word(char *str);
@@ -14,8 +11,5 @@ enum linguistics_cmp_mode {
 	linguistics_cmp_words=4
 };
 int linguistics_compare(const char *s1, const char *s2, enum linguistics_cmp_mode mode);
-#ifdef __cplusplus
-}
-#endif
 
 

@@ -20,9 +20,6 @@
 #ifndef NAVIT_NAVIT_H
 #define NAVIT_NAVIT_H
 
-#ifdef __cplusplus
-extern "C" {
-#endif
 extern struct gui *main_loop_gui;
 // defined in glib.h.
 #ifndef __G_LIST_H__
@@ -127,9 +124,6 @@ void navit_command_add_table(struct navit*this_, struct command_table *commands,
 struct navit * navit_ref(struct navit *this_);
 void navit_unref(struct navit *this_);
 /* end of prototypes */
-#ifdef __cplusplus
-}
-#endif
 
 #endif
 

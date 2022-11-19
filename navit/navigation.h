@@ -24,9 +24,6 @@
 #define FEET_PER_MILE   5280
 #define METERS_PER_MILE 1609
 
-#ifdef __cplusplus
-extern "C" {
-#endif
 
 
 /**
@@ -70,8 +67,5 @@ struct map *navigation_get_map(struct navigation *this_);
 void navigation_set_route(struct navigation *this_, struct route *route);
 void navigation_init(void);
 /* end of prototypes */
-#ifdef __cplusplus
-}
-#endif
 
 #endif

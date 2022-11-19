@@ -20,9 +20,6 @@
 #ifndef NAVIT_VEHICLE_H
 #define NAVIT_VEHICLE_H
 
-#ifdef __cplusplus
-extern "C" {
-#endif
 
 struct point;
 struct vehicle_priv;
@@ -57,9 +54,6 @@ struct vehicle * vehicle_ref(struct vehicle *this_);
 void vehicle_unref(struct vehicle *this_);
 /* end of prototypes */
 
-#ifdef __cplusplus
-}
-#endif
 
 #endif
 

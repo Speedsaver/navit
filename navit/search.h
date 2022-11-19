@@ -20,9 +20,6 @@
 #ifndef NAVIT_SEARCH_H
 #define NAVIT_SEARCH_H
 
-#ifdef __cplusplus
-extern "C" {
-#endif
 struct search_list_common {
 	void *parent;
 	struct item unique,item;
@@ -88,9 +85,6 @@ struct search_list_result *search_list_get_result(struct search_list *this_);
 void search_list_destroy(struct search_list *this_);
 void search_init(void);
 /* end of prototypes */
-#ifdef __cplusplus
-}
-#endif
 
 #endif
 

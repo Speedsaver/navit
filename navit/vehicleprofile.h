@@ -18,9 +18,6 @@
  */
 
 
-#ifdef __cplusplus
-extern "C" {
-#endif
 
 
 enum maxspeed_handling {
@@ -65,6 +62,3 @@ struct roadprofile * vehicleprofile_get_roadprofile(struct vehicleprofile *this_
 
 //! Returns the vehicle profile's name.
 char * vehicleprofile_get_name(struct vehicleprofile *this_);
-#ifdef __cplusplus
-}
-#endif

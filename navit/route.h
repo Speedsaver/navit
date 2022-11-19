@@ -28,9 +28,6 @@
 #ifndef NAVIT_ROUTE_H
 #define NAVIT_ROUTE_H
 
-#ifdef __cplusplus
-extern "C" {
-#endif
 enum route_path_flags {
 	route_path_flag_none=0,
 	route_path_flag_cancel=1,
@@ -131,9 +128,6 @@ int route_get_attr(struct route *this_, enum attr_type type, struct attr *attr, 
 void route_init(void);
 void route_destroy(struct route *this_);
 /* end of prototypes */
-#ifdef __cplusplus
-}
-#endif
 
 #endif
 

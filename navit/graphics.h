@@ -25,9 +25,6 @@
 #ifndef NAVIT_GRAPHICS_H
 #define NAVIT_GRAPHICS_H
 
-#ifdef __cplusplus
-extern "C" {
-#endif
 struct attr;
 struct point;
 struct container;
@@ -280,9 +277,6 @@ int graphics_show_native_keyboard (struct graphics *this_, struct graphics_keybo
 int graphics_hide_native_keyboard (struct graphics *this_, struct graphics_keyboard *kbd);
 
 /* end of prototypes */
-#ifdef __cplusplus
-}
-#endif
 
 #endif
 

@@ -17,9 +17,6 @@
  * Boston, MA  02110-1301, USA.
  */
 
-#ifdef __cplusplus
-extern "C" {
-#endif
 
 struct event_idle;
 struct event_timeout;
@@ -67,6 +64,3 @@ void event_call_callback(struct callback_list *cb);
 char const *event_system(void);
 int event_request_system(const char *system, const char *requestor);
 /* end of prototypes */
-#ifdef __cplusplus
-}
-#endif

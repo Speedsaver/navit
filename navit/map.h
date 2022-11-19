@@ -28,9 +28,6 @@
 #ifndef NAVIT_MAP_H
 #define NAVIT_MAP_H
 
-#ifdef __cplusplus
-extern "C" {
-#endif
 
 struct map_priv;
 struct attr;
@@ -277,7 +274,4 @@ void map_destroy_do(struct map *m);
 struct maps * maps_new(struct attr *parent, struct attr **attrs);
 /* end of prototypes */
 
-#ifdef __cplusplus
-}
-#endif
 #endif

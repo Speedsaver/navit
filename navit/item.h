@@ -20,9 +20,6 @@
 #ifndef NAVIT_ITEM_H
 #define NAVIT_ITEM_H
 
-#ifdef __cplusplus
-extern "C" {
-#endif
 
 #include <stdio.h>
 
@@ -156,10 +153,6 @@ void item_cleanup(void);
 /* end of prototypes */
 
 
-#ifdef __cplusplus
-}
-/* __cplusplus */
-#endif
 
 /* NAVIT_ITEM_H */
 #endif

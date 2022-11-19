@@ -20,9 +20,6 @@
  #ifndef NAVIT_BOOKMARKS_H
  #define NAVIT_BOOKMARKS_H
 
-#ifdef __cplusplus
-extern "C" {
-#endif
 
 /* prototypes */
 struct bookmarks;
@@ -57,8 +54,5 @@ void bookmarks_write_center_to_file(struct bookmarks *this_, char *file);
 void bookmarks_append_destinations(struct map *former_destination_map, char *file, struct pcoord *c, int count, enum item_type type, const char *description, int limit);
 /* end of prototypes */
 
-#ifdef __cplusplus
-}
-#endif
 
  #endif /* NAVIT_BOOKMARKS_H */

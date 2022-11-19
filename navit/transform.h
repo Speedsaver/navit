@@ -20,9 +20,6 @@
 #ifndef NAVIT_TRANSFORM_H
 #define NAVIT_TRANSFORM_H
 
-#ifdef __cplusplus
-extern "C" {
-#endif
 #include "coord.h"
 
 /* prototypes */
@@ -104,8 +101,5 @@ int transform_within_dist_item(struct coord *ref, enum item_type type, struct co
 void transform_copy(struct transformation *src, struct transformation *dst);
 void transform_destroy(struct transformation *t);
 /* end of prototypes */
-#ifdef __cplusplus
-}
-#endif
 
 #endif

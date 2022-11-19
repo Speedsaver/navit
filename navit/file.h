@@ -20,9 +20,6 @@
 #ifndef NAVIT_FILE_H
 #define NAVIT_FILE_H
 
-#ifdef __cplusplus
-extern "C" {
-#endif
 
 #ifndef PATH_MAX
 #define PATH_MAX 4096
@@ -92,8 +89,5 @@ int file_is_reg(char *name);
 void file_data_remove(struct file *file, unsigned char *data);
 /* end of prototypes */
 
-#ifdef __cplusplus
-}
-#endif
 
 #endif

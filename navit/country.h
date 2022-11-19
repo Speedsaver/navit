@@ -20,9 +20,6 @@
 #ifndef NAVIT_COUNTRY_H
 #define NAVIT_COUNTRY_H
 
-#ifdef __cplusplus
-extern "C" {
-#endif
 
 /* prototypes */
 struct attr;
@@ -34,8 +31,5 @@ struct attr *country_default(void);
 void country_search_destroy(struct country_search *this_);
 /* end of prototypes */
 
-#ifdef __cplusplus
-}
-#endif
 
 #endif

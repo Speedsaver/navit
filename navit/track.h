@@ -20,9 +20,6 @@
 #ifndef NAVIT_TRACK_H
 #define NAVIT_TRACK_H
 #include <time.h>
-#ifdef __cplusplus
-extern "C" {
-#endif
 /* prototypes */
 enum attr_type;
 enum projection;
@@ -59,8 +56,5 @@ struct tracking *tracking_ref(struct tracking *this_);
 void tracking_unref(struct tracking *this_);
 void tracking_init(void);
 /* end of prototypes */
-#ifdef __cplusplus
-}
-#endif
 
 #endif

@@ -23,9 +23,6 @@
 #include "item.h"
 #include "attr.h"
 
-#ifdef __cplusplus
-extern "C" {
-#endif
 /* prototypes */
 enum attr_type;
 struct callback;
@@ -81,9 +78,6 @@ void callback_list_destroy(struct callback_list *l);
 #define callback_list_call_attr_4(cbl,type,p1,p2,p3,p4) callback_list_call_attr_args(cbl, type, 4, p1, p2, p3, p4)
 
 #define callback_cast(x) (void (*)(void))(x)
-#ifdef __cplusplus
-}
-#endif
 
 #endif
 

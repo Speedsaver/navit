@@ -20,9 +20,6 @@
 #ifndef NAVIT_DEBUG_H
 #define NAVIT_DEBUG_H
 
-#ifdef __cplusplus
-extern "C" {
-#endif
 
 #include <stdarg.h>
 #include <string.h>
@@ -95,9 +92,6 @@ void *debug_realloc(const char *where, int line, const char *func, void *ptr, in
 void debug_set_global_level(dbg_level level, int override_old_value);
 /* end of prototypes */
 
-#ifdef __cplusplus
-}
-#endif
 
 #endif
 

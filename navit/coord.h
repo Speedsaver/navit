@@ -21,9 +21,6 @@
 #define NAVIT_COORD_H
 
 
-#ifdef __cplusplus
-extern "C" {
-#endif
 #include <stdio.h>
 #include "projection.h"
 
@@ -141,7 +138,4 @@ void coord_format(float lat, float lng, enum coord_format fmt, char *buffer, int
 unsigned int coord_hash(const void *key);
 int coord_equal(const void *a, const void *b);
 /* end of prototypes */
-#ifdef __cplusplus
-}
-#endif
 #endif

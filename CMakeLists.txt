@@ -2,14 +2,7 @@ set(MACOSX_BUNDLE_GUI_IDENTIFIER "org.navitproject.navit")
 set(MACOSX_BUNDLE_BUNDLE_NAME "Navit")
 message(STATUS "Building with CMake V${CMAKE_VERSION}")
 project(navit C)
-
-# Workaround for CMake issue 8345 / 9220, see http://trac.navit-project.org/ticket/1041
-if(DEFINED CMAKE_CXX_COMPILER AND CMAKE_CXX_COMPILER MATCHES "^$")
-  set(CMAKE_CXX_COMPILER CMAKE_CXX_COMPILER-NOTFOUND)
-endif(DEFINED CMAKE_CXX_COMPILER AND CMAKE_CXX_COMPILER MATCHES "^$")
-if (NOT DISABLE_CXX)
-  enable_language(CXX OPTIONAL)
-endif(NOT DISABLE_CXX)
+enable_language(CXX)
 
 cmake_minimum_required(VERSION 2.6 FATAL_ERROR)
 set(NAVIT_VERSION_MAJOR "0")

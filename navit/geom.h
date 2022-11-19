@@ -19,9 +19,6 @@
 #ifndef NAVIT_GEOM_H
 #define NAVIT_GEOM_H
 
-#ifdef __cplusplus
-extern "C" {
-#endif
 
 #include <glib.h>
 #include "coord.h"
@@ -66,9 +63,6 @@ int geom_is_inside(struct coord *p, struct rect *r, int edge);
 void geom_poly_intersection(struct coord *p1, struct coord *p2, struct rect *r, int edge, struct coord *ret);
 void geom_init(void);
 /* end of prototypes */
-#ifdef __cplusplus
-}
-#endif
 
 #endif
 

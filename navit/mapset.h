@@ -20,9 +20,6 @@
 #ifndef NAVIT_MAPSET_H
 #define NAVIT_MAPSET_H
 
-#ifdef __cplusplus
-extern "C" {
-#endif
 
 /* prototypes */
 enum attr_type;
@@ -51,7 +48,4 @@ void mapset_search_destroy(struct mapset_search *this_);
 struct mapset * mapset_ref(struct mapset* m);
 void mapset_unref(struct mapset *m);
 /* end of prototypes */
-#ifdef __cplusplus
-}
-#endif
 #endif

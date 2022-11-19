@@ -20,9 +20,6 @@
 #ifndef NAVIT_MAIN_H
 #define NAVIT_MAIN_H
 
-#ifdef __cplusplus
-extern "C" {
-#endif
 
 /* prototypes */
 struct navit;
@@ -40,8 +37,5 @@ void main_init_nls(void);
 int main(int argc, char **argv);
 /* end of prototypes */
 
-#ifdef __cplusplus
-}
-#endif
 
 #endif

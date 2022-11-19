@@ -35,13 +35,13 @@ extern "C" {
 #include "graphics.h"
 #include "plugin.h"
 #include "navit.h"
-}
 #include "xmlconfig.h"
 #include "vehicle.h"
 #include "transform.h"
 #include "track.h"
 #include "vehicleprofile.h"
 #include "roadprofile.h"
+}
 #include <sys/sysinfo.h>
 #include "ArduiPi_OLED_lib.h"
 #include "Adafruit_GFX.h"

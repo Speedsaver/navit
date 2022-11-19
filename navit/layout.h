@@ -23,9 +23,6 @@
 #include "item.h"
 #include "color.h"
 
-#ifdef __cplusplus
-extern "C" {
-#endif
 
 
 struct element {
@@ -147,8 +144,5 @@ struct arrows *arrows_new(struct attr *parent, struct attr **attrs);
 int element_add_attr(struct element *e, struct attr *attr);
 /* end of prototypes */
 
-#ifdef __cplusplus
-}
-#endif
 
 #endif

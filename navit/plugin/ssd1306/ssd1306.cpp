@@ -33,6 +33,7 @@
 #include <termios.h>
 #include <errno.h>
 #include <sys/ioctl.h>
+extern "C" {
 #include <navit/item.h>
 #include <navit/xmlconfig.h>
 #include <navit/main.h>
@@ -52,6 +53,7 @@
 #include "track.h"
 #include "vehicleprofile.h"
 #include "roadprofile.h"
+}
 
 #include <linux/unistd.h>	/* for _syscallX macros/related stuff */
 #include <linux/kernel.h>	/* for struct sysinfo */

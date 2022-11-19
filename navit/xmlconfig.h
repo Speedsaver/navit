@@ -20,9 +20,6 @@
 #ifndef NAVIT_XMLCONFIG_H
 #define NAVIT_XMLCONFIG_H
 
-#ifdef __cplusplus
-extern "C" {
-#endif
 
 
 #define XML_ATTR_DISTANCE 1
@@ -91,8 +88,5 @@ gboolean config_load(const char *filename, xmlerror **error);
 
 /* end of prototypes */
 
-#ifdef __cplusplus
-}
-#endif
 
 #endif

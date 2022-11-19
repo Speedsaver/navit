@@ -19,9 +19,6 @@
 
 #ifndef PLUGIN_C
 
-#ifdef __cplusplus
-extern "C" {
-#endif
 
 struct plugin;
 
@@ -165,8 +162,5 @@ void plugins_destroy(struct plugins *pls);
 void *plugin_get_category(enum plugin_category category, const char *category_name, const char *name);
 /* end of prototypes */
 
-#ifdef __cplusplus
-}
-#endif
 
 

@@ -20,9 +20,6 @@
 #ifndef NAVIT_COMMAND_H
 #define NAVIT_COMMAND_H
 
-#ifdef __cplusplus
-extern "C" {
-#endif
 
 struct command_table {
 	const char *command;
@@ -56,8 +53,5 @@ struct command_saved *command_saved_attr_new(char *command, struct attr *context
 struct command_saved *command_saved_new(char *command, struct navit *navit, struct callback *cb, int async);
 void command_saved_destroy(struct command_saved *cs);
 /* end of prototypes */
-#ifdef __cplusplus
-}
-#endif
 
  #endif /* NAVIT_COMMAND_H */
