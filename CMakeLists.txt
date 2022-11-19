@@ -94,7 +94,6 @@ INCLUDE (CheckFunctionExists)
 INCLUDE (CheckSymbolExists)
 find_package(ZLIB REQUIRED)
 find_package(OpenSSL)
-find_package(Threads)
 
 #pkg-config based detection
 find_package(PkgConfig)
