@@ -26,11 +26,9 @@
 #include <string.h>
 #include <stdio.h>
 
-#ifdef _POSIX_C_SOURCE
 #include <unistd.h>
 #include <sys/types.h>
 #include <sys/wait.h>
-#endif
 #include "util.h"
 #include "debug.h"
 #include "config.h"
@@ -219,36 +217,9 @@ shell_escape(char *arg)
 	return r;
 }
 
-#ifndef _POSIX_C_SOURCE
-static char*
-spawn_process_compose_cmdline(char **argv)
-{
-	int i,j;
-	char *cmdline=shell_escape(argv[0]);
-	for(i=1,j=strlen(cmdline);argv[i];i++) {
-		char *arg=shell_escape(argv[i]);
-		int arglen=strlen(arg);
-		cmdline[j]=' ';
-		cmdline=g_realloc(cmdline,j+1+arglen+1);
-		memcpy(cmdline+j+1,arg,arglen+1);
-		g_free(arg);
-		j=j+1+arglen;
-	}
-	return cmdline;
-}
-#endif
-
-#ifdef _POSIX_C_SOURCE
-
-#if 0 /* def _POSIX_THREADS */
-#define spawn_process_sigmask(how,set,old) pthread_sigmask(how,set,old)
-#else
 #define spawn_process_sigmask(how,set,old) sigprocmask(how,set,old)
-#endif
 
 GList *spawn_process_children=NULL;
-
-#endif
 
 
 /**
@@ -262,7 +233,6 @@ struct spawn_process_info*
 spawn_process(char **argv)
 {
 	struct spawn_process_info*r=g_new(struct spawn_process_info,1);
-#ifdef _POSIX_C_SOURCE
 	{
 		pid_t pid;
 		
@@ -288,18 +258,6 @@ spawn_process(char **argv)
 		spawn_process_sigmask(SIG_SETMASK,&old,NULL);
 		return r;
 	}
-#else
-	{
-		char *cmdline=spawn_process_compose_cmdline(argv);
-		int status;
-		dbg(lvl_error,"Unblocked spawn_process isn't availiable on this platform.\n");
-		status=system(cmdline);
-		g_free(cmdline);
-		r->status=status;
-		r->pid=0;
-		return r;
-	}
-#endif
 }
 
 /**
@@ -317,7 +275,6 @@ int spawn_process_check_status(struct spawn_process_info *pi, int block)
 		dbg(lvl_error,"Trying to get process status of NULL, assuming process is terminated.\n");
 		return 255;
 	}
-#ifdef _POSIX_C_SOURCE
 	if(pi->status!=-1) {
 		return pi->status;
 	}
@@ -347,17 +304,12 @@ int spawn_process_check_status(struct spawn_process_info *pi, int block)
 			return 255;
 		}
 	}
-#else
-	dbg(lvl_error, "Non-blocking spawn_process isn't availiable for this platform, repoting process exit status.\n");
-	return pi->status;
-#endif
 }
 
 void spawn_process_info_free(struct spawn_process_info *pi)
 {
 	if(pi==NULL)
 		return;
-#ifdef _POSIX_C_SOURCE
 	{
 		sigset_t set, old;
 		sigemptyset(&set);
@@ -366,11 +318,9 @@ void spawn_process_info_free(struct spawn_process_info *pi)
 		spawn_process_children=g_list_remove(spawn_process_children,pi);
 		spawn_process_sigmask(SIG_SETMASK,&old,NULL);
 	}
-#endif
 	g_free(pi);
 }
 
-#ifdef _POSIX_C_SOURCE
 static void spawn_process_sigchld(int sig)
 {
 	int status;
@@ -386,17 +336,14 @@ static void spawn_process_sigchld(int sig)
 		}
 	}
 }
-#endif
 
 void spawn_process_init()
 {
-#ifdef _POSIX_C_SOURCE
 	struct sigaction act;
 	act.sa_handler=spawn_process_sigchld;
 	act.sa_flags=0;
 	sigemptyset(&act.sa_mask);
 	sigaction(SIGCHLD, &act, NULL);
-#endif
 	return;
 }
 
