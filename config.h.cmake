@@ -12,8 +12,6 @@
 
 #cmakedefine USE_ROUTING 1
 
-#cmakedefine HAVE_FONTCONFIG 1
-
 #cmakedefine HAVE_UNISTD_H 1
 
 #cmakedefine HAVE_SOCKET 1
