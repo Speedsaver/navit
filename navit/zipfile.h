@@ -20,11 +20,7 @@
 #ifndef __ZIPFILE_H__
 #define __ZIPFILE_H__
 
-#ifdef  __GNUC__
 #define ATTRIBUTE_PACKED __attribute__ ((packed))
-#else
-#define ATTRIBUTE_PACKED
-#endif
 
 #define zip_split_sig 0x08074b50
 #define zip_split_sig_rev 0x504b0708

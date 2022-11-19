@@ -78,9 +78,7 @@ struct debug *debug_new(struct attr *parent, struct attr **attrs);
 dbg_level debug_level_get(const char *name);
 void debug_vprintf(dbg_level level, const char *module, const int mlen, const char *function, const int flen, int prefix, const char *fmt, va_list ap);
 void debug_printf(dbg_level level, const char *module, const int mlen, const char *function, const int flen, int prefix, const char *fmt, ...)
-#ifdef  __GNUC__
 	__attribute__ ((format (printf, 7, 8)))
-#endif
 ;
 void debug_assert_fail(const char *module, const int mlen, const char *function, const int flen, const char *file, int line, const char *expr);
 void debug_destroy(void);
