@@ -23,9 +23,6 @@
 #include "attr.h"
 #include "geom.h"
 #include "types.h"
-#ifdef HAVE_LIBCRYPTO
-#include <openssl/md5.h>
-#endif
 
 #define sq(x) ((double)(x)*(x))
 

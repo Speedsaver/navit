@@ -93,7 +93,6 @@ INCLUDE (CheckLibraryExists)
 INCLUDE (CheckFunctionExists)
 INCLUDE (CheckSymbolExists)
 find_package(ZLIB REQUIRED)
-find_package(OpenSSL)
 
 #pkg-config based detection
 find_package(PkgConfig REQUIRED)
@@ -114,11 +113,6 @@ include_directories(${GLIB_INCLUDE_DIRS})
 list(APPEND NAVIT_LIBS ${GLIB_LDFLAGS})
 include_directories(${ZLIB_INCLUDE_DIRS})
 list(APPEND NAVIT_LIBS ${ZLIB_LIBRARIES})
-if(OPENSSL_CRYPTO_LIBRARIES)
-   set(HAVE_LIBCRYPTO 1)
-   include_directories(${OPENSSL_INCLUDE_DIR})
-   list(APPEND NAVIT_LIBS ${OPENSSL_CRYPTO_LIBRARIES})
-endif()
 
 set_with_reason(vehicle/gpsd "gpsd lib found" TRUE ${LIBGPS_LDFLAGS})
 

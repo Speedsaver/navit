@@ -8,8 +8,6 @@
 #cmakedefine PACKAGE "@PACKAGE@"
 #cmakedefine LOCALEDIR "@LOCALEDIR@"
 
-#cmakedefine HAVE_LIBCRYPTO 1
-
 #cmakedefine USE_ROUTING 1
 
 #cmakedefine HAVE_UNISTD_H 1
