@@ -44,8 +44,6 @@ navit/graphics/gtk_gl_ext/graphics_gtk_gl_ext.c
 navit/graphics/qt_qpainter/graphics_qt_qpainter.cpp
 navit/graphics/gtk_drawing_area/graphics_gtk_drawing_area.c
 navit/graphics/null/graphics_null.c
-navit/speech/cmdline/speech_cmdline.c
-navit/speech/speech_dispatcher/speech_speech_dispatcher.c
 navit/data/mg/tree.c
 navit/data/mg/poly.c
 navit/data/mg/street.c
