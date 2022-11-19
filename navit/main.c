@@ -137,10 +137,5 @@ main_init(const char *program)
 		}
 		main_setup_environment(1);
 	}
-
-	s = getenv("NAVIT_WID");
-	if (s) {
-		setenv("SDL_WINDOWID", s, 0);
-	}
 }
 

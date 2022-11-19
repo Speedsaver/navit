@@ -4,14 +4,6 @@ GNU General Public License (see GPL-2):
 navit/vehicle/file/vehicle_file.c
 navit/vehicle/demo/vehicle_demo.c
 navit/vehicle/gpsd/vehicle_gpsd.c
-navit/gui/sdl/cegui_keyboard.h
-navit/gui/sdl/wmcontrol.c
-navit/gui/sdl/sdl_events.cpp
-navit/gui/sdl/wmcontrol.h
-navit/gui/sdl/gui_sdl.h
-navit/gui/sdl/sdl_events.h
-navit/gui/sdl/cegui_keyboard.cpp
-navit/gui/sdl/gui_sdl_window.cpp
 navit/gui/internal/gui_internal.c
 navit/graphics/null/graphics_null.c
 navit/data/mg/tree.c
