@@ -46,18 +46,9 @@
    * TORT OR OTHERWISE, ARISING FROM, OUT OF OR IN CONNECTION WITH THE SOFTWARE
    * OR THE USE OR OTHER DEALINGS IN THE SOFTWARE.
    */
-#if HAVE_BYTESWAP_H
   /* machine dependent versions of byte swapping functions.  GNU extension.*/
   #include <byteswap.h>
   #include <endian.h>
-#elif defined(USE_SYS_ENDIAN_H)
-  #include <sys/endian.h>
-#if defined(_BYTE_ORDER) && !defined(__BYTE_ORDER)
-#define __BYTE_ORDER _BYTE_ORDER
-#define __LITTLE_ENDIAN _LITTLE_ENDIAN
-#define __BIG_ENDIAN _BIG_ENDIAN
-#endif
-#endif
 
 #if  __BYTE_ORDER == __BIG_ENDIAN 
   #define le16_to_cpu(x)	__bswap_16 (x)
