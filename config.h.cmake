@@ -21,5 +21,3 @@
 #cmakedefine HAVE_FSYNC 1
 
 #cmakedefine HAVE_ENDIAN_H 1
-
-#cmakedefine HAVE_SHMEM 1
