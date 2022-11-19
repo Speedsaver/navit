@@ -17,7 +17,6 @@
  * Boston, MA  02110-1301, USA.
  */
 
-#include "navit_lfs.h"
 #include <stdlib.h>
 #include <glib.h>
 #include <assert.h>

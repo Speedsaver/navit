@@ -21,6 +21,9 @@ IF(NOT CMAKE_BUILD_TYPE)
    SET(CMAKE_BUILD_TYPE RelWithDebInfo CACHE STRING "Choose the type of build, options are: None Debug Release RelWithDebInfo MinSizeRel." FORCE)
 ENDIF(NOT CMAKE_BUILD_TYPE)
 
+add_definitions ("-D_LARGEFILE_SOURCE=1")
+add_definitions ("-D_FILE_OFFSET_BITS=64")
+
 # binary name
 set(NAVIT_BINARY navit CACHE STRING "Navit binary name")
 # install path

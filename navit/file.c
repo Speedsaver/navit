@@ -17,7 +17,9 @@
  * Boston, MA  02110-1301, USA.
  */
 
-#include "navit_lfs.h"
+#include <stdio.h>
+#include <unistd.h>
+#include <fcntl.h>
 #include <dirent.h>
 #include <string.h>
 #include <sys/stat.h>
@@ -171,7 +173,7 @@ file_create(char *name, struct attr **options)
 {
 	struct file *file= g_new0(struct file,1);
 	struct attr *attr;
-	int open_flags=O_LARGEFILE|O_BINARY;
+	int open_flags=0;
 
 	if (options && (attr=attr_search(options, NULL, attr_url))) {
 		file_request_do(file, options, 1);
