@@ -136,7 +136,6 @@ ADD_DEPENDENCIES(${NAVIT_LIBNAME} git_version)
 
 add_subdirectory (maptool)
 add_subdirectory (icons)
-add_subdirectory (maps)
 
 install(TARGETS navit
         DESTINATION ${BIN_DIR}
