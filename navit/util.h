@@ -17,8 +17,8 @@
  * Boston, MA  02110-1301, USA.
  */
 
-#ifndef NAVIT_types_H
-#define NAVIT_types_H
+#ifndef NAVIT_UTIL_H
+#define NAVIT_UTIL_H
 
 #include <ctype.h>
 
