@@ -76,7 +76,6 @@ endif(EXTRA_LIBDIR)
 
 ### Detect environment
 
-add_plugin(support/ezxml "native Glib found" FALSE)
 add_plugin(support/glib "native Glib found" FALSE)
 add_plugin(support/zlib "native zlib found" FALSE)
 add_plugin(support/libpng "native libpng found" FALSE)
@@ -226,9 +225,6 @@ endif(PNG_FOUND)
 if (NOT HAVE_WORDEXP)
    message(STATUS "wordexp.h not found. use internal wordexp")
    set_with_reason(support/wordexp "native wordexp missing" TRUE)
-endif()
-if (NOT Glib_FOUND)
-   set_with_reason(support/ezxml "Glib not found" TRUE)
 endif()
 
 if(FREETYPE_FOUND)

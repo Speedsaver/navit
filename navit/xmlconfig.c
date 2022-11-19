@@ -1030,32 +1030,11 @@ xi_text (xml_context *context,
 	}
 }
 
-#if USE_EZXML
-static void
-parse_node_text(ezxml_t node, void *data, void (*start)(void *, const char *, const char **, const char **, void *, void *),
-					  void (*end)(void *, const char *, void *, void *),
-					  void (*text)(void *, const char *, int, void *, void *))
-{
-	while (node) {
-		if (start)
-			start(NULL, node->name, (const char **)node->attr, (const char **)(node->attr+1), data, NULL);
-		if (text && node->txt)
-			text(NULL, node->txt, strlen(node->txt), data, NULL);
-		if (node->child)
-			parse_node_text(node->child, data, start, end, text);
-		if (end)
-			end(NULL, node->name, data, NULL);
-		node=node->ordered;
-	}
-}
-#endif
-
 void
 xml_parse_text(const char *document, void *data,
 	void (*start)(xml_context *, const char *, const char **, const char **, void *, GError **),
 	void (*end)(xml_context *, const char *, void *, GError **),
 	void (*text)(xml_context *, const char *, gsize, void *, GError **)) {
-#if !USE_EZXML
 	GMarkupParser parser = { start, end, text, NULL, NULL};
 	xml_context *context;
 	gboolean result;
@@ -1071,19 +1050,8 @@ xml_parse_text(const char *document, void *data,
 		exit(1);
 	}
 	g_markup_parse_context_free (context);
-#else
-	char *str=g_strdup(document);
-	ezxml_t root = ezxml_parse_str(str, strlen(str));
-	if (!root)
-		return;
-	parse_node_text(root, data, start, end, text);
-	ezxml_free(root);
-	g_free(str);
-#endif
 }
 
-
-#if !USE_EZXML
 
 static const GMarkupParser parser = {
 	xi_start_element,
@@ -1158,43 +1126,6 @@ parse_file(struct xmldocument *document, xmlerror **error)
 
 	return result;
 }
-#else
-static void
-parse_node(struct xmldocument *document, ezxml_t node)
-{
-	while (node) {
-		xi_start_element(NULL,node->name, node->attr, node->attr+1, document, NULL);
-		if (node->txt)
-			xi_text(NULL,node->txt,strlen(node->txt),document,NULL);
-		if (node->child)
-			parse_node(document, node->child);
-		xi_end_element (NULL,node->name,document,NULL);
-		node=node->ordered;
-	}
-}
-
-static gboolean
-parse_file(struct xmldocument *document, xmlerror **error)
-{
-	FILE *f;
-	ezxml_t root;
-
-	f=fopen(document->href,"rb");
-	if (!f)
-		return FALSE;
-	root = ezxml_parse_fp(f);
-	fclose(f);
-	if (!root)
-		return FALSE;
-	document->active=document->xpointer ? 0:1;
-	document->first=NULL;
-	document->last=NULL;
-
-	parse_node(document, root);
-
-	return TRUE;
-}
-#endif
 
 /**
  * * Load and parse the master config file
