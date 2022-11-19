@@ -1,26 +1,6 @@
 The following files are lincensed under the terms of the
 GNU General Public License (see GPL-2):
 
-navit/tools/gpx2navit_txt/src/utils.c
-navit/tools/gpx2navit_txt/src/setmeta.c
-navit/tools/gpx2navit_txt/src/setpath.c
-navit/tools/gpx2navit_txt/src/emess.h
-navit/tools/gpx2navit_txt/src/main.c
-navit/tools/gpx2navit_txt/src/geod_for.c
-navit/tools/gpx2navit_txt/src/setwpt.c
-navit/tools/gpx2navit_txt/src/gpx2navit_txt.h
-navit/tools/gpx2navit_txt/src/geodesic.h
-navit/tools/gpx2navit_txt/src/geod_set.c
-navit/tools/gpx2navit_txt/src/errorcode.h
-navit/tools/gpx2navit_txt/src/geod_inv.c
-navit/tools/gpx2navit_txt/src/elementControl.c
-navit/tools/gpx2navit_txt/src/misc.c
-navit/tools/gpx2navit_txt/src/parser.c
-navit/tools/gpx2navit_txt/depcomp
-navit/tools/gpx2navit_txt/config.guess
-navit/tools/gpx2navit_txt/config.sub
-navit/tools/gpx2navit_txt/COPYING
-navit/tools/gpx2navit_txt/missing
 navit/vehicle/file/vehicle_file.c
 navit/vehicle/demo/vehicle_demo.c
 navit/vehicle/gpsd/vehicle_gpsd.c
