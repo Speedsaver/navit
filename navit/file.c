@@ -35,10 +35,8 @@
 #include "util.h"
 #include "types.h"
 #include "zipfile.h"
-#ifdef HAVE_SOCKET
 #include <sys/socket.h>
 #include <netdb.h>
-#endif
 
 extern char *version;
 
@@ -55,7 +53,6 @@ struct file_cache_id {
 	int method;
 } ATTRIBUTE_PACKED;
 
-#ifdef HAVE_SOCKET
 static int
 file_socket_connect(char *host, char *service)
 {
@@ -137,7 +134,6 @@ file_request_do(struct file *file, struct attr **options, int connect)
 	}
 	return 1;
 }
-#endif
 
 static unsigned char *
 file_http_header_end(unsigned char *str, int len)
@@ -162,11 +158,7 @@ file_http_header_end(unsigned char *str, int len)
 int
 file_request(struct file *f, struct attr **options)
 {
-#ifdef HAVE_SOCKET
 	return file_request_do(f, options, 0);
-#else
-	return 0;
-#endif
 }
 
 char *
@@ -185,9 +177,7 @@ file_create(char *name, struct attr **options)
 	int open_flags=O_LARGEFILE|O_BINARY;
 
 	if (options && (attr=attr_search(options, NULL, attr_url))) {
-#ifdef HAVE_SOCKET
 		file_request_do(file, options, 1);
-#endif
 	} else {
 		if (options && (attr=attr_search(options, NULL, attr_readwrite)) && attr->u.num) {
 			open_flags |= O_RDWR;

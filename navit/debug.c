@@ -30,7 +30,6 @@
 #include "item.h"
 #include "debug.h"
 
-#ifdef HAVE_SOCKET
 #include <stdlib.h>
 #include <sys/socket.h>
 #include <netinet/in.h>
@@ -38,7 +37,6 @@
 
 static int debug_socket=-1;
 static struct sockaddr_in debug_sin;
-#endif
 
 
 #define DEFAULT_DEBUG_LEVEL lvl_error
@@ -147,7 +145,6 @@ debug_new(struct attr *parent, struct attr **attrs)
 	dbg_level_attr=attr_search(attrs, NULL, attr_dbg_level);
 	level_attr=attr_search(attrs, NULL, attr_level);
 	level = parse_dbg_level(dbg_level_attr,level_attr);
-#ifdef HAVE_SOCKET
 	if (!name && level==lvl_unset) {
 		struct attr *socket_attr=attr_search(attrs, NULL, attr_socket);
 		char *p,*s;
@@ -171,7 +168,6 @@ debug_new(struct attr *parent, struct attr **attrs)
 		g_free(s);
 		return (struct debug *)&dummy;	
 	}
-#endif
 	if (!name || level==lvl_unset)
 		return NULL;
 	debug_level_set(name->u.str, level);
@@ -241,12 +237,10 @@ debug_vprintf(dbg_level level, const char *module, const int mlen, const char *f
 			strcpy(debug_message+strlen(debug_message),":");
 		}
 		vsnprintf(debug_message+strlen(debug_message),4095-strlen(debug_message),fmt,ap);
-#ifdef HAVE_SOCKET
 		if (debug_socket != -1) {
 			sendto(debug_socket, debug_message, strlen(debug_message), 0, (struct sockaddr *)&debug_sin, sizeof(debug_sin));
 			return;
 		}
-#endif
 		FILE *fp=debug_fp;
 		if (! fp)
 			fp = stderr;
