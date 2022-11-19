@@ -17,7 +17,6 @@
  * Boston, MA  02110-1301, USA.
  */
 
-#define _USE_MATH_DEFINES 1
 #include <unistd.h>
 #include <stdio.h>
 #include <errno.h>

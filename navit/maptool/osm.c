@@ -32,11 +32,6 @@
 #include "types.h"
 #include "transform.h"
 
-#ifndef M_PI
-#define M_PI       3.14159265358979323846
-#define M_PI_4     0.785398163397448309616
-#endif
-
 static int in_way, in_node, in_relation;
 osmid nodeid,wayid;
 
