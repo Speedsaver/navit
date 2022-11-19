@@ -105,10 +105,6 @@ if(PKG_CONFIG_FOUND)
    pkg_check_modules(LIBGPS19 libgps>=2.90)
    # libgpsd<V3.1 is buggy if LC_ALL is set.
    pkg_check_modules(LIBGPS_NEW libgps>=3.1)
-   pkg_check_modules(IMLIB2 imlib2)
-   if(IMLIB2_FOUND)
-      set(HAVE_IMLIB2 1)
-   endif(IMLIB2_FOUND)
 endif(PKG_CONFIG_FOUND)
 #Simple checks
 CHECK_INCLUDE_FILES(endian.h HAVE_ENDIAN_H)
