@@ -19,7 +19,6 @@ navit/gui/gtk/destination.c
 navit/gui/gtk/gui_gtk_statusbar.c
 navit/gui/gtk/gui_gtk_action.c
 navit/gui/internal/gui_internal.c
-navit/graphics/opengl/graphics_opengl.c
 navit/graphics/gtk_gl_ext/graphics_gtk_gl_ext.c
 navit/graphics/qt_qpainter/graphics_qt_qpainter.cpp
 navit/graphics/gtk_drawing_area/graphics_gtk_drawing_area.c
