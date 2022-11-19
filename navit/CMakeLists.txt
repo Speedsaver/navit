@@ -85,22 +85,12 @@ if (DEFINED NAVIT_COMPILE_FLAGS)
    set_target_properties(${NAVIT_LIBNAME} PROPERTIES COMPILE_FLAGS "${NAVIT_COMPILE_FLAGS}")
 endif()
 
-ADD_CUSTOM_TARGET(
-   git_version
-   ${CMAKE_COMMAND} -D SRC=${CMAKE_CURRENT_SOURCE_DIR}/version.h.in
-                    -D DST=${CMAKE_CURRENT_BINARY_DIR}/version.h
-		    -D NAME="GIT_VERSION"
-                    -P ${PROJECT_SOURCE_DIR}/cmake/version.cmake
-)
-
 configure_file(${CMAKE_CURRENT_SOURCE_DIR}/navit_shipped.xml ${CMAKE_CURRENT_BINARY_DIR}/navit.xml COPYONLY)
 configure_file(${CMAKE_CURRENT_SOURCE_DIR}/navit.dtd ${CMAKE_CURRENT_BINARY_DIR}/navit.dtd COPYONLY)
 
 add_custom_target( navit_config_xml_resource DEPENDS ${CMAKE_CURRENT_BINARY_DIR}/navit.xml COMMAND mkdir -p resources/share/navit COMMAND cp ${CMAKE_CURRENT_BINARY_DIR}/navit.xml resources/share/navit)
 add_custom_target( locale_resource DEPENDS locales COMMAND mkdir -p resources/share COMMAND cp -a ${CMAKE_CURRENT_BINARY_DIR}/../locale resources/share/locale)
 add_custom_target( navit_config_xml ALL DEPENDS ${CMAKE_CURRENT_BINARY_DIR}/navit.xml)
-
-ADD_DEPENDENCIES(${NAVIT_LIBNAME} git_version)
 
 
 add_subdirectory (maptool)
