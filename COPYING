@@ -1,7 +1,6 @@
 The following files are lincensed under the terms of the
 GNU General Public License (see GPL-2):
 
-navit/vehicle/file/vehicle_file.c
 navit/vehicle/gpsd/vehicle_gpsd.c
 navit/gui/internal/gui_internal.c
 navit/graphics/null/graphics_null.c
