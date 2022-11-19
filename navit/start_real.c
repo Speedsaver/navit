@@ -43,7 +43,7 @@
 #include "command.h"
 #include "geom.h"
 
-char *version="dev-version"; // PACKAGE_VERSION"+git:"GIT_VERSION""NAVIT_VARIANT;
+char *version="dev-version";
 int main_argc;
 char * const* main_argv;
 
