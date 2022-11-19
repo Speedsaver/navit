@@ -1,2 +1,0 @@
-/* Versions */
-#cmakedefine LOCALEDIR "@LOCALEDIR@"
