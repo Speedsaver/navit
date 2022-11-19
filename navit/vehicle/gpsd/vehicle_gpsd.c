@@ -69,12 +69,7 @@ static struct vehicle_priv {
 static void vehicle_gpsd_io(struct vehicle_priv *priv);
 
 static void
-#ifdef HAVE_LIBGPS19
 vehicle_gpsd_callback(struct gps_data_t *data, const char *buf, size_t len)
-#else
-vehicle_gpsd_callback(struct gps_data_t *data, const char *buf, size_t len,
-                      int level)
-#endif
 {
     char *pos,*nmea_data_buf;
     int i=0,sats_signal=0;
@@ -120,17 +115,9 @@ vehicle_gpsd_callback(struct gps_data_t *data, const char *buf, size_t len,
     if (data->set & SATELLITE_SET) {
 // We cannot rely on GPSD_API_MAJOR_VERSION here because it was not
 // incremented for this change :-(.
-#ifdef HAVE_LIBGPS19
         if(data->satellites_visible > 0) {
-#else
-        if(data->satellites > 0) {
-#endif
             sats_signal=0;
-#ifdef HAVE_LIBGPS19
             for( i=0; i<data->satellites_visible; i++) {
-#else
-            for( i=0; i<data->satellites; i++) {
-#endif
 #if GPSD_API_MAJOR_VERSION >= 6
                 if (data->skyview[i].ss > 0)
 #else
@@ -139,18 +126,10 @@ vehicle_gpsd_callback(struct gps_data_t *data, const char *buf, size_t len,
                     sats_signal++;
             }
         }
-#ifdef HAVE_LIBGPS19
         if (priv->sats_used != data->satellites_used || priv->sats != data->satellites_visible
                 || priv->sats_signal != sats_signal ) {
-#else
-        if (priv->sats_used != data->satellites_used || priv->sats != data->satellites || priv->sats_signal != sats_signal ) {
-#endif
             priv->sats_used = data->satellites_used;
-#ifdef HAVE_LIBGPS19
             priv->sats = data->satellites_visible;
-#else
-            priv->sats = data->satellites;
-#endif
             priv->sats_signal = sats_signal;
             callback_list_call_attr_0(priv->cbl, attr_position_sats);
         }
@@ -176,17 +155,10 @@ vehicle_gpsd_callback(struct gps_data_t *data, const char *buf, size_t len,
 #endif
         data->set &= ~TIME_SET;
     }
-#ifdef HAVE_LIBGPS19
     if (data->set & DOP_SET) {
         dbg(lvl_debug, "pdop : %g\n", data->dop.pdop);
         priv->hdop = data->dop.pdop;
         data->set &= ~DOP_SET;
-#else
-    if (data->set & PDOP_SET) {
-        dbg(lvl_debug, "pdop : %g\n", data->pdop);
-        priv->hdop = data->hdop;
-        data->set &= ~PDOP_SET;
-#endif
     }
     if (data->set & LATLON_SET) {
         priv->geo.lat = data->fix.latitude;
@@ -233,14 +205,10 @@ static int vehicle_gpsd_try_open(struct vehicle_priv *priv) {
     }
     g_free(source);
 
-#ifdef HAVE_LIBGPS19
     if (strchr(priv->gpsd_query,'r'))
         gps_stream(priv->gps, WATCH_ENABLE|WATCH_NMEA|WATCH_JSON, NULL);
     else
         gps_stream(priv->gps, WATCH_ENABLE|WATCH_JSON, NULL);
-#else
-    gps_query(priv->gps, priv->gpsd_query);
-#endif
 
 #if GPSD_API_MAJOR_VERSION < 5
     gps_set_raw_hook(priv->gps, vehicle_gpsd_callback);
