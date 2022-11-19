@@ -44,7 +44,7 @@
 #include <string.h>
 #include <math.h>
 #include "navit_nls.h"
-#include "glib_slice.h"
+#include <glib.h>
 #include "point.h"
 #include "graphics.h"
 #include "profile.h"

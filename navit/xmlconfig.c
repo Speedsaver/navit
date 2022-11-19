@@ -1066,9 +1066,6 @@ parse_file(struct xmldocument *document, xmlerror **error)
 	char *xmldir,*newxmldir,*xmlfile,*newxmlfile,*sep;
 
 	dbg(lvl_debug,"enter filename='%s'\n", document->href);
-#if GLIB_MAJOR_VERSION == 2 && GLIB_MINOR_VERSION < 12
-#define G_MARKUP_TREAT_CDATA_AS_TEXT 0
-#endif
 	context = g_markup_parse_context_new (&parser, G_MARKUP_TREAT_CDATA_AS_TEXT, document, NULL);
 
 	if (!g_file_get_contents (document->href, &contents, &len, error)) {
