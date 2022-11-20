@@ -10,7 +10,7 @@ set(NAVIT_SRC announcement.c atom.c attr.c cache.c callback.c command.c config_.
    linguistics.c mapset.c maptype.c menu.c messages.c bookmarks.c navit.c navit_nls.c navigation.c osd.c param.c phrase.c plugin.c popup.c
    profile.c profile_option.c projection.c roadprofile.c route.c script.c search.c speech.c start_real.c sunriset.c transform.c track.c
    search_houseno_interpol.c util.c vehicle.c vehicleprofile.c xmlconfig.c
-   map/binfile/binfile.c osd/core/osd_core.c
+   map/binfile/binfile.c
    fib-1.1/fib.c
    graphics/ssd1306/graphics_ssd1306 graphics/ssd1306/graphics_ssd1306.cpp graphics/ssd1306/graphics_init_animation.cpp)
 
