@@ -105,9 +105,6 @@ list(APPEND NAVIT_LIBS ${ZLIB_LIBRARIES})
 
 set_with_reason(vehicle/gpsd "gpsd lib found" TRUE ${LIBGPS_LDFLAGS})
 
-#Independent modules
-add_module(osd/core "Default" TRUE)
-
 #Modules without test yet
 # add_module(plugin/ssd1306 "Default" TRUE)
 
