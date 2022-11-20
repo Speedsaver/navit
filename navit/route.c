@@ -58,7 +58,7 @@
 #include "track.h"
 #include "transform.h"
 #include "plugin.h"
-#include "fib.h"
+#include "fib-1.1/fib.h"
 #include "event.h"
 #include "callback.h"
 #include "vehicle.h"

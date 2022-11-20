@@ -10,7 +10,8 @@ set(NAVIT_SRC announcement.c atom.c attr.c cache.c callback.c command.c config_.
    linguistics.c mapset.c maptype.c menu.c messages.c bookmarks.c navit.c navit_nls.c navigation.c osd.c param.c phrase.c plugin.c popup.c
    profile.c profile_option.c projection.c roadprofile.c route.c script.c search.c speech.c start_real.c sunriset.c transform.c track.c
    search_houseno_interpol.c util.c vehicle.c vehicleprofile.c xmlconfig.c
-   map/binfile/binfile.c osd/core/osd_core.c )
+   map/binfile/binfile.c osd/core/osd_core.c
+   fib-1.1/fib.c )
 
 list(APPEND NAVIT_SRC  ${CMAKE_CURRENT_BINARY_DIR}/builtin.c)
 
@@ -42,16 +43,12 @@ endforeach()
 
 CONFIGURE_FILE(${CMAKE_CURRENT_SOURCE_DIR}/builtin.c.in ${CMAKE_CURRENT_BINARY_DIR}/builtin.c)
 
-include_directories( "${CMAKE_CURRENT_SOURCE_DIR}/fib-1.1")
-
 # Add module paths
 foreach (CURRENT_MODULE ${ALL_PLUGINS} ${ALL_MODULE_PLUGINS} ${ALL_MODULES})
    if (${CURRENT_MODULE})
       add_subdirectory( "${CMAKE_CURRENT_SOURCE_DIR}/${CURRENT_MODULE}")
    endif()
 endforeach()
-
-add_subdirectory (fib-1.1)
 
 set(NAVIT_START_SRC start.c)
 if (BUILD_BUNDLE)
@@ -80,7 +77,7 @@ else(SHARED_LIBNAVIT)
   add_library (${NAVIT_LIBNAME} STATIC ${NAVIT_SRC} )
 endif(SHARED_LIBNAVIT)
 SET(NAVIT_LIBS ${NAVIT_LIBS} m)
-target_link_libraries(${NAVIT_LIBNAME}  ${MODULES_NAME} ${NAVIT_SUPPORT_LIBS} fib ${NAVIT_LIBS} ) 
+target_link_libraries(${NAVIT_LIBNAME}  ${MODULES_NAME} ${NAVIT_SUPPORT_LIBS} ${NAVIT_LIBS} ) 
 set_target_properties(${NAVIT_LIBNAME} PROPERTIES COMPILE_DEFINITIONS "MODULE=navit;LIBDIR=\"${CMAKE_INSTALL_PREFIX}/${LIB_DIR}\";PREFIX=\"${CMAKE_INSTALL_PREFIX}\"")
 if (DEFINED NAVIT_COMPILE_FLAGS)
    set_target_properties(${NAVIT_LIBNAME} PROPERTIES COMPILE_FLAGS "${NAVIT_COMPILE_FLAGS}")
