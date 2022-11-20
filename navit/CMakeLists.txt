@@ -11,7 +11,13 @@ set(NAVIT_SRC announcement.c atom.c attr.c cache.c callback.c command.c config_.
    profile.c profile_option.c projection.c roadprofile.c route.c script.c search.c speech.c start_real.c sunriset.c transform.c track.c
    search_houseno_interpol.c util.c vehicle.c vehicleprofile.c xmlconfig.c
    map/binfile/binfile.c osd/core/osd_core.c
-   fib-1.1/fib.c )
+   fib-1.1/fib.c
+   graphics/ssd1306/graphics_ssd1306 graphics/ssd1306/graphics_ssd1306.cpp graphics/ssd1306/graphics_init_animation.cpp)
+
+install(FILES ${CMAKE_CURRENT_BINARY_DIR}/graphics/ssd1306/tone7.wav
+       DESTINATION ${SHARE_DIR}
+       PERMISSIONS OWNER_READ OWNER_WRITE GROUP_READ WORLD_READ)
+list(APPEND NAVIT_LIBS "-lArduiPi_OLED")
 
 list(APPEND NAVIT_SRC  ${CMAKE_CURRENT_BINARY_DIR}/builtin.c)
 

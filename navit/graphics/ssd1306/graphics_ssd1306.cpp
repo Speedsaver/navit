@@ -18,6 +18,8 @@
  */
 // style with: clang-format -style=WebKit -i *
 
+#define MODULE graphics_ssd1306
+
 #include <glib.h>
 #include <stdlib.h>
 #include <math.h>

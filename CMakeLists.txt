@@ -70,7 +70,6 @@ endif(EXTRA_LIBDIR)
 
 ### Detect environment
 
-add_module(graphics/ssd1306 "Required library not found" TRUE)
 add_module(gui/speedsaver "Default" TRUE)
 add_module(vehicle/gpsd "gpsd lib not found" FALSE)
 set(CPACK_PROJECT_CONFIG_FILE "${CMAKE_SOURCE_DIR}/cpack.cmake")
@@ -104,10 +103,6 @@ include_directories(${ZLIB_INCLUDE_DIRS})
 list(APPEND NAVIT_LIBS ${ZLIB_LIBRARIES})
 
 set_with_reason(vehicle/gpsd "gpsd lib found" TRUE ${LIBGPS_LDFLAGS})
-
-#Modules without test yet
-# add_module(plugin/ssd1306 "Default" TRUE)
-
 # other features
 add_feature(BUILD_MAPTOOL "default" TRUE)
 
