@@ -70,7 +70,6 @@ endif(EXTRA_LIBDIR)
 
 ### Detect environment
 
-add_module(gui/speedsaver "Default" TRUE)
 set(CPACK_PROJECT_CONFIG_FILE "${CMAKE_SOURCE_DIR}/cpack.cmake")
 set(CPACK_PACKAGE_VENDOR "Navit team")
 set(CPACK_PACKAGE_VERSION_MAJOR ${NAVIT_VERSION_MAJOR})
@@ -141,7 +140,6 @@ if (NOT NAVIT_DEPENDENCY_ERROR)
    message("\nSummary:\n")
 
    set(SUMMARY_COMPONENTS ${ALL_PLUGINS} ${ALL_MODULE_PLUGINS} ${ALL_MODULES})
-   list(SORT SUMMARY_COMPONENTS)
 
    set(LAST_TYPE NONE)
    foreach ( SUMMARY_COMP ${SUMMARY_COMPONENTS})

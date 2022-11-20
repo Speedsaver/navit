@@ -13,7 +13,8 @@ set(NAVIT_SRC announcement.c atom.c attr.c cache.c callback.c command.c config_.
    map/binfile/binfile.c
    fib-1.1/fib.c
    graphics/ssd1306/graphics_ssd1306 graphics/ssd1306/graphics_ssd1306.cpp graphics/ssd1306/graphics_init_animation.cpp
-   vehicle/gpsd/vehicle_gpsd.c)
+   vehicle/gpsd/vehicle_gpsd.c
+   gui/speedsaver/gui_speedsaver.c)
 
 install(FILES ${CMAKE_CURRENT_BINARY_DIR}/graphics/ssd1306/tone7.wav
        DESTINATION ${SHARE_DIR}
@@ -28,6 +29,7 @@ set(NAVIT_LIBNAME navit_core)
 
 
 foreach ( PLUGIN_PATH ${ALL_PLUGINS})
+	message("PLUGIN PATH ${PLUGIN_PATH}")
    if (${PLUGIN_PATH})
       include_directories( "${CMAKE_CURRENT_SOURCE_DIR}/${PLUGIN_PATH}")
       
@@ -37,6 +39,7 @@ foreach ( PLUGIN_PATH ${ALL_PLUGINS})
 endforeach()
 
 foreach ( MODULE_PATH ${ALL_MODULES})
+	message("MODULE PATH ${MODULE_PATH}")
    if ( ${MODULE_PATH} )
       include_directories( "${CMAKE_CURRENT_SOURCE_DIR}/${MODULE_PATH}")
       
