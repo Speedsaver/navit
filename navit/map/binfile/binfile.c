@@ -17,6 +17,8 @@
  * Boston, MA  02110-1301, USA.
  */
 
+#define MODULE map_binfile
+
 #include <stdlib.h>
 #include <glib.h>
 #include <stdio.h>
