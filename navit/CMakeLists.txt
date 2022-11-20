@@ -12,7 +12,8 @@ set(NAVIT_SRC announcement.c atom.c attr.c cache.c callback.c command.c config_.
    search_houseno_interpol.c util.c vehicle.c vehicleprofile.c xmlconfig.c
    map/binfile/binfile.c
    fib-1.1/fib.c
-   graphics/ssd1306/graphics_ssd1306 graphics/ssd1306/graphics_ssd1306.cpp graphics/ssd1306/graphics_init_animation.cpp)
+   graphics/ssd1306/graphics_ssd1306 graphics/ssd1306/graphics_ssd1306.cpp graphics/ssd1306/graphics_init_animation.cpp
+   vehicle/gpsd/vehicle_gpsd.c)
 
 install(FILES ${CMAKE_CURRENT_BINARY_DIR}/graphics/ssd1306/tone7.wav
        DESTINATION ${SHARE_DIR}

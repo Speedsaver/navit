@@ -17,6 +17,8 @@
  * Boston, MA  02110-1301, USA.
  */
 
+#define MODULE vehicle_gpsd
+
 #include <gps.h>
 #include <string.h>
 #include <glib.h>

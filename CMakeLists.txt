@@ -71,7 +71,6 @@ endif(EXTRA_LIBDIR)
 ### Detect environment
 
 add_module(gui/speedsaver "Default" TRUE)
-add_module(vehicle/gpsd "gpsd lib not found" FALSE)
 set(CPACK_PROJECT_CONFIG_FILE "${CMAKE_SOURCE_DIR}/cpack.cmake")
 set(CPACK_PACKAGE_VENDOR "Navit team")
 set(CPACK_PACKAGE_VERSION_MAJOR ${NAVIT_VERSION_MAJOR})
@@ -102,7 +101,8 @@ list(APPEND NAVIT_LIBS ${GLIB_LDFLAGS})
 include_directories(${ZLIB_INCLUDE_DIRS})
 list(APPEND NAVIT_LIBS ${ZLIB_LIBRARIES})
 
-set_with_reason(vehicle/gpsd "gpsd lib found" TRUE ${LIBGPS_LDFLAGS})
+list(APPEND NAVIT_LIBS ${LIBGPS_LDFLAGS})
+
 # other features
 add_feature(BUILD_MAPTOOL "default" TRUE)
 
