@@ -11,14 +11,13 @@ set(NAVIT_SRC announcement.c atom.c attr.c cache.c callback.c command.c config_.
    fib-1.1/fib.c
    graphics/ssd1306/graphics_ssd1306 graphics/ssd1306/graphics_ssd1306.cpp graphics/ssd1306/graphics_init_animation.cpp
    vehicle/gpsd/vehicle_gpsd.c
-   gui/speedsaver/gui_speedsaver.c)
+   gui/speedsaver/gui_speedsaver.c
+   builtin.c)
 
 install(FILES ${CMAKE_CURRENT_BINARY_DIR}/graphics/ssd1306/tone7.wav
        DESTINATION ${SHARE_DIR}
        PERMISSIONS OWNER_READ OWNER_WRITE GROUP_READ WORLD_READ)
 list(APPEND NAVIT_LIBS "-lArduiPi_OLED")
-
-list(APPEND NAVIT_SRC  ${CMAKE_CURRENT_BINARY_DIR}/builtin.c)
 
 add_executable(navit ${NAVIT_SRC})
 target_link_libraries (navit ${NAVIT_LIBS})
