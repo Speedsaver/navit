@@ -26,15 +26,6 @@ macro(add_feature FEATURE REASON ENABLE)
    set_feature_switch_default(${FEATURE} ${REASON} ${ENABLE})
 endmacro()
 
-macro(cfg_feature FEATURE REASON ENABLE)
-   set(${FEATURE} ${ENABLE})
-   if (${FEATURE}_REASON STREQUAL "User defined")
-      set(${FEATURE}_REASON "${REASON} *user setting overridden*")
-   else()
-      set(${FEATURE}_REASON ${REASON})
-   endif()
-endmacro()
-
 macro(add_module MODULE_PATH REASON ENABLE)
    list(APPEND ALL_MODULES ${MODULE_PATH})
    set_feature_switch_default(${MODULE_PATH} ${REASON} ${ENABLE})
@@ -43,12 +34,6 @@ endmacro()
 # plugins are always linked static
 macro(add_plugin PLUGIN_PATH REASON ENABLE)
    list(APPEND ALL_PLUGINS ${PLUGIN_PATH})
-   set_feature_switch_default(${PLUGIN_PATH} ${REASON} ${ENABLE})
-endmacro()
-
-# module plugins are always linked static
-macro(add_module_plugin PLUGIN_PATH REASON ENABLE)
-   list(APPEND ALL_MODULE_PLUGINS ${PLUGIN_PATH})
    set_feature_switch_default(${PLUGIN_PATH} ${REASON} ${ENABLE})
 endmacro()
 
@@ -70,11 +55,6 @@ macro(supportlib_add_library LIB_NAME )
 	   DESTINATION ${LIB_DIR}/${${LIB_NAME}_TYPE}
            PERMISSIONS OWNER_READ OWNER_WRITE OWNER_EXECUTE GROUP_READ GROUP_EXECUTE WORLD_READ WORLD_EXECUTE)
 endmacro(supportlib_add_library)
-
-macro(message_error)
-   set(NAVIT_DEPENDENCY_ERROR 1)
-   message( SEND_ERROR ${ARGN})
-endmacro(message_error)
 
 include(CheckCCompilerFlag)
 include(CheckCXXCompilerFlag)
