@@ -14,7 +14,7 @@ set(NAVIT_SRC announcement.c atom.c attr.c cache.c callback.c command.c config_.
    gui/speedsaver/gui_speedsaver.c
    builtin.c)
 
-install(FILES ${CMAKE_CURRENT_BINARY_DIR}/graphics/ssd1306/tone7.wav
+install(FILES ${CMAKE_CURRENT_SOURCE_DIR}/graphics/ssd1306/tone7.wav
        DESTINATION ${SHARE_DIR}
        PERMISSIONS OWNER_READ OWNER_WRITE GROUP_READ WORLD_READ)
 list(APPEND NAVIT_LIBS "-lArduiPi_OLED")
