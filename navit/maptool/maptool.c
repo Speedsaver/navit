@@ -259,9 +259,6 @@ usage()
 	fprintf(f,"-6 (--64bit)                      : set zip 64 bit compression\n");
 	fprintf(f,"-a (--attr-debug-level)  <level>  : control which data is included in the debug attribute\n");
 	fprintf(f,"-c (--dump-coordinates)           : dump coordinates after phase 1\n");
-#ifdef HAVE_POSTGRESQL
-	fprintf(f,"-d (--db) <conn. string>          : get osm data out of a postgresql database with osm simple scheme and given connect string\n");
-#endif
 	fprintf(f,"-D (--dump)                       : dump map data to standard output in Navit textfile format\n");
 	fprintf(f,"-e (--end) <phase>                : end at specified phase\n");
 	fprintf(f,"-E (--experimental)               : Enable experimental features (%s)\n",
@@ -338,9 +335,6 @@ parse_option(struct maptool_params *p, char **argv, int argc, int *option_index)
 		{"attr-debug-level", 1, 0, 'a'},
 		{"binfile", 0, 0, 'b'},
 		{"compression-level", 1, 0, 'z'},
-#ifdef HAVE_POSTGRESQL
-		{"db", 1, 0, 'd'},
-#endif
 		{"dedupe-ways", 0, 0, 'w'},
 		{"dump", 0, 0, 'D'},
 		{"dump-coordinates", 0, 0, 'c'},
@@ -366,9 +360,6 @@ parse_option(struct maptool_params *p, char **argv, int argc, int *option_index)
 		{0, 0, 0, 0}
 	};
 	c = getopt_long (argc, argv, "5:6B:DEMNO:PS:Wa:bc"
-#ifdef HAVE_POSTGRESQL
-				      "d:"
-#endif
 				      "e:hi:knm:p:r:s:t:wu:z:Ux:", long_options, option_index);
 	if (c == -1)
 		return 1;
@@ -422,11 +413,6 @@ parse_option(struct maptool_params *p, char **argv, int argc, int *option_index)
 	case 'c':
 		p->dump_coordinates=1;
 		break;
-#ifdef HAVE_POSTGRESQL
-	case 'd':
-		p->dbstr=optarg;
-		break;
-#endif
 	case 'e':
 		p->end=atoi(optarg);
 		break;
@@ -550,11 +536,6 @@ osm_read_input_data(struct maptool_params *p, char *suffix)
 		p->osm.associated_streets=tempfile(suffix,"associated_streets",1);
 		p->osm.house_number_interpolations=tempfile(suffix,"house_number_interpolations",1);
 	}
-#ifdef HAVE_POSTGRESQL
-	if (p->dbstr)
-		map_collect_data_osm_db(p->dbstr,&p->osm);
-	else
-#endif
 	if (p->map_handles) {
 		GList *l;
 		phase1_map(p->map_handles,p->osm.ways,p->osm.nodes);

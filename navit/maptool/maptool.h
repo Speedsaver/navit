@@ -324,9 +324,6 @@ void osm_init(FILE*);
 /* osm_o5m.c */
 int map_collect_data_osm_o5m(FILE *in, struct maptool_osm *osm);
 
-/* osm_psql.c */
-int map_collect_data_osm_db(char *dbstr, struct maptool_osm *osm);
-
 /* osm_protobuf.c */
 int map_collect_data_osm_protobuf(FILE *in, struct maptool_osm *osm);
 int osm_protobufdb_load(FILE *in, char *dir);
