@@ -46,8 +46,6 @@
 #include "navit_nls.h"
 #include "util.h"
 
-struct map_data *map_data_default;
-
 struct callback_list *cbl;
 
 /*
