@@ -274,8 +274,6 @@ object_func_lookup(enum attr_type type)
 		return &roadprofile_func;
 	case attr_route:
 		return &route_func;
-	case attr_script:
-		return &script_func;
 	case attr_osd:
 		return &osd_func;
 	case attr_trackingo:
@@ -545,11 +543,6 @@ static void initStatic(void) {
 	elements[41].parent="profile_option";
 	elements[41].func=NULL;
 	elements[41].type=attr_roadprofile;
-
-	elements[42].name="script";
-	elements[42].parent="navit";
-	elements[42].func=NULL;
-	elements[42].type=attr_script;
 }
 
 /**

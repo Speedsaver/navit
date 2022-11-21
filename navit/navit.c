@@ -2974,8 +2974,6 @@ navit_add_attr(struct navit *this_, struct attr *attr)
 		this_->autozoom_max = attr->u.num;
 		break;
 	case attr_layer:
-	case attr_script:
-		break;
 	default:
 		return 0;
 	}
