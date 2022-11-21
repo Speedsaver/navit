@@ -1782,7 +1782,8 @@ navit_add_former_destinations_from_file(struct navit *this_)
 	struct pcoord *pc;
 	struct map_rect *mr;
 
-	this_->former_destination=read_former_destinations_from_file();
+	// don't bother, we don't have textfile
+	//this_->former_destination=read_former_destinations_from_file();
 	if (!this_->route || !navit_former_destinations_active(this_) || !this_->vehicle)
 		return;	
 	mr=map_rect_new(this_->former_destination, NULL);
