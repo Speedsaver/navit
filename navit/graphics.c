@@ -32,7 +32,6 @@
 #include <math.h>
 #include "debug.h"
 #include "string.h"
-#include "draw_info.h"
 #include "point.h"
 #include "graphics.h"
 #include "projection.h"
