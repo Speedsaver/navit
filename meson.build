@@ -85,7 +85,6 @@ sources = [
 	'navit/track.c',
 	'navit/transform.c',
 	'navit/util.c',
-	'navit/vehicle/gpsd/vehicle_gpsd.c',
 	'navit/vehicle.c',
 	'navit/vehicleprofile.c',
 	'navit/xmlconfig.c',
@@ -102,7 +101,7 @@ if libgps.found() and arduipi.found()
 		'navit/graphics/ssd1306/graphics_ssd1306.cpp',
 		'navit/gui/speedsaver/gui_speedsaver.c',
 		'navit/start.c',
-
+		'navit/vehicle/gpsd/vehicle_gpsd.c',
 	]
 	executable('navit',
 		navitsources,
