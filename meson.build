@@ -109,6 +109,11 @@ if libgps.found() and arduipi.found()
 		dependencies: navitdepends,
 		include_directories: navitincludedirs,
 		install: true)
+	configure_file(input: 'navit/navit.service.in',
+		output: 'navit.service',
+		configuration: { 'bindir': get_option('prefix') / get_option('bindir') },
+		install: true,
+		install_dir: '/usr/lib/systemd/system/')
 	install_data('navit/navit_shipped.xml', rename: 'navit.xml', install_dir: sharedir)
 	install_data('navit/graphics/ssd1306/tone7.wav', install_dir: sharedir)
 else

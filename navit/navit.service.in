@@ -1,0 +1,9 @@
+[Unit]
+Description=navit software
+
+[Service]
+ExecStart="@bindir@/navit"
+Restart=on-failure
+
+[Install]
+WantedBy=multi-user.target
