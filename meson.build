@@ -1,7 +1,4 @@
-project('navit', 'c', 'cpp',
-  default_options: [
-    'warning_level=3',
-    'b_sanitize=address,undefined'])
+project('navit', 'c', 'cpp', default_options: ['warning_level=3'])
 
 # Enable some sanity
 add_project_arguments(
