@@ -97,10 +97,12 @@ zlib = dependency('zlib')
 libgps = dependency('libgps')
 glib = dependency('glib-2.0')
 arduipi = cc.find_library('ArduiPi_OLED')
+libm = cc.find_library('m')
+libpthread = cc.find_library('pthread')
 
 # Binary
 executable('navit',
 	sources,
-	dependencies: [zlib, libgps, glib, arduipi],
+	dependencies: [zlib, libgps, glib, arduipi, libm, libpthread],
 	include_directories: includedir,
 	install: true)
