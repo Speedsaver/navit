@@ -29,7 +29,6 @@ sources = [
 	'navit/atom.c',
 	'navit/attr.c',
 	'navit/bookmarks.c',
-	'navit/builtin.c',
 	'navit/cache.c',
 	'navit/callback.c',
 	'navit/command.c',

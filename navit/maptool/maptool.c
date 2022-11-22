@@ -17,6 +17,11 @@
  * Boston, MA  02110-1301, USA.
  */
 
+void module_map_binfile_init(void);
+void builtin_init(void) {
+    module_map_binfile_init();
+}
+
 #include <stdlib.h>
 #include <glib.h>
 #include <assert.h>
