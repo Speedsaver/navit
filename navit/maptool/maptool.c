@@ -885,7 +885,6 @@ int main(int argc, char **argv)
 	int suffix_start=0;
 	int option_index=0;
 	main_init(argv[0]);
-	_g_slice_thread_init_nomessage();
 	linguistics_init();
 
 	memset(&p, 0, sizeof(p));
