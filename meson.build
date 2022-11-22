@@ -22,8 +22,16 @@ add_project_arguments(
 	'-DLOCALE_DIR="' + get_option('localedir') + '"',
 	language: ['c', 'cpp'])
 
-# Navit source
-includedir = include_directories('navit')
+# Required dependencies
+cc = meson.get_compiler('cpp')
+glib = dependency('glib-2.0')
+libm = cc.find_library('m')
+libpthread = cc.find_library('pthread')
+zlib = dependency('zlib')
+
+# Common source code
+depends = [glib, libm, libpthread, zlib]
+includedirs = [include_directories('navit')]
 sources = [
 	'navit/announcement.c',
 	'navit/atom.c',
@@ -43,10 +51,7 @@ sources = [
 	'navit/file.c',
 	'navit/geom.c',
 	'navit/graphics.c',
-	'navit/graphics/ssd1306/graphics_init_animation.cpp',
-	'navit/graphics/ssd1306/graphics_ssd1306.cpp',
 	'navit/gui.c',
-	'navit/gui/speedsaver/gui_speedsaver.c',
 	'navit/item.c',
 	'navit/layout.c',
 	'navit/linguistics.c',
@@ -75,33 +80,73 @@ sources = [
 	'navit/search.c',
 	'navit/search_houseno_interpol.c',
 	'navit/speech.c',
-	'navit/start.c',
 	'navit/start_real.c',
 	'navit/sunriset.c',
 	'navit/track.c',
 	'navit/transform.c',
 	'navit/util.c',
-	'navit/vehicle.c',
 	'navit/vehicle/gpsd/vehicle_gpsd.c',
+	'navit/vehicle.c',
 	'navit/vehicleprofile.c',
-	'navit/xmlconfig.c']
+	'navit/xmlconfig.c',
+]
 
-# Runtime files
-install_data('navit/navit_shipped.xml', rename: 'navit.xml', install_dir: sharedir)
-install_data('navit/graphics/ssd1306/tone7.wav', install_dir: sharedir)
+# Navit
+libgps = dependency('libgps', required: false)
+arduipi = cc.find_library('ArduiPi_OLED', required: false)
+if libgps.found() and arduipi.found()
+	navitdepends = depends + [libgps, arduipi]
+	navitincludedirs = includedirs
+	navitsources = sources + [
+		'navit/graphics/ssd1306/graphics_init_animation.cpp',
+		'navit/graphics/ssd1306/graphics_ssd1306.cpp',
+		'navit/gui/speedsaver/gui_speedsaver.c',
+		'navit/start.c',
 
-# Dependencies
-cc = meson.get_compiler('cpp')
-zlib = dependency('zlib')
-libgps = dependency('libgps')
-glib = dependency('glib-2.0')
-arduipi = cc.find_library('ArduiPi_OLED')
-libm = cc.find_library('m')
-libpthread = cc.find_library('pthread')
+	]
+	executable('navit',
+		navitsources,
+		dependencies: navitdepends,
+		include_directories: navitincludedirs,
+		install: true)
+	install_data('navit/navit_shipped.xml', rename: 'navit.xml', install_dir: sharedir)
+	install_data('navit/graphics/ssd1306/tone7.wav', install_dir: sharedir)
+else
+	message('Unable to find a Navit dependency, skipping build')
+endif
 
-# Binary
-executable('navit',
-	sources,
-	dependencies: [zlib, libgps, glib, arduipi, libm, libpthread],
-	include_directories: includedir,
-	install: true)
+# MapTool apparently only supports 64-bit architectures
+# I assume it's only been tested on x86_64
+if target_machine.cpu_family() == 'x86_64'
+	mapdepends = depends
+	mapincludedirs = includedirs + [include_directories('navit/maptool')]
+	mapsources = sources + [
+		'navit/maptool/boundaries.c',
+		'navit/maptool/buffer.c',
+		'navit/maptool/ch.c',
+		'navit/maptool/coastline.c',
+		'navit/maptool/generated-code/fileformat.pb-c.c',
+		'navit/maptool/generated-code/osmformat.pb-c.c',
+		'navit/maptool/google/protobuf-c/protobuf-c.c',
+		'navit/maptool/itembin_buffer.c',
+		'navit/maptool/itembin.c',
+		'navit/maptool/maptool.c',
+		'navit/maptool/misc.c',
+		'navit/maptool/osm.c',
+		'navit/maptool/osm_o5m.c',
+		'navit/maptool/osm_protobuf.c',
+		'navit/maptool/osm_protobufdb.c',
+		'navit/maptool/osm_relations.c',
+		'navit/maptool/osm_xml.c',
+		'navit/maptool/sourcesink.c',
+		'navit/maptool/tempfile.c',
+		'navit/maptool/tile.c',
+		'navit/maptool/zip.c',
+	]
+	executable('maptool',
+		mapsources,
+		dependencies: mapdepends,
+		include_directories: mapincludedirs)
+else
+	message('MapTool build only supported on x86_64')
+endif
