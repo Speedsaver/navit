@@ -7,6 +7,8 @@ To create the maptool executable binary file required to use our ogr2osm-transla
 
 dependencies: meson ninja-build libglib2.0-dev
 
+```
 git clone https://github.com/Speedsaver/navit.git && cd navit && meson setup builddir && cd builddir && ninja
+```
 
 copy the newly created maptool executable binary file to path/to/ogr2osm/translations as described in our ogr2osm-translations repo
