@@ -2,13 +2,23 @@
 
 This is the core Speedsaver code. Derived from Navit, the open source satnav software. Thanks to the Navit team for their great work over the years.
 
+# Building #
 
-To create the maptool executable binary file required to use our ogr2osm-translations map conversion repository do the following:
-
-dependencies: meson ninja-build libglib2.0-dev
+Install meson, ninja-build and libglib2.0-dev using your favorite package manager. Then run:
 
 ```
-git clone https://github.com/Speedsaver/navit.git && cd navit && meson setup builddir && cd builddir && ninja
+git clone https://github.com/Speedsaver/navit
+cd navit
+meson setup builddir
+cd builddir
+ninja
 ```
 
-copy the newly created maptool executable binary file to path/to/ogr2osm/translations as described in our ogr2osm-translations repo
+This will try to build the following software:
+
+- navit: Requires libgps and [ArduiPi_OLED](https://github.com/Speedsaver/ArduiPi_OLED)
+- maptool: Requires an amd64 target processor
+
+# Importing maps #
+
+To import maps, follow the https://github.com/speedsaver/ogr2osm-translations tool. Make sure to copy the 'maptool' binary to the required directory.
