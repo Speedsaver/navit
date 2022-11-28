@@ -17,7 +17,7 @@ ninja
 This will try to build the following software:
 
 - navit: Requires libgps and [ArduiPi_OLED](https://github.com/Speedsaver/ArduiPi_OLED)
-- maptool: Requires an amd64 target processor
+- maptool: Requires an x86_64 target processor
 
 # Importing maps #
 
