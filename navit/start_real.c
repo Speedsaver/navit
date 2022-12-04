@@ -26,20 +26,16 @@
 #include "item.h"
 #include "coord.h"
 #include "main.h"
-#include "route.h"
-#include "navigation.h"
 #include "track.h"
 #include "debug.h"
 #include "event.h"
 #include "event_glib.h"
 #include "xmlconfig.h"
 #include "file.h"
-#include "search.h"
 #include "start_real.h"
 #include "linguistics.h"
 #include "navit_nls.h"
 #include "atom.h"
-#include "command.h"
 #include "geom.h"
 
 char *version="dev-version";
@@ -64,7 +60,7 @@ extern void builtin_init(void);
 int main_real(int argc, char * const* argv)
 {
 	xmlerror *error = NULL;
-	char *config_file = NULL, *command=NULL, *startup_file=NULL;
+	char *config_file = NULL;
 	int opt;
 	char *cp;
 	struct attr navit, conf;
@@ -86,16 +82,19 @@ int main_real(int argc, char * const* argv)
 	file_init();
 	builtin_init();
 	route_init();
-	navigation_init();
 	tracking_init();
-	search_init();
 	linguistics_init();
 	geom_init();
+
+	if(!event_request_system("glib", "navit")) {
+		dbg(lvl_error, "FATAL: No event system\n");
+		return NULL;
+	}
 	config_file=NULL;
 	opterr=0;  //don't bomb out on errors.
 	if (argc > 1) {
 		/* Don't forget to update the manpage if you modify theses options */
-		while((opt = getopt(argc, argv, ":hvc:d:e:s:")) != -1) {
+		while((opt = getopt(argc, argv, ":hvc:d:")) != -1) {
 			switch(opt) {
 			case 'h':
 				print_usage();
@@ -111,12 +110,6 @@ int main_real(int argc, char * const* argv)
 				break;
 			case 'd':
 				debug_set_global_level(atoi(optarg), 1);
-				break;
-			case 'e':
-				command=optarg;
-				break;
-			case 's':
-				startup_file=optarg;
 				break;
 			case ':':
 				fprintf(stderr, "navit: Error - Option `%c' needs a value\n", optopt);
@@ -181,25 +174,6 @@ int main_real(int argc, char * const* argv)
 	}
 	conf.type=attr_config;
 	conf.u.config=config;
-	if (startup_file) {
-		FILE *f = fopen(startup_file,"r");
-		if (f) {
-			char buffer[4096];
-			int fclose_ret;
-			while(fgets(buffer, sizeof(buffer), f)) {
-				command_evaluate(&conf, buffer);
-			}
-                        fclose_ret = fclose(f);
-                        if (fclose_ret != 0) {
-				dbg(lvl_error, "Could not close the specified startup file: %s\n", startup_file);
-			}
-		} else {
-			dbg(lvl_error, "Could not open the specified startup file: %s\n", startup_file);
-                }
-	}
-	if (command) {
-		command_evaluate(&conf, command);
-	}
 	event_main_loop_run();
 
 	linguistics_free();

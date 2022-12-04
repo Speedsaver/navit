@@ -11,8 +11,6 @@
 	<debug name="segv" level="1"/>
 	<debug name="timestamps" level="0"/>
 	<navit center="11.5666 48.1333" zoom="256" tracking="1" orientation="-1" recent_dest="250" drag_bitmap="0" imperial="1">
-		<graphics type="ssd1306"/>
-		<gui type="speedsaver" enabled="yes"/>
 		<vehicle name="Local GPS" profilename="car" enabled="yes" active="1" source="gpsd://localhost" gpsd_query="w+xj">
 		</vehicle>
 		<tracking cdf_histsize="0"/>
@@ -33,11 +31,8 @@
 			<roadprofile item_types="roundabout" speed="10" route_weight="10"/>
 			<roadprofile item_types="ferry" speed="40" route_weight="40"/>
 		</vehicleprofile>
-		<route destination_distance="50"/>
-		<navigation></navigation>
 		<mapset enabled="yes">
 			<xi:include href="$NAVIT_SHAREDIR/maps/*.xml"/>
 		</mapset>
-		<layout name="Car"></layout>
 	</navit>
 </config>

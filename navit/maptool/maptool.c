@@ -21,6 +21,9 @@ void module_map_binfile_init(void);
 void builtin_init(void) {
     module_map_binfile_init();
 }
+void graphics_new(struct navit *nav) {
+    (void)nav;
+}
 
 #include <stdlib.h>
 #include <glib.h>

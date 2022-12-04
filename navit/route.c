@@ -46,7 +46,6 @@
 #include "navit_nls.h"
 #include <glib.h>
 #include "point.h"
-#include "graphics.h"
 #include "coord.h"
 #include "projection.h"
 #include "item.h"

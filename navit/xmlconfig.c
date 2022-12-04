@@ -31,23 +31,14 @@
 #include "coord.h"
 #include "item.h"
 #include "xmlconfig.h"
-#include "layout.h"
 #include "mapset.h"
 #include "projection.h"
 #include "map.h"
-#include "navigation.h"
 #include "navit.h"
 #include "plugin.h"
-#include "route.h"
-#include "speech.h"
 #include "track.h"
 #include "vehicle.h"
 #include "point.h"
-#include "graphics.h"
-#include "gui.h"
-#include "osd.h"
-#include "log.h"
-#include "announcement.h"
 #include "vehicleprofile.h"
 #include "callback.h"
 #include "config_.h"
@@ -176,41 +167,6 @@ convert_number(const char *val)
 		return 0;
 }
 
-static int
-xmlconfig_announce(struct xmlstate *state)
-{
-	const char *type,*value;
-	char key[32];
-	int level[3];
-	int i;
-	enum item_type itype;
-	char *tok, *type_str, *str;
-
-	type=find_attribute(state, "type", 1);
-	if (! type)
-		return 0;
-	for (i = 0 ; i < 3 ; i++) {
-		sprintf(key,"level%d", i);
-		value=find_attribute(state, key, 0);
-		if (value)
-			level[i]=convert_number(value);
-		else
-			level[i]=-1;
-	}
-	type_str=g_strdup(type);
-	str=type_str;
-	while ((tok=strtok(str, ","))) {
-		itype=item_from_name(tok);
-		if (itype!=type_none) {
-			navigation_set_announce(state->parent->element_attr.u.data, itype, level);
-		} else {
-			dbg(lvl_error, "Invalid type for announcement: %s\n",tok);
-		}
-		str=NULL;
-	}
-	g_free(type_str);
-	return 1;
-}
 /**
  * * Define the elements in our config
  * *
@@ -227,22 +183,10 @@ xmlconfig_announce(struct xmlstate *state)
 #define DESTROY(x) (void (*)(void *))(x)
 
 static struct object_func object_funcs[] = {
-	{ attr_announcement,NEW(announcement_new),  GET(announcement_get_attr), NULL, NULL, SET(announcement_set_attr), ADD(announcement_add_attr) },
-	{ attr_arrows,     NEW(arrows_new)},
-	{ attr_circle,     NEW(circle_new),   NULL, NULL, NULL, NULL, ADD(element_add_attr)},
 	{ attr_coord,      NEW(coord_new_from_attrs)},
-	{ attr_cursor,     NEW(cursor_new),   NULL, NULL, NULL, NULL, ADD(cursor_add_attr)},
 	{ attr_debug,      NEW(debug_new)},
-	{ attr_graphics,   NEW(graphics_new), GET(graphics_get_attr)},
-	{ attr_gui,        NEW(gui_new), GET(gui_get_attr), NULL, NULL, SET(gui_set_attr), ADD(gui_add_attr)},
-	{ attr_icon,       NEW(icon_new),     NULL, NULL, NULL, NULL, ADD(element_add_attr)},
-	{ attr_image,      NEW(image_new)},
-	{ attr_itemgra,    NEW(itemgra_new),  NULL, NULL, NULL, NULL, ADD(itemgra_add_attr)},
 	{ attr_plugins,    NEW(plugins_new),  NULL, NULL, NULL, NULL, NULL, NULL, INIT(plugins_init)},
 	{ attr_plugin,     NEW(plugin_new)},
-	{ attr_polygon,    NEW(polygon_new),  NULL, NULL, NULL, NULL, ADD(element_add_attr)},
-	{ attr_polyline,   NEW(polyline_new), NULL, NULL, NULL, NULL, ADD(element_add_attr)},
-	{ attr_text,       NEW(text_new)},
 };
 
 struct object_func *
@@ -253,11 +197,11 @@ object_func_lookup(enum attr_type type)
 	case attr_config:
 		return &config_func;
 	case attr_layer:
-		return &layer_func;
+		return NULL;
 	case attr_layout:
-		return &layout_func;
+		return NULL;
 	case attr_log:
-		return &log_func;
+		return NULL;
 	case attr_map:
 		return &map_func;
 	case attr_maps:
@@ -265,7 +209,7 @@ object_func_lookup(enum attr_type type)
 	case attr_mapset:
 		return &mapset_func;
 	case attr_navigation:
-		return &navigation_func;
+		return NULL;
 	case attr_navit:
 		return &navit_func;
 	case attr_profile_option:
@@ -275,11 +219,11 @@ object_func_lookup(enum attr_type type)
 	case attr_route:
 		return &route_func;
 	case attr_osd:
-		return &osd_func;
+		return NULL;
 	case attr_trackingo:
 		return &tracking_func;
 	case attr_speech:
-		return &speech_func;
+		return NULL;
 	case attr_vehicle:
 		return &vehicle_func;
 	case attr_vehicleprofile:
@@ -335,214 +279,82 @@ static char *element_fixmes[]={
 static void initStatic(void) {
 	elements=g_new0(struct element_func,44); //43 is a number of elements + ending NULL element
 
-	elements[0].name="config";
-	elements[0].parent=NULL;
-	elements[0].func=NULL;
-	elements[0].type=attr_config;
+	int i = 0;
 
-	elements[1].name="announce";
-	elements[1].parent="navigation";
-	elements[1].func=xmlconfig_announce;
+	elements[i].name="config";
+	elements[i].parent=NULL;
+	elements[i].func=NULL;
+	elements[i].type=attr_config;
 
-	elements[2].name="speech";
-	elements[2].parent="navit";
-	elements[2].func=NULL;
-	elements[2].type=attr_speech;
+	elements[++i].name="tracking";
+	elements[i].parent="navit";
+	elements[i].func=NULL;
+	elements[i].type=attr_trackingo;
 
-	elements[3].name="tracking";
-	elements[3].parent="navit";
-	elements[3].func=NULL;
-	elements[3].type=attr_trackingo;
+	elements[++i].name="route";
+	elements[i].parent="navit";
+	elements[i].func=NULL;
+	elements[i].type=attr_route;
 
-	elements[4].name="route";
-	elements[4].parent="navit";
-	elements[4].func=NULL;
-	elements[4].type=attr_route;
+	elements[++i].name="mapset";
+	elements[i].parent="navit";
+	elements[i].func=NULL;
+	elements[i].type=attr_mapset;
 
-	elements[5].name="mapset";
-	elements[5].parent="navit";
-	elements[5].func=NULL;
-	elements[5].type=attr_mapset;
+	elements[++i].name="map";
+	elements[i].parent="mapset";
+	elements[i].func=NULL;
+	elements[i].type=attr_map;
 
-	elements[6].name="map";
-	elements[6].parent="mapset";
-	elements[6].func=NULL;
-	elements[6].type=attr_map;
+	elements[++i].name="debug";
+	elements[i].parent="config";
+	elements[i].func=NULL;
+	elements[i].type=attr_debug;
 
-	elements[7].name="debug";
-	elements[7].parent="config";
-	elements[7].func=NULL;
-	elements[7].type=attr_debug;
+	elements[++i].name="navit";
+	elements[i].parent="config";
+	elements[i].func=NULL;
+	elements[i].type=attr_navit;
 
-	elements[8].name="osd";
-	elements[8].parent="navit";
-	elements[8].func=NULL;
-	elements[8].type=attr_osd;
+	elements[++i].name="vehicle";
+	elements[i].parent="navit";
+	elements[i].func=NULL;
+	elements[i].type=attr_vehicle;
 
-	elements[9].name="navigation";
-	elements[9].parent="navit";
-	elements[9].func=NULL;
-	elements[9].type=attr_navigation;
+	elements[++i].name="vehicleprofile";
+	elements[i].parent="navit";
+	elements[i].func=NULL;
+	elements[i].type=attr_vehicleprofile;
 
-	elements[10].name="navit";
-	elements[10].parent="config";
-	elements[10].func=NULL;
-	elements[10].type=attr_navit;
+	elements[++i].name="roadprofile";
+	elements[i].parent="vehicleprofile";
+	elements[i].func=NULL;
+	elements[i].type=attr_roadprofile;
 
-	elements[11].name="graphics";
-	elements[11].parent="navit";
-	elements[11].func=NULL;
-	elements[11].type=attr_graphics;
+	elements[++i].name="plugins";
+	elements[i].parent="config";
+	elements[i].func=NULL;
+	elements[i].type=attr_plugins;
 
-	elements[12].name="gui";
-	elements[12].parent="navit";
-	elements[12].func=NULL;
-	elements[12].type=attr_gui;
+	elements[++i].name="plugin";
+	elements[i].parent="plugins";
+	elements[i].func=NULL;
+	elements[i].type=attr_plugin;
 
-	elements[13].name="layout";
-	elements[13].parent="navit";
-	elements[13].func=NULL;
-	elements[13].type=attr_layout;
+	elements[++i].name="maps";
+	elements[i].parent="mapset";
+	elements[i].func=NULL;
+	elements[i].type=attr_maps;
 
-	elements[14].name="cursor";
-	elements[14].parent="layout";
-	elements[14].func=NULL;
-	elements[14].type=attr_cursor;
+	elements[++i].name="profile_option";
+	elements[i].parent="vehicleprofile";
+	elements[i].func=NULL;
+	elements[i].type=attr_profile_option;
 
-	elements[15].name="layer";
-	elements[15].parent="layout";
-	elements[15].func=NULL;
-	elements[15].type=attr_layer;
-
-	elements[16].name="itemgra";
-	elements[16].parent="layer";
-	elements[16].func=NULL;
-	elements[16].type=attr_itemgra;
-
-	elements[17].name="circle";
-	elements[17].parent="itemgra";
-	elements[17].func=NULL;
-	elements[17].type=attr_circle;
-
-	elements[18].name="coord";
-	elements[18].parent="circle";
-	elements[18].func=NULL;
-	elements[18].type=attr_coord;
-
-	elements[19].name="icon";
-	elements[19].parent="itemgra";
-	elements[19].func=NULL;
-	elements[19].type=attr_icon;
-
-	elements[20].name="coord";
-	elements[20].parent="icon";
-	elements[20].func=NULL;
-	elements[20].type=attr_coord;
-
-	elements[21].name="image";
-	elements[21].parent="itemgra";
-	elements[21].func=NULL;
-	elements[21].type=attr_image;
-
-	elements[22].name="text";
-	elements[22].parent="itemgra";
-	elements[22].func=NULL;
-	elements[22].type=attr_text;
-
-	elements[23].name="polygon";
-	elements[23].parent="itemgra";
-	elements[23].func=NULL;
-	elements[23].type=attr_polygon;
-
-	elements[24].name="coord";
-	elements[24].parent="polygon";
-	elements[24].func=NULL;
-	elements[24].type=attr_coord;
-
-	elements[25].name="polyline";
-	elements[25].parent="itemgra";
-	elements[25].func=NULL;
-	elements[25].type=attr_polyline;
-
-	elements[26].name="coord";
-	elements[26].parent="polyline";
-	elements[26].func=NULL;
-	elements[26].type=attr_coord;
-
-	elements[27].name="arrows";
-	elements[27].parent="itemgra";
-	elements[27].func=NULL;
-	elements[27].type=attr_arrows;
-
-	elements[28].name="vehicle";
-	elements[28].parent="navit";
-	elements[28].func=NULL;
-	elements[28].type=attr_vehicle;
-
-	elements[29].name="vehicleprofile";
-	elements[29].parent="navit";
-	elements[29].func=NULL;
-	elements[29].type=attr_vehicleprofile;
-
-	elements[30].name="roadprofile";
-	elements[30].parent="vehicleprofile";
-	elements[30].func=NULL;
-	elements[30].type=attr_roadprofile;
-
-	elements[31].name="announcement";
-	elements[31].parent="roadprofile";
-	elements[31].func=NULL;
-	elements[31].type=attr_announcement;
-
-	elements[32].name="cursor";
-	elements[32].parent="vehicle";
-	elements[32].func=NULL;
-	elements[32].type=attr_cursor;
-
-	elements[33].name="itemgra";
-	elements[33].parent="cursor";
-	elements[33].func=NULL;
-	elements[33].type=attr_itemgra;
-
-	elements[34].name="log";
-	elements[34].parent="vehicle";
-	elements[34].func=NULL;
-	elements[34].type=attr_log;
-
-	elements[35].name="log";
-	elements[35].parent="navit";
-	elements[35].func=NULL;
-	elements[35].type=attr_log;
-
-	elements[36].name="plugins";
-	elements[36].parent="config";
-	elements[36].func=NULL;
-	elements[36].type=attr_plugins;
-
-	elements[37].name="plugin";
-	elements[37].parent="plugins";
-	elements[37].func=NULL;
-	elements[37].type=attr_plugin;
-
-	elements[38].name="maps";
-	elements[38].parent="mapset";
-	elements[38].func=NULL;
-	elements[38].type=attr_maps;
-
-	elements[39].name="layer";
-	elements[39].parent="navit";
-	elements[39].func=NULL;
-	elements[39].type=attr_layer;
-
-	elements[40].name="profile_option";
-	elements[40].parent="vehicleprofile";
-	elements[40].func=NULL;
-	elements[40].type=attr_profile_option;
-
-	elements[41].name="roadprofile";
-	elements[41].parent="profile_option";
-	elements[41].func=NULL;
-	elements[41].type=attr_roadprofile;
+	elements[++i].name="roadprofile";
+	elements[i].parent="profile_option";
+	elements[i].func=NULL;
+	elements[i].type=attr_roadprofile;
 }
 
 /**

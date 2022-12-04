@@ -33,7 +33,6 @@ struct map_priv;
 struct attr;
 #include "coord.h"
 #include "point.h"
-#include "layer.h"
 #include "debug.h"
 
 #define WORLD_BOUNDINGBOX_MIN_X -20000000

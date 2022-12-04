@@ -18,8 +18,6 @@
  */
 // style with: clang-format -style=WebKit -i *
 
-#define MODULE graphics_ssd1306
-
 #include <glib.h>
 #include <stdlib.h>
 #include <math.h>
@@ -34,8 +32,6 @@ extern "C" {
 #include "point.h"		/* needs to be before graphics.h */
 #include "coord.h"
 
-#include "graphics.h"
-#include "plugin.h"
 #include "navit.h"
 #include "xmlconfig.h"
 #include "vehicle.h"
@@ -73,8 +69,6 @@ struct graphics_priv {
 	int height;
 	int imperial = 0;
 	long tone_next = 0;
-	enum draw_mode_num mode;
-	struct callback_list *cbl;
 	long last_draw_time = 0;
 	// screensaver state
 	int ss_xpos = 0;
@@ -368,50 +362,16 @@ show_qrcode(void *data)
 #endif // 0
 
 
-static struct graphics_methods graphics_methods = {
-	NULL,			//graphics_destroy,
-	NULL,			//draw_mode,
-	NULL,			//draw_lines,
-	NULL,			//draw_polygon,
-	NULL,			//draw_rectangle,
-	NULL,			//draw_circle
-	NULL,			//draw_text,
-	NULL,			//draw_image,
-	NULL,			//draw_image_warp
-	NULL,			//draw_drag,
-	NULL,			//font_new
-	NULL,			//gc_new,
-	NULL,			//background_gc,
-	NULL,			//overlay_new,
-	NULL,			//image_new,
-	NULL,			//get_data,
-	NULL,			//image_free,
-	NULL,			//get_text_bbox
-	NULL,			//overlay_disable,
-	NULL,			//overlay_resize,
-	NULL,			/* set_attr, */
-	NULL,			/* show_native_keyboard */
-	NULL,			/* hide_native_keyboard */
-};
-
-static struct graphics_priv *
-graphics_ssd1306_new(struct navit *nav, struct graphics_methods *meth,
-		     struct attr **attrs, struct callback_list *cbl)
+extern "C" void graphics_new(struct navit *nav)
 {
+	tone_cmd = g_strdup_printf("aplay \"%s/tone7.wav\" 2>/dev/null >/dev/null&", getenv("NAVIT_SHAREDIR"));
+	char *bug = getenv("SSD1306_DEBUG_LEVEL");
+	if ( bug )
+		debug_level_set(dbg_module,(dbg_level)(*bug-'0'));
+
 	struct attr *attr, imperial_attr;
-	if (!event_request_system("glib", "graphics_ssd1306_new"))
-		return NULL;
 	struct graphics_priv *this_ = g_new0(struct graphics_priv, 1);
-	*meth = graphics_methods;
 
-	this_->cbl = cbl;
-
-	this_->width = SCREEN_WIDTH;
-	if ((attr = attr_search(attrs, NULL, attr_w)))
-		this_->width = attr->u.num;
-	this_->height = SCREEN_HEIGHT;
-	if ((attr = attr_search(attrs, NULL, attr_h)))
-		this_->height = attr->u.num;
 	if (nav) {
 		if (navit_get_attr
 		    (nav, attr_imperial, &imperial_attr, NULL)) {
@@ -434,15 +394,4 @@ graphics_ssd1306_new(struct navit *nav, struct graphics_methods *meth,
 	show_version_info(this_);
 
 	dbg(lvl_info, "initialized\n");
-	return this_;
-}
-
-void
-plugin_init(void)
-{
-	tone_cmd = g_strdup_printf("aplay \"%s/tone7.wav\" 2>/dev/null >/dev/null&", getenv("NAVIT_SHAREDIR"));
-	plugin_register_category_graphics("ssd1306", graphics_ssd1306_new);
-	char *bug = getenv("SSD1306_DEBUG_LEVEL");
-	if ( bug )
-		debug_level_set(dbg_module,(dbg_level)(*bug-'0'));
 }

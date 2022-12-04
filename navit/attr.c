@@ -34,8 +34,6 @@
 #include "item.h"
 #include "coord.h"
 #include "transform.h"
-#include "color.h"
-#include "navigation.h"
 #include "attr.h"
 #include "map.h"
 #include "endianess.h"
@@ -273,24 +271,7 @@ attr_new_from_text(const char *name, const char *value)
 			break;
 		}
 		if (attr >= attr_type_color_begin && attr <= attr_type_color_end) {
-			struct color *color=g_new0(struct color, 1);
-			int r,g,b,a;
-			ret->u.color=color;
-			if(strlen(value)==7){
-				sscanf(value,"#%02x%02x%02x", &r, &g, &b);
-				color->r = (r << 8) | r;
-				color->g = (g << 8) | g;
-				color->b = (b << 8) | b;
-				color->a = (65535);
-			} else if(strlen(value)==9){
-				sscanf(value,"#%02x%02x%02x%02x", &r, &g, &b, &a);
-				color->r = (r << 8) | r;
-				color->g = (g << 8) | g;
-				color->b = (b << 8) | b;
-				color->a = (a << 8) | a;
-			} else {
-				dbg(lvl_error,"color %s has unknown format\n",value);
-			}
+                        dbg(lvl_error,"color %s has unknown format\n",value);
 			break;
 		}
 		if (attr >= attr_type_coord_geo_begin && attr <= attr_type_coord_geo_end) {
@@ -436,12 +417,6 @@ attr_to_text_ext(struct attr *attr, char *sep, enum attr_format fmt, enum attr_f
 		return g_strdup_printf("%f", *attr->u.numd);
 	if (type >= attr_type_object_begin && type <= attr_type_object_end) 
 		return g_strdup_printf("(object[%s])", attr_to_name(type));
-	if (type >= attr_type_color_begin && type <= attr_type_color_end) {
-		if (attr->u.color->a != 65535) 
-			return g_strdup_printf("#%02x%02x%02x%02x", attr->u.color->r>>8,attr->u.color->g>>8,attr->u.color->b>>8, attr->u.color->a>>8);
-		else
-			return g_strdup_printf("#%02x%02x%02x", attr->u.color->r>>8,attr->u.color->g>>8,attr->u.color->b>>8);
-	}
 	if (type >= attr_type_coord_geo_begin && type <= attr_type_coord_geo_end) 
 		return g_strdup_printf("%f %f",attr->u.coord_geo->lng,attr->u.coord_geo->lat);
 	if (type == attr_zipfile_ref_block) {
@@ -476,9 +451,6 @@ attr_to_text_ext(struct attr *attr, char *sep, enum attr_format fmt, enum attr_f
 	}
 	if (type >= attr_type_item_type_begin && type <= attr_type_item_type_end) {
 		return g_strdup_printf("0x%ld[%s]",attr->u.num,item_to_name(attr->u.num));
-	}
-	if (type == attr_nav_status) {
-		return nav_status_to_text(attr->u.num);
 	}
 	return g_strdup_printf("(no text[%s])", attr_to_name(type));	
 }
@@ -730,8 +702,6 @@ attr_type_begin(enum attr_type type)
 		return attr_type_double_begin;
 	if (type < attr_type_color_begin)
 		return attr_type_coord_geo_begin;
-	if (type < attr_type_object_begin)
-		return attr_type_color_begin;
 	if (type < attr_type_coord_begin)
 		return attr_type_object_begin;
 	if (type < attr_type_pcoord_begin)
@@ -756,8 +726,6 @@ attr_data_size(struct attr *attr)
 		return sizeof(attr->u.num);
 	if (attr->type >= attr_type_coord_geo_begin && attr->type <= attr_type_coord_geo_end) 
 		return sizeof(*attr->u.coord_geo);
-	if (attr->type >= attr_type_color_begin && attr->type <= attr_type_color_end) 
-		return sizeof(*attr->u.color);
 	if (attr->type >= attr_type_object_begin && attr->type <= attr_type_object_end) 
 		return sizeof(void *);
 	if (attr->type >= attr_type_item_begin && attr->type <= attr_type_item_end) 
