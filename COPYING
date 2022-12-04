@@ -57,7 +57,6 @@ navit/zipfile.h
 navit/menu.h
 navit/map_data.h
 navit/speech.h
-navit/data.h
 navit/attr.h
 navit/transform.h
 navit/plugin_def.h
@@ -65,7 +64,6 @@ navit/projection.h
 navit/layout.h
 navit/cursor.h
 navit/color.h
-navit/destination.h
 navit/event.h
 navit/gui.h
 navit/osd.h
