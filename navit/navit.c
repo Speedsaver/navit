@@ -55,7 +55,6 @@
 #include "attr.h"
 #include "event.h"
 #include "file.h"
-#include "profile.h"
 #include "command.h"
 #include "navit_nls.h"
 #include "map.h"
@@ -3093,7 +3092,6 @@ navit_vehicle_update_position(struct navit *this_, struct navit_vehicle *nv) {
 	char *destination_file;
 	char *description;
 
-	profile(0,NULL);
 	if (this_->ready == 3)
 		navit_layout_switch(this_);
 	if (this_->vehicle == nv && this_->tracking_flag)
@@ -3112,7 +3110,6 @@ navit_vehicle_update_position(struct navit *this_, struct navit_vehicle *nv) {
 	if (! get_attr(attr_object, attr_position_direction, &attr_dir, NULL) ||
 	    ! get_attr(attr_object, attr_position_speed, &attr_speed, NULL) ||
 	    ! get_attr(attr_object, attr_position_coord_geo, &attr_pos, NULL)) {
-		profile(0,"return 2\n");
 		return;
 	}
 	nv->dir=*attr_dir.u.numd;
@@ -3121,7 +3118,6 @@ navit_vehicle_update_position(struct navit *this_, struct navit_vehicle *nv) {
 	if (nv != this_->vehicle) {
 		if (this_->ready == 3)
 			navit_vehicle_draw(this_, nv, NULL);
-		profile(0,"return 3\n");
 		return;
 	}
 	cursor_pc.x = nv->coord.x;
@@ -3175,7 +3171,6 @@ navit_vehicle_update_position(struct navit *this_, struct navit_vehicle *nv) {
 			break;
 		}
 	}
-	profile(0,"return 5\n");
 }
 
 /**

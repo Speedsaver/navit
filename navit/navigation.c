@@ -24,7 +24,6 @@
 #include <ctype.h>
 #include <glib.h>
 #include "debug.h"
-#include "profile.h"
 #include "navigation.h"
 #include "coord.h"
 #include "item.h"
@@ -3720,7 +3719,6 @@ navigation_update_done(struct navigation *this_, int cancel) {
 				make_maneuvers(this_,this_->route);
 			}
 			calculate_dest_distance(this_, incr);
-			profile(0,"end");
 			navigation_call_callbacks(this_, FALSE);
 		}
 		navigation_set_attr(this_, &nav_status);

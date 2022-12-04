@@ -41,7 +41,6 @@
 #include "coord.h"
 #include "transform.h"
 #include "plugin.h"
-#include "profile.h"
 #include "mapset.h"
 #include "layout.h"
 #include "route.h"
@@ -2423,7 +2422,6 @@ do_draw(struct displaylist *displaylist, int cancel, int flags)
 		displaylist->order_hashed=displaylist->order;
 		displaylist->layout_hashed=displaylist->layout;
 	}
-	profile(0,NULL);
 	pro=transform_get_projection(displaylist->dc.trans);
 	while (!cancel) {
 		if (!displaylist->msh)
@@ -2502,7 +2500,6 @@ do_draw(struct displaylist *displaylist, int cancel, int flags)
 		displaylist->sel=NULL;
 		displaylist->m=NULL;
 	}
-	profile(1,"process_selection\n");
 	if (displaylist->idle_ev)
 		event_remove_idle(displaylist->idle_ev);
 	displaylist->idle_ev=NULL;
@@ -2510,7 +2507,6 @@ do_draw(struct displaylist *displaylist, int cancel, int flags)
 	displaylist->idle_cb=NULL;
 	displaylist->busy=0;
 	graphics_process_selection(displaylist->dc.gra, displaylist);
-	profile(1,"draw\n");
 	if (! cancel)
 		graphics_displaylist_draw(displaylist->dc.gra, displaylist, displaylist->dc.trans, displaylist->layout, flags);
 	map_rect_destroy(displaylist->mr);
@@ -2521,9 +2517,7 @@ do_draw(struct displaylist *displaylist, int cancel, int flags)
 	displaylist->sel=NULL;
 	displaylist->m=NULL;
 	displaylist->msh=NULL;
-	profile(1,"callback\n");
 	callback_call_1(displaylist->cb, cancel);
-	profile(0,"end\n");
 }
 
 /**

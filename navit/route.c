@@ -47,7 +47,6 @@
 #include <glib.h>
 #include "point.h"
 #include "graphics.h"
-#include "profile.h"
 #include "coord.h"
 #include "projection.h"
 #include "item.h"
@@ -1172,7 +1171,6 @@ route_set_destinations(struct route *this, struct pcoord *dst, int count, int as
 	int i;
 	route_status.type=attr_route_status;
 
-	profile(0,NULL);
 	route_clear_destinations(this);
 	if (dst && count) {
 		for (i = 0 ; i < count ; i++) {
@@ -1189,14 +1187,12 @@ route_set_destinations(struct route *this, struct pcoord *dst, int count, int as
 	}
 	callback_list_call_attr_1(this->cbl2, attr_destination, this);
 	route_set_attr(this, &route_status);
-	profile(1,"find_nearest_street");
 
 	/* The graph has to be destroyed and set to NULL, otherwise route_path_update() doesn't work */
 	route_graph_destroy(this->graph);
 	this->graph=NULL;
 	this->current_dst=route_get_dst(this);
 	route_path_update(this, 1, async);
-	profile(0,"end");
 }
 
 int

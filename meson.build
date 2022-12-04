@@ -71,7 +71,6 @@ sources = [
 	'navit/param.c',
 	'navit/plugin.c',
 	'navit/popup.c',
-	'navit/profile.c',
 	'navit/profile_option.c',
 	'navit/projection.c',
 	'navit/roadprofile.c',
