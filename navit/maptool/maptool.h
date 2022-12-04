@@ -323,10 +323,6 @@ void osm_init(FILE*);
 /* osm_o5m.c */
 int map_collect_data_osm_o5m(FILE *in, struct maptool_osm *osm);
 
-/* osm_protobuf.c */
-int map_collect_data_osm_protobuf(FILE *in, struct maptool_osm *osm);
-int osm_protobufdb_load(FILE *in, char *dir);
-
 /* osm_relations.c */
 struct relations * relations_new(void);
 struct relations_func *relations_func_new(void (*func)(void *func_priv, void *relation_priv, struct item_bin *member, void *member_priv), void *func_priv);

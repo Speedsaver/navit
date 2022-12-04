@@ -259,8 +259,6 @@ usage()
 	fprintf(f,"maptool - parse osm textfile and convert to Navit binfile format\n\n");
 	fprintf(f,"Usage (for OSM XML data):\n");
 	fprintf(f,"bzcat planet.osm.bz2 | maptool mymap.bin\n");
-	fprintf(f,"Usage (for OSM Protobuf/PBF data):\n");
-	fprintf(f,"maptool --protobuf -i planet.osm.pbf planet.bin\n");
 	fprintf(f,"Available switches:\n");
 	fprintf(f,"-h (--help)                       : this screen\n");
 	fprintf(f,"-5 (--md5) <file>                 : set file where to write md5 sum\n");
@@ -276,7 +274,6 @@ usage()
 	fprintf(f,"-M (--o5m)                        : input data is in o5m format\n");
 	fprintf(f,"-n (--ignore-unknown)             : do not output ways and nodes with unknown type\n");
 	fprintf(f,"-N (--nodes-only)                 : process only nodes\n");
-	fprintf(f,"-P (--protobuf)                   : input data is in pbf (Protocol Buffer) format\n");
 	fprintf(f,"-r (--rule-file) <file>           : read mapping rules from specified file\n");
 	fprintf(f,"-s (--start) <phase>              : start at specified phase\n");
 	fprintf(f,"-S (--slice-size) <size>          : limit memory to use for some large internal buffers, in bytes. Default is %dGB.\n", SLIZE_SIZE_DEFAULT_GB);
@@ -288,9 +285,7 @@ usage()
 	fprintf(f,"-z (--compression-level) <level>  : set the compression level\n");
 	fprintf(f,"Internal options (undocumented):\n");                                                                      
 	fprintf(f,"-b (--binfile)\n");                                                                                        
-	fprintf(f,"-B \n");                                                                                                   
 	fprintf(f,"-m (--map) \n");                                                                                           
-	fprintf(f,"-O \n");                                                                                                   
 	fprintf(f,"-p (--plugin) \n");                                                                                        
 	fprintf(f,"-u (--url) \n");
 	
@@ -303,15 +298,12 @@ struct maptool_params {
 	int process_nodes;
 	int process_ways;
 	int process_relations;
-	char *protobufdb;
-	char *protobufdb_operation;
 	char *md5file;
 	int start;
 	int end;
 	int dump;
 	int o5m;
 	int compression_level;
-	int protobuf;
 	int dump_coordinates;
 	int input;
 	GList *map_handles;
@@ -354,7 +346,6 @@ parse_option(struct maptool_params *p, char **argv, int argc, int *option_index)
 		{"map", 1, 0, 'm'},
 		{"o5m", 0, 0, 'M'},
 		{"plugin", 1, 0, 'p'},
-		{"protobuf", 0, 0, 'P'},
 		{"start", 1, 0, 's'},
 		{"timestamp", 1, 0, 't'},
 		{"input-file", 1, 0, 'i'},
@@ -367,7 +358,7 @@ parse_option(struct maptool_params *p, char **argv, int argc, int *option_index)
 		{"index-size", 0, 0, 'x'},
 		{0, 0, 0, 0}
 	};
-	c = getopt_long (argc, argv, "5:6B:DEMNO:PS:Wa:bc"
+	c = getopt_long (argc, argv, "5:6DEMNS:Wa:bc"
 				      "e:hi:knm:p:r:s:t:wu:z:Ux:", long_options, option_index);
 	if (c == -1)
 		return 1;
@@ -377,9 +368,6 @@ parse_option(struct maptool_params *p, char **argv, int argc, int *option_index)
 		break;
 	case '6':
 		p->zip64=1;
-		break;
-	case 'B':
-		p->protobufdb=optarg;
 		break;
 	case 'D':
 		p->dump=1;
@@ -395,13 +383,6 @@ parse_option(struct maptool_params *p, char **argv, int argc, int *option_index)
 		break;
 	case 'R':
 		p->process_relations=0;
-		break;
-	case 'O':
-		p->protobufdb_operation=optarg;
-		p->dump=1;
-		break;
-	case 'P':
-		p->protobuf=1;
 		break;
 	case 'S':
 		slice_size=atoll(optarg);
@@ -552,9 +533,6 @@ osm_read_input_data(struct maptool_params *p, char *suffix)
 			map_destroy(l->data);
 			l=g_list_next(l);
 		}
-	}
-	else if (p->protobuf) {
-		map_collect_data_osm_protobuf(p->input_file,&p->osm);
 	}
 	else if (p->o5m)
 		map_collect_data_osm_o5m(p->input_file,&p->osm);
@@ -933,10 +911,6 @@ int main(int argc, char **argv)
 
 	// initialize plugins and OSM mappings
 	maptool_init(p.rule_file);
-	if (p.protobufdb_operation) {
-		osm_protobufdb_load(p.input_file, p.protobufdb);
-		return 0;
-	}
 	phase=0;
 
 	// input from an OSM file
