@@ -30,7 +30,6 @@ navit/plugin.c
 navit/data_window.c
 navit/search.c
 navit/map.c
-navit/maptype.c
 navit/file.c
 navit/vehicle.c
 navit/navit.c
@@ -80,7 +79,6 @@ navit/data_window.h
 navit/search.h
 navit/layer.h
 navit/map.h
-navit/maptype.h
 navit/file.h
 navit/vehicle.h
 navit/log.h

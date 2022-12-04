@@ -29,7 +29,6 @@
 #include "projection.h"
 #include "item.h"
 #include "map.h"
-#include "maptype.h"
 #include "attr.h"
 #include "coord.h"
 #include "transform.h"

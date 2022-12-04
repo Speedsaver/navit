@@ -45,7 +45,6 @@
 #include "projection.h"
 #include "item.h"
 #include "map.h"
-#include "maptype.h"
 #include "transform.h"
 #include "plugin.h"
 #include "callback.h"

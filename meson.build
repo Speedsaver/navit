@@ -61,7 +61,6 @@ sources = [
 	'navit/map.c',
 	'navit/maps.c',
 	'navit/mapset.c',
-	'navit/maptype.c',
 	'navit/menu.c',
 	'navit/messages.c',
 	'navit/navigation.c',
