@@ -29,7 +29,6 @@
 #include "country.h"
 #include "file.h"
 #include "profile.h"
-#include "types.h"
 #include "transform.h"
 
 static int in_way, in_node, in_relation;

@@ -30,7 +30,6 @@
 #include "item.h"
 #include "vehicle.h"
 #include "event.h"
-#include "types.h"
 
 static struct vehicle_priv {
 	char *source;
@@ -91,7 +90,7 @@ vehicle_gpsd_callback(struct gps_data_t *data, const char *buf, size_t len)
         }
     }
 
-    dbg(lvl_debug,"data->set="LONGLONG_HEX_FMT"\n", (unsigned long long)data->set);
+    dbg(lvl_debug,"data->set=%llx\n", (unsigned long long)data->set);
     if (data->set & SPEED_SET) {
         priv->speed = data->fix.speed * MPS_TO_KPH;
         if(!isnan(data->fix.speed))

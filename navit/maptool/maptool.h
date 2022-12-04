@@ -21,7 +21,6 @@
 #include "item.h"
 #include "attr.h"
 #include "geom.h"
-#include "types.h"
 
 #define sq(x) ((double)(x)*(x))
 
@@ -30,8 +29,8 @@
 #define debug_tile(x) 0
 #define debug_itembin(x) 0
 
-#define RELATION_MEMBER_PRINT_FORMAT "%d:"LONGLONG_FMT":%s"
-#define RELATION_MEMBER_PARSE_FORMAT "%d:"LONGLONG_FMT":%n"
+#define RELATION_MEMBER_PRINT_FORMAT "%d:%lld:%s"
+#define RELATION_MEMBER_PARSE_FORMAT "%d:%lld:%n"
 
 struct tile_data {
 	char buffer[1024];
@@ -127,7 +126,7 @@ struct country_table;
  * Must be at least 64 bit wide because IDs will soon exceed 32 bit.
  */
 typedef unsigned long long int osmid;
-#define OSMID_FMT ULONGLONG_FMT
+#define OSMID_FMT "%llu"
 
 /** Files needed for processing a relation. */
 struct files_relation_processing {

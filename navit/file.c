@@ -34,7 +34,6 @@
 #include "atom.h"
 #include "item.h"
 #include "util.h"
-#include "types.h"
 #include "zipfile.h"
 #include <sys/socket.h>
 #include <netdb.h>
@@ -195,7 +194,7 @@ file_create(char *name, struct attr **options)
 		file->size=lseek(file->fd, 0, SEEK_END);
 		if (file->size < 0)
 			file->size=0;
-		dbg(lvl_debug,"size="LONGLONG_FMT"\n", file->size);
+		dbg(lvl_debug,"size=%lld\n", file->size);
 		file->name_id = (long)atom(name);
 	}
 	if (!options || !(attr=attr_search(options, NULL, attr_cache)) || attr->u.num)
@@ -408,7 +407,7 @@ file_data_flush(struct file *file, long long offset, int size)
 	if (file->cache) {
 		struct file_cache_id id={offset,size,file->name_id,0};
 		cache_flush(file_cache,&id);
-		dbg(lvl_debug,"Flushing "LONGLONG_FMT" %d bytes\n",offset,size);
+		dbg(lvl_debug,"Flushing %lld %d bytes\n",offset,size);
 	}
 }
 

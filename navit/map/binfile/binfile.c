@@ -38,7 +38,6 @@
 #include "linguistics.h"
 #include "endianess.h"
 #include "callback.h"
-#include "types.h"
 #include "geom.h"
 
 static int map_id;
@@ -273,7 +272,7 @@ binfile_read_eoc64(struct file *fi)
 		dbg(lvl_warning,"map file %s: eoc wrong\n", fi->name);
 			eoc=NULL;
 		}
-		dbg(lvl_debug,"eoc64 ok 0x"LONGLONG_HEX_FMT " 0x"LONGLONG_HEX_FMT "\n",eoc->zip64eofst,eoc->zip64ecsz);
+		dbg(lvl_debug,"eoc64 ok 0x%llx 0x%llx\n",eoc->zip64eofst,eoc->zip64ecsz);
 	}
 	file_data_free(fi,(unsigned char *)eocl);
 	return eoc;
@@ -298,7 +297,7 @@ binfile_read_cd(struct map_priv *m, int offset, int len)
 	}
 	cd=(struct zip_cd *)file_data_read(m->fi,cdoffset+offset, sizeof(*cd)+len);
 	if (cd) {
-		dbg(lvl_debug,"cd at "LONGLONG_FMT" %zu bytes\n",cdoffset+offset, sizeof(*cd)+len);
+		dbg(lvl_debug,"cd at %lld %zu bytes\n",cdoffset+offset, sizeof(*cd)+len);
 		cd_to_cpu(cd);
 		dbg(lvl_debug,"sig 0x%x\n", cd->zipcensig);
 		if (cd->zipcensig != zip_cd_sig) {
@@ -917,7 +916,7 @@ zipfile_to_tile(struct map_priv *m, struct zip_cd *cd, struct tile *t)
 	char *zipfn;
 	struct file *fi;
 	dbg(lvl_debug,"enter %p %p %p\n", m, cd, t);
-	dbg(lvl_debug,"cd->zipofst=0x"LONGLONG_HEX_FMT "\n", binfile_cd_offset(cd));
+	dbg(lvl_debug,"cd->zipofst=0x%llx\n", binfile_cd_offset(cd));
 	t->start=NULL;
 	t->mode=1;
 	if (m->fis)
@@ -997,7 +996,7 @@ map_binfile_download_size(struct map_priv *m)
 	} while (map_binfile_handle_redirect(m));
 
 	ret=file_size(m->http);
-	dbg(lvl_debug,"file size "LONGLONG_FMT"\n",ret);
+	dbg(lvl_debug,"file size %lld\n",ret);
 	return ret;
 }
 
@@ -1028,7 +1027,7 @@ map_binfile_http_range(struct map_priv *m, long long offset, int size)
 	attrs[3]=NULL;
 
 	url.u.str=m->url;
-	http_header.u.str=g_strdup_printf("Range: bytes="LONGLONG_FMT"-"LONGLONG_FMT,offset, offset+size-1);
+	http_header.u.str=g_strdup_printf("Range: bytes=%lld-%lld",offset, offset+size-1);
 	map_binfile_http_request(m, attrs);
 	g_free(http_header.u.str);
 	return m->http;
@@ -1085,12 +1084,12 @@ download_request(struct map_download *download)
 		long long offset=binfile_cd_offset(download->cd_copy);
 		int size=download->cd_copy->zipcsiz+sizeof(struct zip_lfh)+download->cd_copy->zipcfnl;
 		url.u.str=g_strdup(download->m->url);
-		http_header.u.str=g_strdup_printf("Range: bytes="LONGLONG_FMT"-"LONGLONG_FMT,offset,offset+size-1);
+		http_header.u.str=g_strdup_printf("Range: bytes=%lld-%lld",offset,offset+size-1);
 		attrs[2]=&http_header;
 		attrs[3]=NULL;
 		download->dl_size=size;
 	}
-	dbg(lvl_debug,"encountered missing tile %d %s(%s), Downloading %d bytes at "LONGLONG_FMT"\n",download->zipfile, url.u.str,(char *)(download->cd_copy+1), download->dl_size, download->offset);
+	dbg(lvl_debug,"encountered missing tile %d %s(%s), Downloading %d bytes at %lld\n",download->zipfile, url.u.str,(char *)(download->cd_copy+1), download->dl_size, download->offset);
 	map_binfile_http_request(download->m, attrs);
 	g_free(url.u.str);
 	download->http=download->m->http;
@@ -1138,7 +1137,7 @@ download_download(struct map_download *download)
 		return 0;
 	}
 
-	dbg(lvl_debug,"got %d bytes writing at offset "LONGLONG_FMT"\n",size_ret,download->offset);
+	dbg(lvl_debug,"got %d bytes writing at offset %lld\n",size_ret,download->offset);
 	if (size_ret <= 0) {
 		g_free(data);
 		return 1;
@@ -1188,7 +1187,7 @@ static int
 download_planet_size(struct map_download *download)
 {
 	download->size=map_binfile_download_size(download->m);
-	dbg(lvl_debug,"Planet size "LONGLONG_FMT"\n",download->size);
+	dbg(lvl_debug,"Planet size %lld\n",download->size);
 	if (!download->size)
 		return 0;
 	return 1;
@@ -1204,7 +1203,7 @@ download_eoc(struct map_download *download)
 	download->zip_eoc=(struct zip_eoc *)(download->zip64_eocl+1);
 	if (download->zip64_eoc->zip64esig != zip64_eoc_sig || download->zip64_eocl->zip64lsig != zip64_eocl_sig || download->zip_eoc->zipesig != zip_eoc_sig)
 	{
-		dbg(lvl_error,"wrong signature on zip64_eoc downloaded from "LONGLONG_FMT"\n",download->size-98);
+		dbg(lvl_error,"wrong signature on zip64_eoc downloaded from %lld\n",download->size-98);
 		g_free(download->zip64_eoc);
 		return 0;
 	}
@@ -1447,7 +1446,7 @@ push_zipfile_tile(struct map_rect_priv *mr, int zipfile, int offset, int length,
 	struct file *f=m->fi;
 	long long cdoffset=m->eoc64?m->eoc64->zip64eofst:m->eoc->zipeofst;
 	struct zip_cd *cd=(struct zip_cd *)(file_data_read(f, cdoffset + zipfile*m->cde_size, m->cde_size));
-	dbg(lvl_debug,"read from "LONGLONG_FMT" %d bytes\n",cdoffset + zipfile*m->cde_size, m->cde_size);
+	dbg(lvl_debug,"read from %lld %d bytes\n",cdoffset + zipfile*m->cde_size, m->cde_size);
 	cd_to_cpu(cd);
 	if (!cd->zipcunc && m->url) {
 		cd=download(m, mr, cd, zipfile, offset, length, async);
