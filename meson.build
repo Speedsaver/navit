@@ -69,7 +69,6 @@ sources = [
 	'navit/navit_nls.c',
 	'navit/osd.c',
 	'navit/param.c',
-	'navit/phrase.c',
 	'navit/plugin.c',
 	'navit/popup.c',
 	'navit/profile.c',

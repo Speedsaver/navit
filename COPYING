@@ -36,7 +36,6 @@ navit/file.c
 navit/vehicle.c
 navit/navit.c
 navit/log.c
-navit/phrase.c
 navit/main.c
 navit/xmlconfig.c
 navit/callback.c
@@ -88,7 +87,6 @@ navit/file.h
 navit/vehicle.h
 navit/log.h
 navit/navit.h
-navit/phrase.h
 navit/main.h
 navit/xmlconfig.h
 navit/attr_def.h
