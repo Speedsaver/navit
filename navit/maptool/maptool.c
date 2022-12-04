@@ -271,7 +271,6 @@ usage()
 		experimental_feature_description ? experimental_feature_description : "-not available in this version-");
 	fprintf(f,"-i (--input-file) <file>          : specify the input file name (OSM), overrules default stdin\n");
 	fprintf(f,"-k (--keep-tmpfiles)              : do not delete tmp files after processing. useful to reuse them\n");
-	fprintf(f,"-M (--o5m)                        : input data is in o5m format\n");
 	fprintf(f,"-n (--ignore-unknown)             : do not output ways and nodes with unknown type\n");
 	fprintf(f,"-N (--nodes-only)                 : process only nodes\n");
 	fprintf(f,"-r (--rule-file) <file>           : read mapping rules from specified file\n");
@@ -302,7 +301,6 @@ struct maptool_params {
 	int start;
 	int end;
 	int dump;
-	int o5m;
 	int compression_level;
 	int dump_coordinates;
 	int input;
@@ -344,7 +342,6 @@ parse_option(struct maptool_params *p, char **argv, int argc, int *option_index)
 		{"keep-tmpfiles", 0, 0, 'k'},
 		{"nodes-only", 0, 0, 'N'},
 		{"map", 1, 0, 'm'},
-		{"o5m", 0, 0, 'M'},
 		{"plugin", 1, 0, 'p'},
 		{"start", 1, 0, 's'},
 		{"timestamp", 1, 0, 't'},
@@ -358,7 +355,7 @@ parse_option(struct maptool_params *p, char **argv, int argc, int *option_index)
 		{"index-size", 0, 0, 'x'},
 		{0, 0, 0, 0}
 	};
-	c = getopt_long (argc, argv, "5:6DEMNS:Wa:bc"
+	c = getopt_long (argc, argv, "5:6DENS:Wa:bc"
 				      "e:hi:knm:p:r:s:t:wu:z:Ux:", long_options, option_index);
 	if (c == -1)
 		return 1;
@@ -375,9 +372,6 @@ parse_option(struct maptool_params *p, char **argv, int argc, int *option_index)
 	case 'E':
 		experimental=1;
 		break;
-	case 'M':
-		p->o5m=1;
-		break;	
 	case 'N':
 		p->process_ways=0;
 		break;
@@ -534,10 +528,7 @@ osm_read_input_data(struct maptool_params *p, char *suffix)
 			l=g_list_next(l);
 		}
 	}
-	else if (p->o5m)
-		map_collect_data_osm_o5m(p->input_file,&p->osm);
-	else
-		map_collect_data_osm(p->input_file,&p->osm);
+	map_collect_data_osm(p->input_file,&p->osm);
 
 	if (node_buffer.size==0 && !p->map_handles){
 		fprintf(stderr,"No nodes found - looks like an invalid input file.\n");

@@ -113,7 +113,6 @@ if target_machine.cpu_family() == 'x86_64'
 		'navit/maptool/maptool.c',
 		'navit/maptool/misc.c',
 		'navit/maptool/osm.c',
-		'navit/maptool/osm_o5m.c',
 		'navit/maptool/osm_relations.c',
 		'navit/maptool/osm_xml.c',
 		'navit/maptool/sourcesink.c',
