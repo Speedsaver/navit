@@ -56,7 +56,6 @@ GHashTable *dedupe_ways_hash;
 int phase;
 int slices;
 int unknown_country;
-char ch_suffix[] ="r"; /* Used to make compiler happy due to Bug 35903 in gcc */
 /** Textual description of available experimental features, or NULL (=none available). */
 char* experimental_feature_description = "Move coastline data to order 6 tiles. Makes map look more smooth, but may affect drawing/searching performance."; /* add description here */
 /** Indicates if experimental features (if available) were enabled. */
@@ -709,16 +708,12 @@ maptool_generate_tiles(struct maptool_params *p, char *suffix, char **filenames,
 	}
 	zipnum=zip_get_zipnum(zip_info);
 	tilesdir=tempfile(suffix,"tilesdir",1);
-	if (!strcmp(suffix,ch_suffix)) { /* Makes compiler happy due to bug 35903 in gcc */
-		ch_generate_tiles(suffix0,suffix,tilesdir,zip_info);
-	} else {
-		for (f = 0 ; f < filename_count ; f++)
-			files[f]=tempfile(suffix,filenames[f],0);
-		phase4(files,filename_count,0,suffix,tilesdir,zip_info);
-		for (f = 0 ; f < filename_count ; f++) {
-			if (files[f])
-				fclose(files[f]);
-		}
+	for (f = 0 ; f < filename_count ; f++)
+		files[f]=tempfile(suffix,filenames[f],0);
+	phase4(files,filename_count,0,suffix,tilesdir,zip_info);
+	for (f = 0 ; f < filename_count ; f++) {
+		if (files[f])
+			fclose(files[f]);
 	}
 	fclose(tilesdir);
 	zip_set_zipnum(zip_info,zipnum);
@@ -752,23 +747,19 @@ maptool_assemble_map(struct maptool_params *p, char *suffix, char **filenames, c
 		}
 		index_init(zip_info, 1);
 	}
-	if (!strcmp(suffix,ch_suffix)) {  /* Makes compiler happy due to bug 35903 in gcc */
-		ch_assemble_map(suffix0,suffix,zip_info);
-	} else {
-		for (f = 0 ; f < filename_count ; f++) {
-			files[f]=tempfile(suffix, filenames[f], 0);
-			if (referencenames[f]) 
-				references[f]=tempfile(suffix,referencenames[f],1);
-			else
-				references[f]=NULL;
-		}
-		phase5(files,references,filename_count,0,suffix,zip_info);
-		for (f = 0 ; f < filename_count ; f++) {
-			if (files[f])
-				fclose(files[f]);
-			if (references[f])
-				fclose(references[f]);
-		}
+	for (f = 0 ; f < filename_count ; f++) {
+		files[f]=tempfile(suffix, filenames[f], 0);
+		if (referencenames[f]) 
+			references[f]=tempfile(suffix,referencenames[f],1);
+		else
+			references[f]=NULL;
+	}
+	phase5(files,references,filename_count,0,suffix,zip_info);
+	for (f = 0 ; f < filename_count ; f++) {
+		if (files[f])
+			fclose(files[f]);
+		if (references[f])
+			fclose(references[f]);
 	}
 	if(!p->keep_tmpfiles) {
 		tempfile_unlink(suffix,"relations");

@@ -178,11 +178,6 @@ void save_buffer(char *filename, struct buffer *b, long long offset);
 void load_buffer(char *filename, struct buffer *b, long long offset, long long size);
 long long sizeof_buffer(char *filename);
 
-/* ch.c */
-
-void ch_generate_tiles(char *map_suffix, char *suffix, FILE *tilesdir_out, struct zip_info *zip_info);
-void ch_assemble_map(char *map_suffix, char *suffix, struct zip_info *zip_info);
-
 /* coastline.c */
 
 void process_coastlines(FILE *in, FILE *out);

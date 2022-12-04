@@ -106,7 +106,6 @@ if target_machine.cpu_family() == 'x86_64'
 	mapsources = sources + [
 		'navit/maptool/boundaries.c',
 		'navit/maptool/buffer.c',
-		'navit/maptool/ch.c',
 		'navit/maptool/coastline.c',
 		'navit/maptool/itembin_buffer.c',
 		'navit/maptool/itembin.c',
