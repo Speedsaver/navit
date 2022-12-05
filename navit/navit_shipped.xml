@@ -1,19 +1,10 @@
-<?xml version="1.0" encoding="UTF-8"?><!--
-	For configuration options used in this file, please read
-	http://wiki.navit-project.org/index.php/Configuration
-	Do not edit /usr/share/navit/navit.xml or /etc/navit/navit.xml :
-	changes would be lost on upgrade. Rather copy it to ~/.navit/.
--->
-<config xmlns:xi="http://www.w3.org/2001/XInclude">
-	<debug name="global" dbg_level="error"/>
-	<debug name="segv" level="1"/>
-	<debug name="timestamps" level="0"/>
-	<navit center="11.5666 48.1333" zoom="256" tracking="1" orientation="-1" recent_dest="250" drag_bitmap="0" imperial="1">
-		<vehicle name="Local GPS" enabled="yes" active="1" source="gpsd://localhost" gpsd_query="w+xj">
-		</vehicle>
-		<tracking cdf_histsize="0"/>
-		<mapset enabled="yes">
-			<xi:include href="$NAVIT_SHAREDIR/maps/*.xml"/>
-		</mapset>
-	</navit>
+<config>
+        <debug name="global" dbg_level="error"/>
+        <navit imperial="0">
+                <vehicle name="Local GPS" enabled="yes" active="1" source="gpsd://localhost" gpsd_query="w+xj"/>
+                <tracking />
+                <mapset enabled="yes">
+                        <maps type="binfile" data="$NAVIT_SHAREDIR/maps/*.bin" />
+                </mapset>
+        </navit>
 </config>
