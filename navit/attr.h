@@ -193,8 +193,6 @@ struct attr {
 		struct cursor *cursor;
 		struct displaylist *displaylist;
 		struct transformation *transformation;
-		struct vehicleprofile *vehicleprofile;
-		struct roadprofile *roadprofile;
 		struct bookmarks *bookmarks;
 		struct config *config;
 		struct osd *osd;

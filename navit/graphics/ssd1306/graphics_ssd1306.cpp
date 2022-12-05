@@ -37,8 +37,6 @@ extern "C" {
 #include "vehicle.h"
 #include "transform.h"
 #include "track.h"
-#include "vehicleprofile.h"
-#include "roadprofile.h"
 }
 #include <sys/sysinfo.h>
 #include "ArduiPi_OLED_lib.h"

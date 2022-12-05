@@ -39,7 +39,6 @@
 #include "track.h"
 #include "vehicle.h"
 #include "point.h"
-#include "vehicleprofile.h"
 #include "callback.h"
 #include "config_.h"
 
@@ -213,11 +212,11 @@ object_func_lookup(enum attr_type type)
 	case attr_navit:
 		return &navit_func;
 	case attr_profile_option:
-		return &profile_option_func;
+		return NULL;
 	case attr_roadprofile:
-		return &roadprofile_func;
+		return NULL;
 	case attr_route:
-		return &route_func;
+		return NULL;
 	case attr_osd:
 		return NULL;
 	case attr_trackingo:
@@ -227,7 +226,7 @@ object_func_lookup(enum attr_type type)
 	case attr_vehicle:
 		return &vehicle_func;
 	case attr_vehicleprofile:
-		return &vehicleprofile_func;
+		return NULL;
 	default:
 		for (i = 0 ; i < sizeof(object_funcs)/sizeof(struct object_func); i++) {
 			if (object_funcs[i].type == type)
@@ -321,16 +320,6 @@ static void initStatic(void) {
 	elements[i].func=NULL;
 	elements[i].type=attr_vehicle;
 
-	elements[++i].name="vehicleprofile";
-	elements[i].parent="navit";
-	elements[i].func=NULL;
-	elements[i].type=attr_vehicleprofile;
-
-	elements[++i].name="roadprofile";
-	elements[i].parent="vehicleprofile";
-	elements[i].func=NULL;
-	elements[i].type=attr_roadprofile;
-
 	elements[++i].name="plugins";
 	elements[i].parent="config";
 	elements[i].func=NULL;
@@ -345,16 +334,6 @@ static void initStatic(void) {
 	elements[i].parent="mapset";
 	elements[i].func=NULL;
 	elements[i].type=attr_maps;
-
-	elements[++i].name="profile_option";
-	elements[i].parent="vehicleprofile";
-	elements[i].func=NULL;
-	elements[i].type=attr_profile_option;
-
-	elements[++i].name="roadprofile";
-	elements[i].parent="profile_option";
-	elements[i].func=NULL;
-	elements[i].type=attr_roadprofile;
 }
 
 /**

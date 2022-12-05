@@ -57,16 +57,12 @@ sources = [
 	'navit/navit_nls.c',
 	'navit/param.c',
 	'navit/plugin.c',
-	'navit/profile_option.c',
 	'navit/projection.c',
-	'navit/roadprofile.c',
-	'navit/route.c',
 	'navit/start_real.c',
 	'navit/track.c',
 	'navit/transform.c',
 	'navit/util.c',
 	'navit/vehicle.c',
-	'navit/vehicleprofile.c',
 	'navit/xmlconfig.c',
 ]
 

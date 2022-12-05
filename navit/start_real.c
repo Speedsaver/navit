@@ -81,7 +81,6 @@ int main_real(int argc, char * const* argv)
 	}
 	file_init();
 	builtin_init();
-	route_init();
 	tracking_init();
 	linguistics_init();
 	geom_init();

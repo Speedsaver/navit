@@ -51,9 +51,6 @@ Core code:
 - navit/event.c - Event loop interface
 - navit/event_glib.c - Event loop Glib implementation
 - navit/track.c - Vehicle tracking information
-- navit/roadprofile.c - Road profiles
-- navit/vehicleprofile.c - Vehicle profiles
-- navit/profile_option.c - Options for vehicle profiles
 - navit/vehicle.c - Vehicles
 - navit/item_def.h - List of all map item types and flags
 - navit/item.c - Map items

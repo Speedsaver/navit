@@ -28,14 +28,11 @@
 #include "debug.h"
 #include "transform.h"
 #include "coord.h"
-#include "route.h"
 #include "projection.h"
 #include "map.h"
 #include "mapset.h"
 #include "plugin.h"
-#include "vehicleprofile.h"
 #include "vehicle.h"
-#include "roadprofile.h"
 #include "util.h"
 #include "callback.h"
 
@@ -47,6 +44,131 @@ struct tracking_line
 	struct tracking_line *next;
 	int angle[0];
 };
+
+/**
+ * @brief Information about a street
+ *
+ * This contains information about a certain street
+ */
+struct street_data {
+	struct item item;	/**< The map item for this street */
+	int count;			/**< Number of coordinates this street has */
+	int flags;
+	int maxspeed;		/**< Maximum speed allowed on this street. */
+	struct coord c[0];	/**< Pointer to the coordinates of this street.
+						 *   DO NOT INSERT FIELDS AFTER THIS. */
+};
+
+/**
+ * @brief Gets street data for an item
+ *
+ * @param item The item to get the data for
+ * @return Street data for the item
+ */
+struct street_data *
+street_get_data (struct item *item)
+{
+	int count=0,*flags;
+	struct street_data *ret = NULL, *ret1;
+	struct attr flags_attr, maxspeed_attr;
+	const int step = 128;
+	int c;
+
+	do {
+		ret1=g_realloc(ret, sizeof(struct street_data)+(count+step)*sizeof(struct coord));
+		if (!ret1) {
+			if (ret)
+				g_free(ret);
+			return NULL;
+		}
+		ret = ret1;
+		c = item_coord_get(item, &ret->c[count], step);
+		count += c;
+	} while (c && c == step);
+
+	ret1=g_realloc(ret, sizeof(struct street_data)+count*sizeof(struct coord));
+	if (ret1)
+		ret = ret1;
+	ret->item=*item;
+	ret->count=count;
+	if (item_attr_get(item, attr_flags, &flags_attr)) 
+		ret->flags=flags_attr.u.num;
+	else {
+		flags=item_get_default_flags(item->type);
+		if (flags)
+			ret->flags=*flags;
+		else
+			ret->flags=0;
+	}
+
+	ret->maxspeed = -1;
+	if (ret->flags & AF_SPEED_LIMIT) {
+		if (item_attr_get(item, attr_maxspeed, &maxspeed_attr)) {
+			ret->maxspeed = maxspeed_attr.u.num;
+		}
+	}
+
+	return ret;
+}
+
+/**
+ * @brief Frees street data
+ *
+ * @param sd Street data to be freed
+ */
+void
+street_data_free(struct street_data *sd)
+{
+	g_free(sd);
+}
+
+
+/**
+ * @brief Returns a single map selection
+ */
+struct map_selection *
+route_rect(int order, struct coord *c1, struct coord *c2, int rel, int abs)
+{
+	int dx,dy,sx=1,sy=1,d,m;
+	struct map_selection *sel=g_new(struct map_selection, 1);
+	if (!sel) {
+		printf("%s:Out of memory\n", __FUNCTION__);
+		return sel;
+	}
+	sel->order=order;
+	sel->range.min=route_item_first;
+	sel->range.max=route_item_last;
+	dbg(lvl_debug,"%p %p\n", c1, c2);
+	dx=c1->x-c2->x;
+	dy=c1->y-c2->y;
+	if (dx < 0) {
+		sx=-1;
+		sel->u.c_rect.lu.x=c1->x;
+		sel->u.c_rect.rl.x=c2->x;
+	} else {
+		sel->u.c_rect.lu.x=c2->x;
+		sel->u.c_rect.rl.x=c1->x;
+	}
+	if (dy < 0) {
+		sy=-1;
+		sel->u.c_rect.lu.y=c2->y;
+		sel->u.c_rect.rl.y=c1->y;
+	} else {
+		sel->u.c_rect.lu.y=c1->y;
+		sel->u.c_rect.rl.y=c2->y;
+	}
+	if (dx*sx > dy*sy) 
+		d=dx*sx;
+	else
+		d=dy*sy;
+	m=d*rel/100+abs;
+	sel->u.c_rect.lu.x-=m;
+	sel->u.c_rect.rl.x+=m;
+	sel->u.c_rect.lu.y+=m;
+	sel->u.c_rect.rl.y-=m;
+	sel->next=NULL;
+	return sel;
+}
 
 
 /**
@@ -88,7 +210,6 @@ struct tracking {
 	struct route *rt;
 	struct map *map;
 	struct vehicle *vehicle;
-	struct vehicleprofile *vehicleprofile;
 	struct coord last_updated;
 	struct tracking_line *lines;
 	struct tracking_line *curr_line;
@@ -393,12 +514,6 @@ static int
 tracking_angle_delta(struct tracking *tr, int vehicle_angle, int street_angle, int flags)
 {
 	int full=180,ret=360,fwd=0,rev=0;
-	struct vehicleprofile *profile=tr->vehicleprofile;
-	
-	if (profile) {
-	    fwd=((flags & profile->flags_forward_mask) == profile->flags);
-	    rev=((flags & profile->flags_reverse_mask) == profile->flags);
-	}
 	if (fwd || rev) {
 		if (!fwd || !rev) {
 			full=360;
@@ -435,11 +550,7 @@ tracking_is_no_stop(struct tracking *tr, struct coord *c1, struct coord *c2)
 static int
 tracking_is_on_route(struct tracking *tr, struct route *rt, struct item *item)
 {
-	if (! rt)
-		return 0;
-	if (route_contains(rt, item))
-		return 0;
-	return tr->route_pref;
+	return 0;
 }
 
 static int
@@ -472,11 +583,6 @@ tracking_value(struct tracking *tr, struct tracking_line *t, int offset, struct 
 		return value;
 	if ((flags & 16) && tr->route_pref)
 		value += tracking_is_on_route(tr, tr->rt, &sd->item);
-	if ((flags & 32) && tr->overspeed_percent_pref && tr->overspeed_pref ) {
-		struct roadprofile *roadprofile=g_hash_table_lookup(tr->vehicleprofile->roadprofile_hash, (void *)t->street->item.type);
-		if (roadprofile && tr->speed > roadprofile->speed * tr->overspeed_percent_pref/ 100)
-			value += tr->overspeed_pref;
-	}
 	if ((flags & 64) && !!(sd->flags & AF_UNDERGROUND) != tr->no_gps) 
 		value+=200;
 	return value;
@@ -488,11 +594,10 @@ tracking_value(struct tracking *tr, struct tracking_line *t, int offset, struct 
  *
  * @param tr The {@code struct tracking} which will receive the position update
  * @param v The vehicle whose position has changed
- * @param vehicleprofile The vehicle profile to use
  * @param pro The projection to use for transformations
  */
 void
-tracking_update(struct tracking *tr, struct vehicle *v, struct vehicleprofile *vehicleprofile, enum projection pro)
+tracking_update(struct tracking *tr, struct vehicle *v, enum projection pro)
 {
 	struct tracking_line *t;
 	int i,value,min,time;
@@ -502,8 +607,6 @@ tracking_update(struct tracking *tr, struct vehicle *v, struct vehicleprofile *v
 	double speed, direction;
 	if (v)
 		tr->vehicle=v;
-	if (vehicleprofile)
-		tr->vehicleprofile=vehicleprofile;
 
 	if (! tr->vehicle)
 		return;
@@ -534,11 +637,8 @@ tracking_update(struct tracking *tr, struct vehicle *v, struct vehicleprofile *v
 		} else
 			tr->no_gps=1;
 	}
-	if (!vehicleprofile_get_attr(vehicleprofile,attr_static_speed,&static_speed,NULL) || !vehicleprofile_get_attr(vehicleprofile,attr_static_distance,&static_distance,NULL)) {
-		static_speed.u.num=3;
-		static_distance.u.num=10;
-		dbg(lvl_debug,"Using defaults for static position detection\n");
-	}
+	static_speed.u.num=3;
+	static_distance.u.num=10;
 	dbg(lvl_info,"Static speed: %ld, static distance: %ld\n",static_speed.u.num, static_distance.u.num);
 	time=iso8601_to_secs(time_attr.u.str);
 	speed=*speed_attr.u.numd;

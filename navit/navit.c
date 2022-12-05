@@ -48,8 +48,6 @@
 #include "navit_nls.h"
 #include "map.h"
 #include "util.h"
-#include "route.h"
-#include "vehicleprofile.h"
 
 /* define string for bookmark handling */
 #define TEXTFILE_COMMENT_NAVI_STOPPED "# navigation stopped\n"
@@ -62,7 +60,6 @@
  * - a set of maps
  * - one or more vehicles
  * - a graphics object for rendering the map
- * - a route object
  * - a navigation object
  * @{
  */
@@ -89,7 +86,6 @@ struct navit {
 	struct action *action;
 	struct transformation *trans, *trans_cursor;
 	struct compass *compass;
-	struct route *route;
 	struct navigation *navigation;
 	struct speech *speech;
 	struct tracking *tracking;
@@ -104,7 +100,7 @@ struct navit {
 	GList *windows_items;
 	struct navit_vehicle *vehicle;
 	struct callback_list *attr_cbl;
-	struct callback *nav_speech_cb, *roadbook_callback, *popup_callback, *route_cb, *progress_cb;
+	struct callback *nav_speech_cb, *roadbook_callback, *popup_callback, *progress_cb;
 	struct datawindow *roadbook_window;
 	struct map *former_destination;
 	struct point pressed, last, current;
@@ -129,8 +125,6 @@ struct navit {
 	int drag_bitmap;
 	int use_mousewheel;
 	struct callback *resize_callback,*button_callback,*motion_callback,*predraw_callback;
-	struct vehicleprofile *vehicleprofile;
-	GList *vehicleprofiles;
 	int pitch;
 	int follow_cursor;
 	int prevTs;
@@ -160,7 +154,6 @@ static int navit_add_vehicle(struct navit *this_, struct vehicle *v);
 static int navit_set_attr_do(struct navit *this_, struct attr *attr, int init);
 static int navit_get_cursor_pnt(struct navit *this_, struct point *p, int keep_orientation, int *dir);
 static void navit_set_vehicle(struct navit *this_, struct navit_vehicle *nv);
-static int navit_set_vehicleprofile(struct navit *this_, struct vehicleprofile *vp);
 struct object_func navit_func;
 
 struct navit *global_navit;
@@ -349,18 +342,6 @@ navit_new(struct attr *parent, struct attr **attrs)
 	return this_;
 }
 
-struct vehicleprofile *
-navit_get_vehicleprofile(struct navit *this_)
-{
-	return this_->vehicleprofile;
-}
-
-GList *
-navit_get_vehicleprofiles(struct navit *this_)
-{
-	return this_->vehicleprofiles;
-}
-
 static void
 navit_projection_set(struct navit *this_, enum projection pro, int draw)
 {
@@ -389,29 +370,8 @@ navit_init(struct navit *this_)
 	if (this_->mapsets) {
 		struct mapset_handle *msh;
 		ms=this_->mapsets->data;
-		if (this_->route) {
-			if ((map=route_get_map(this_->route))) {
-				struct attr map_a;
-				map_a.type=attr_map;
-				map_a.u.map=map;
-				mapset_add_attr(ms, &map_a);
-			}
-			if ((map=route_get_graph_map(this_->route))) {
-				struct attr map_a,active;
-				map_a.type=attr_map;
-				map_a.u.map=map;
-				active.type=attr_active;
-				active.u.num=0;
-				mapset_add_attr(ms, &map_a);
-				map_set_attr(map, &active);
-			}
-			route_set_mapset(this_->route, ms);
-			route_set_projection(this_->route, transform_get_projection(this_->trans));
-		}
 		if (this_->tracking) {
 			tracking_set_mapset(this_->tracking, ms);
-			if (this_->route)
-				tracking_set_route(this_->tracking, this_->route);
 		}
 		if (this_->tracking) {
 			if ((map=tracking_get_map(this_->tracking))) {
@@ -581,7 +541,6 @@ navit_set_attr_do(struct navit *this_, struct attr *attr, int init)
 		}
 		break;
 	case attr_vehicleprofile:
-		attr_updated=navit_set_vehicleprofile(this_, attr->u.vehicleprofile);
 		break;
 	case attr_zoom:
 		zoom=transform_get_scale(this_->trans);
@@ -719,7 +678,6 @@ navit_get_attr(struct navit *this_, enum attr_type type, struct attr *attr, stru
 		}
 		break;
 	case attr_route:
-		attr->u.route=this_->route;
 		break;
 	case attr_speech:
                 if(this_->speech) {
@@ -759,18 +717,6 @@ navit_get_attr(struct navit *this_, enum attr_type type, struct attr *attr, stru
 		}
 		break;
 	case attr_vehicleprofile:
-		if (iter) {
-			if(iter->u.list) {
-				iter->u.list=g_list_next(iter->u.list);
-			} else { 
-				iter->u.list=this_->vehicleprofiles;
-			}
-			if(!iter->u.list)
-				return 0;
-			attr->u.vehicleprofile=iter->u.list->data;
-		} else {
-			attr->u.vehicleprofile=this_->vehicleprofile;
-		}
 		break;
 	case attr_zoom:
 		attr->u.num=transform_get_scale(this_->trans);
@@ -809,7 +755,6 @@ navit_add_attr(struct navit *this_, struct attr *attr)
 	case attr_layout:
 		break;
 	case attr_route:
-		this_->route=attr->u.route;
 		break;
 	case attr_mapset:
 		this_->mapsets = g_list_append(this_->mapsets, attr->u.mapset);
@@ -832,7 +777,6 @@ navit_add_attr(struct navit *this_, struct attr *attr)
 		ret=navit_add_vehicle(this_, attr->u.vehicle);
 		break;
 	case attr_vehicleprofile:
-		this_->vehicleprofiles=g_list_append(this_->vehicleprofiles, attr->u.vehicleprofile);
 		break;
 	case attr_autozoom_min:
 		this_->autozoom_min = attr->u.num;
@@ -911,7 +855,6 @@ coord_not_set(struct coord c){
  * <li>Triggering an update of the vehicle's position on the map and, if needed, an update of the
  * visible map area ad orientation</li>
  * <li>Logging a new track point, if enabled</li>
- * <li>Updating the position on the route</li>
  * <li>Stopping navigation if the destination has been reached</li>
  * </ul>
  *
@@ -935,7 +878,7 @@ navit_vehicle_update_position(struct navit *this_, struct navit_vehicle *nv) {
 	if (this_->vehicle == nv && this_->tracking_flag)
 		tracking=this_->tracking;
 	if (tracking) {
-		tracking_update(tracking, nv->vehicle, this_->vehicleprofile, pro);
+		tracking_update(tracking, nv->vehicle, pro);
 		attr_object=tracking;
 		get_attr=(int (*)(void *, enum attr_type, struct attr *, struct attr_iter *))tracking_get_attr;
 	} else {
@@ -956,12 +899,6 @@ navit_vehicle_update_position(struct navit *this_, struct navit_vehicle *nv) {
 	cursor_pc.x = nv->coord.x;
 	cursor_pc.y = nv->coord.y;
 	cursor_pc.pro = pro;
-	if (this_->route) {
-		if (tracking)
-			route_set_position_from_tracking(this_->route, tracking, pro);
-		else
-			route_set_position(this_->route, &cursor_pc);
-	}
 	callback_list_call_attr_0(this_->attr_cbl, attr_position);
 	if (this_->ready == 3) {
 		transform(this_->trans_cursor, pro, &nv->coord, &cursor_pnt, 1, 0, 0, NULL);
@@ -1016,39 +953,6 @@ navit_vehicle_update_status(struct navit *this_, struct navit_vehicle *nv, enum 
 void
 navit_set_position(struct navit *this_, struct pcoord *c)
 {
-	if (this_->route) {
-		route_set_position(this_->route, c);
-		callback_list_call_attr_0(this_->attr_cbl, attr_position);
-	}
-}
-
-static int
-navit_set_vehicleprofile(struct navit *this_, struct vehicleprofile *vp)
-{
-	if (this_->vehicleprofile == vp)
-		return 0;
-	this_->vehicleprofile=vp;
-	if (this_->route)
-		route_set_profile(this_->route, this_->vehicleprofile);
-	return 1;
-}
-
-int
-navit_set_vehicleprofile_name(struct navit *this_, char *name)
-{
-	struct attr attr;
-	GList *l;
-	l=this_->vehicleprofiles;
-	while (l) {
-		if (vehicleprofile_get_attr(l->data, attr_name, &attr, NULL)) {
-			if (!strcmp(attr.u.str, name)) {
-				navit_set_vehicleprofile(this_, l->data);
-				return 1;
-			}
-		}
-		l=g_list_next(l);
-	}
-	return 0;
 }
 
 static void
@@ -1056,27 +960,6 @@ navit_set_vehicle(struct navit *this_, struct navit_vehicle *nv)
 {
 	struct attr attr;
 	this_->vehicle=nv;
-	if (nv && vehicle_get_attr(nv->vehicle, attr_profilename, &attr, NULL)) {
-		if (navit_set_vehicleprofile_name(this_, attr.u.str))
-			return;
-	}
-	if (!this_->vehicleprofile) { // When deactivating vehicle, keep the last profile if any
-		if (!navit_set_vehicleprofile_name(this_,"car")) {
-			/* We do not have a fallback "car" profile
-			* so lets set any profile */
-			GList *l;
-			l=this_->vehicleprofiles;
-			if (l) {
-		    		this_->vehicleprofile=l->data;
-		    		if (this_->route)
-				route_set_profile(this_->route, this_->vehicleprofile);
-			}
-		}
-	}
-	else {
-		if (this_->route)
-			route_set_profile(this_->route, this_->vehicleprofile);
-	}
 }
 
 /**
@@ -1125,12 +1008,6 @@ navit_get_trans(struct navit *this_)
 	return this_->trans;
 }
 
-struct route *
-navit_get_route(struct navit *this_)
-{
-	return this_->route;
-}
-
 int 
 navit_set_vehicle_by_name(struct navit *n,const char *name) 
 {
@@ -1169,10 +1046,6 @@ navit_destroy(struct navit *this_)
 	callback_destroy(this_->resize_callback);
 	callback_destroy(this_->motion_callback);
 	callback_destroy(this_->predraw_callback);
-
-        callback_destroy(this_->route_cb);
-	if (this_->route)
-		route_destroy(this_->route);
 
         map_destroy(this_->former_destination);
 

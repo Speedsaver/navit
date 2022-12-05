@@ -11,26 +11,9 @@
 	<debug name="segv" level="1"/>
 	<debug name="timestamps" level="0"/>
 	<navit center="11.5666 48.1333" zoom="256" tracking="1" orientation="-1" recent_dest="250" drag_bitmap="0" imperial="1">
-		<vehicle name="Local GPS" profilename="car" enabled="yes" active="1" source="gpsd://localhost" gpsd_query="w+xj">
+		<vehicle name="Local GPS" enabled="yes" active="1" source="gpsd://localhost" gpsd_query="w+xj">
 		</vehicle>
 		<tracking cdf_histsize="0"/>
-		<vehicleprofile name="car" route_depth="4:25%,8:40000,18:10000" flags="0x4000000" flags_forward_mask="0x4040002" flags_reverse_mask="0x4040001" maxspeed_handling="0" route_mode="0" static_speed="5" static_distance="25">
-			<roadprofile item_types="street_0,street_1_city,living_street,street_service,track_gravelled,track_unpaved,street_parking_lane" speed="10" route_weight="10" />
-			<roadprofile item_types="street_2_city,track_paved" speed="30" route_weight="30" />
-			<roadprofile item_types="street_3_city" speed="40" route_weight="40" />
-			<roadprofile item_types="street_4_city" speed="50" route_weight="50" />
-			<roadprofile item_types="highway_city" speed="80" route_weight="80" />
-			<roadprofile item_types="street_1_land" speed="60" route_weight="60" />
-			<roadprofile item_types="street_2_land" speed="65" route_weight="65" />
-			<roadprofile item_types="street_3_land" speed="70" route_weight="70" />
-			<roadprofile item_types="street_4_land" speed="80" route_weight="80" />
-			<roadprofile item_types="street_n_lanes" speed="120" route_weight="120" />
-			<roadprofile item_types="highway_land" speed="120" route_weight="120" />
-			<roadprofile item_types="ramp" speed="40" route_weight="40" />
-			<!--roundabout does not apply to OSMaps -->
-			<roadprofile item_types="roundabout" speed="10" route_weight="10"/>
-			<roadprofile item_types="ferry" speed="40" route_weight="40"/>
-		</vehicleprofile>
 		<mapset enabled="yes">
 			<xi:include href="$NAVIT_SHAREDIR/maps/*.xml"/>
 		</mapset>

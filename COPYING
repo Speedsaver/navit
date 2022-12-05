@@ -7,7 +7,6 @@ navit/country.c
 navit/track.c
 navit/util.c
 navit/debug.c
-navit/route.c
 navit/param.c
 navit/attr.c
 navit/transform.c
@@ -36,7 +35,6 @@ navit/item_def.h
 navit/util.h
 navit/debug.h
 navit/point.h
-navit/route.h
 navit/param.h
 navit/zipfile.h
 navit/attr.h

@@ -32,7 +32,6 @@ struct mapset;
 struct route;
 struct tracking;
 struct vehicle;
-struct vehicleprofile;
 int tracking_get_angle(struct tracking *tr);
 struct coord *tracking_get_pos(struct tracking *tr);
 int tracking_get_street_direction(struct tracking *tr);
@@ -41,7 +40,6 @@ int tracking_get_attr(struct tracking *_this, enum attr_type type, struct attr *
 struct item *tracking_get_current_item(struct tracking *_this);
 int *tracking_get_current_flags(struct tracking *_this);
 void tracking_flush(struct tracking *tr);
-void tracking_update(struct tracking *tr, struct vehicle *v, struct vehicleprofile *vehicleprofile, enum projection pro);
 int tracking_set_attr(struct tracking *tr, struct attr *attr);
 struct tracking *tracking_new(struct attr *parent, struct attr **attrs);
 void tracking_set_mapset(struct tracking *this_, struct mapset *ms);
