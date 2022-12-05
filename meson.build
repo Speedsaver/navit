@@ -43,7 +43,6 @@ sources = [
 	'navit/debug.c',
 	'navit/event.c',
 	'navit/event_glib.c',
-	'navit/fib-1.1/fib.c',
 	'navit/file.c',
 	'navit/geom.c',
 	'navit/item.c',

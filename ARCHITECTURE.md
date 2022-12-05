@@ -17,10 +17,6 @@ Development:
 - .gitignore - List of files to ignore in Git
 - navit/Doxyfile - Doxygen configuration
 
-Third party dependencies:
-
-- navit/fib-1.1/* - Fibonacci heap
-
 Utility code:
 
 - navit/navit_nls.c - Stub code, formerly translated strings
