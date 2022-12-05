@@ -1,6 +1,6 @@
 <config>
         <debug name="global" dbg_level="error"/>
-        <navit imperial="0">
+        <navit imperial="1">
                 <vehicle name="Local GPS" enabled="yes" active="1" source="gpsd://localhost" gpsd_query="w+xj"/>
                 <tracking />
                 <mapset enabled="yes">
