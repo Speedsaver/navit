@@ -4,8 +4,6 @@
 	Do not edit /usr/share/navit/navit.xml or /etc/navit/navit.xml :
 	changes would be lost on upgrade. Rather copy it to ~/.navit/.
 -->
-<!DOCTYPE config
-  SYSTEM "navit.dtd">
 <config xmlns:xi="http://www.w3.org/2001/XInclude">
 	<debug name="global" dbg_level="error"/>
 	<debug name="segv" level="1"/>

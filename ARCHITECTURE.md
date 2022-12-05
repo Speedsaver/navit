@@ -42,7 +42,6 @@ Core code:
 - navit/attr.c - Attributes
 - navit/callback.c - Callbacks
 - navit/xmlconfig.c - Object configuration and creation
-- navit/navit.dtd - Navit XML doctype
 - navit/navit_shipped.xml - Navit XML configuration
 - navit/event.c - Event loop interface
 - navit/event_glib.c - Event loop Glib implementation
