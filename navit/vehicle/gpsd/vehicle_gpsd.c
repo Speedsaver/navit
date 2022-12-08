@@ -57,7 +57,7 @@ static struct vehicle_priv {
 	char fixiso8601[128];
 } *vehicle_last;
 
-#define DEFAULT_RETRY_INTERVAL 10 // seconds
+#define DEFAULT_RETRY_INTERVAL 5 // seconds
 #define MIN_RETRY_INTERVAL 1 // seconds
 
 static void vehicle_gpsd_io(struct vehicle_priv *priv);
