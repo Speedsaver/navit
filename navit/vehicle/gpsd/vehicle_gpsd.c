@@ -210,6 +210,7 @@ static int vehicle_gpsd_try_open(struct vehicle_priv *priv) {
  * Open a connection to gpsd. Will re-try the connection if it fails
  */
 static void vehicle_gpsd_open(struct vehicle_priv *priv) {
+    priv->gps = g_new0(struct gps_data_t, 1);
     priv->cbt = callback_new_1(callback_cast(vehicle_gpsd_try_open), priv);
     priv->retry_timer2=event_add_timeout(priv->retry_interval*1000, 1, priv->cbt);
     vehicle_gpsd_try_open(priv);
@@ -362,7 +363,6 @@ static struct vehicle_priv *vehicle_gpsd_new_gpsd(struct vehicle_methods
     dbg(lvl_debug, "enter\n");
     source = attr_search(attrs, NULL, attr_source);
     ret = g_new0(struct vehicle_priv, 1);
-    ret->gps = g_new0(struct gps_data_t, 1);
     ret->source = g_strdup(source->u.str);
     query = attr_search(attrs, NULL, attr_gpsd_query);
     if (query) {
