@@ -113,7 +113,6 @@ get_signal_strength(const struct attr &attr)
 	struct attr position_fix_attr;
 	if (vehicle_get_attr(attr.u.vehicle, attr_position_fix_type, &position_fix_attr, NULL)) {
 		switch (position_fix_attr.u.num) {
-		case 1:
 		case 2:
 			strength = 2;
 			if (vehicle_get_attr(attr.u.vehicle, attr_position_sats_used, &position_fix_attr, NULL)) {

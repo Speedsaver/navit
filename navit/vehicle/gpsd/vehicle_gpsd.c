@@ -196,7 +196,6 @@ static int vehicle_gpsd_try_open(struct vehicle_priv *priv) {
         gps_stream(priv->gps, WATCH_ENABLE|WATCH_JSON, NULL);
 
     priv->cb = callback_new_1(callback_cast(vehicle_gpsd_io), priv);
-    priv->cbt = callback_new_1(callback_cast(vehicle_gpsd_try_open), priv);
     priv->evwatch = event_add_watch(priv->gps->gps_fd, event_watch_cond_read, priv->cb);
     if (!priv->gps->gps_fd) {
         dbg(lvl_error,"Warning: gps_fd is 0, most likely you have used a gps.h incompatible to libgps\n");
@@ -211,9 +210,9 @@ static int vehicle_gpsd_try_open(struct vehicle_priv *priv) {
  * Open a connection to gpsd. Will re-try the connection if it fails
  */
 static void vehicle_gpsd_open(struct vehicle_priv *priv) {
-    priv->retry_timer2=NULL;
-    if (vehicle_gpsd_try_open(priv))
-        priv->retry_timer2=event_add_timeout(priv->retry_interval*1000, 1, priv->cbt);
+    priv->cbt = callback_new_1(callback_cast(vehicle_gpsd_try_open), priv);
+    priv->retry_timer2=event_add_timeout(priv->retry_interval*1000, 1, priv->cbt);
+    vehicle_gpsd_try_open(priv);
 }
 
 static void vehicle_gpsd_close(struct vehicle_priv *priv) {
