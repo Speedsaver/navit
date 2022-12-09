@@ -261,7 +261,7 @@ graphics_ssd1306_idle(void *data)
 			update_delta = abs(time(NULL) - attr3.u.num);
 		}
 
-		if (ggf || update_delta < 5) {
+		if (ggf || update_delta < 2) {
 			latlong_pos current_pos = { 0, 0 };
 			double speed = get_vehicle_speed(ssd1306, attr, current_pos);
 			double routespeed = get_route_speed(ssd1306);
