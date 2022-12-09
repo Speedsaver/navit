@@ -23,6 +23,7 @@
 #include <string.h>
 #include <glib.h>
 #include <math.h>
+#include <time.h>
 #include "debug.h"
 #include "callback.h"
 #include "plugin.h"
@@ -47,6 +48,7 @@ static struct vehicle_priv {
 	int status;
 	int fix_type;
 	time_t fix_time;
+	time_t update_time;
 	int sats;
 	int sats_signal;
 	int sats_used;
@@ -163,6 +165,7 @@ vehicle_gpsd_callback(struct gps_data_t *data, const char *buf, size_t len)
     if (! isnan(data->fix.speed) && priv->fix_type > 0) {
         callback_list_call_attr_0(priv->cbl, attr_position_coord_geo);
     }
+    priv->update_time = time(0);
     dbg(lvl_info,"speed ok\n");
 }
 
@@ -334,6 +337,9 @@ static int vehicle_gpsd_position_attr_get(struct vehicle_priv *priv,
             return 0;
     }
     break;
+    case attr_position_last_update:
+        attr->u.num = priv->update_time;
+        break;
     case attr_active:
         active = attr_search(priv->attrs,NULL,attr_active);
         if(active != NULL) {

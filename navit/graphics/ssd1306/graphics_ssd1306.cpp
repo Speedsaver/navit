@@ -39,6 +39,7 @@ extern "C" {
 #include "track.h"
 }
 #include <sys/sysinfo.h>
+#include <time.h>
 #include "ArduiPi_OLED_lib.h"
 #include "Adafruit_GFX.h"
 #include "ArduiPi_OLED.h"
@@ -104,37 +105,6 @@ get_uptime()
 		printf("code error = %d\n", error);
 	}
 	return s_info.uptime;
-}
-
-static int
-get_signal_strength(const struct attr &attr)
-{
-	int strength = -1;
-	struct attr position_fix_attr;
-	if (vehicle_get_attr(attr.u.vehicle, attr_position_fix_type, &position_fix_attr, NULL)) {
-		switch (position_fix_attr.u.num) {
-		case 2:
-			strength = 2;
-			if (vehicle_get_attr(attr.u.vehicle, attr_position_sats_used, &position_fix_attr, NULL)) {
-				if (position_fix_attr.u.num >= 3)
-					strength = position_fix_attr.u.num - 1;
-				if (strength > 5)
-					strength = 5;
-				if (strength > 3) {
-					if (vehicle_get_attr(attr.u.vehicle, attr_position_hdop, &position_fix_attr, NULL)) {
-						if (*position_fix_attr.u.numd > 2.0 && strength > 4)
-							strength = 4;
-						if (*position_fix_attr.u.numd > 4.0 && strength > 3)
-							strength = 3;
-					}
-				}
-			}
-			break;
-		default:
-			strength = -1;
-		}
-	}
-	return strength;
 }
 
 static double
@@ -279,14 +249,19 @@ graphics_ssd1306_idle(void *data)
 	display.setTextColor(WHITE);
 	display.setCursor(0, 0);
 
-	struct attr attr, attr2;
+	struct attr attr, attr2, attr3;
 	struct attr_iter *iter = navit_attr_iter_new();
 	if (navit_get_attr(ssd1306->nav, attr_vehicle, &attr, iter) &&
 	   !navit_get_attr(ssd1306->nav, attr_vehicle, &attr2, iter)) {
 		navit_attr_iter_destroy(iter);
 
-		int strength = get_signal_strength(attr);
-		if (ggf || strength > -1) {
+		int update_delta = 10;
+
+		if (vehicle_get_attr(attr.u.vehicle, attr_position_last_update, &attr3, NULL)) {
+			update_delta = abs(time(NULL) - attr3.u.num);
+		}
+
+		if (ggf || update_delta < 5) {
 			latlong_pos current_pos = { 0, 0 };
 			double speed = get_vehicle_speed(ssd1306, attr, current_pos);
 			double routespeed = get_route_speed(ssd1306);
