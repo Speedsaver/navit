@@ -4,7 +4,7 @@ This is the core Speedsaver code. Derived from Navit, the open source satnav sof
 
 # Building #
 
-Install meson, ninja-build and libglib2.0-dev using your favorite package manager. Then run:
+Install meson, cmake, libgps-dev, ninja-build and libglib2.0-dev using your favorite package manager. Then run:
 
 ```
 git clone https://github.com/Speedsaver/navit
