@@ -353,12 +353,24 @@ extern "C" void graphics_new(struct navit *nav)
 	generate_init_animations(init_animation,init_animation_count);
 	generate_qr_bm(qr_logo);
 
-	if (!display.init(OLED_I2C_RESET, 2))
+	if (!display.init(OLED_I2C_RESET, OLED_ADAFRUIT_I2C_128x32))
 		exit(-1);
 
 	display.begin();
 	display.clearDisplay();
 	display.display();
+
+	// Hackery for lctechF1C200s, which sometimes fail to show
+	// the display at start of day.  Restarting navit has generally
+	// proved to be a reliable way of getting the display back.
+	// So we simulate that by closing the display and re-opening it.
+	display.close();
+	sleep(1);
+	(void)display.init(OLED_I2C_RESET, OLED_ADAFRUIT_I2C_128x32);
+	display.begin();
+	display.clearDisplay();
+	display.display();
+	// End of hack
 
 	this_->nav = nav;
 	this_->last_draw_time = get_uptime();
